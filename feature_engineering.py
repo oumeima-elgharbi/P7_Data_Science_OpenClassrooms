@@ -319,11 +319,9 @@ def generate_dataset(input_path, output_path, debug=False):
     df.to_csv(output_path, index=False)  # , index=False
 
 
-
 def load_model(model_file):
     model = joblib.load(model_file)
     return model
-
 
 
 if __name__ == "__main__":
