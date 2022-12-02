@@ -27,6 +27,7 @@ import gc
 from time import time
 from contextlib import contextmanager
 import joblib
+from sklearn.preprocessing import OneHotEncoder
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -49,6 +50,29 @@ def one_hot_encoder(df, nan_as_category=True):  # TODO : refacto style P4 featur
     df = pd.get_dummies(df, columns=categorical_columns, dummy_na=nan_as_category)
     new_columns = [c for c in df.columns if c not in original_columns]
     return df, new_columns
+
+def one_hot_encoding(df):
+    # 0) creating instance of one-hot-encoder
+    one_hot_encoder = OneHotEncoder(handle_unknown='ignore', sparse=False) # if sparse=True (by default), we need to add .toarray() to encoded_categorical_data
+
+    # 1) Fit the encoder on the training set
+    categorical_columns = [col for col in df.columns if df[col].dtype == 'object']
+    encoded_categorical_data = one_hot_encoder.fit_transform(df[categorical_columns])
+
+    # 3) we make a list of the columns names
+    encoded_categorical_data_names = one_hot_encoder.get_feature_names_out().tolist()
+    print("We have indeed :", len(encoded_categorical_data_names), "labels after encoding the categorical variables.")
+
+    # 4) we recreate a dataframe with the column names and the numpy array
+    df_encoded = pd.DataFrame(columns=encoded_categorical_data_names,
+                              data=encoded_categorical_data,
+                              index=df.index)
+    # we remove NaN columns
+    l = [s for s in encoded_categorical_data_names if s.endswith("nan")]
+    df_encoded = df_encoded.drop(columns=l)
+    display(df_encoded.sort_index())
+
+    return df_encoded
 
 
 # Preprocess application_train.csv and application_test.csv
