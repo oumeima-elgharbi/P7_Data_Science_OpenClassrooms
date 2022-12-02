@@ -21,10 +21,11 @@ def main():
     MLFLOW_URI = 'http://127.0.0.1:5000/invocations'
     CORTEX_URI = 'http://0.0.0.0:8890/'
     RAY_SERVE_URI = 'http://127.0.0.1:8000/regressor'
+    FASTAPI_URI = 'http://127.0.0.1:8000/v1/give_loan/predict'
 
     api_choice = st.sidebar.selectbox(
         'Quelle API souhaitez vous utiliser',
-        ['MLflow', 'Cortex', 'Ray Serve'])
+        ['MLflow', 'Cortex', 'Ray Serve', 'FastAPI'])
 
     st.title('Median House Price Prediction')
 
