@@ -29,7 +29,7 @@ import time
 from contextlib import contextmanager
 from lightgbm import LGBMClassifier
 import lightgbm as lgb
-#from lightgbm import Booster
+# from lightgbm import Booster
 from sklearn.metrics import roc_auc_score, roc_curve
 from sklearn.model_selection import KFold, StratifiedKFold
 import matplotlib.pyplot as plt
@@ -40,6 +40,9 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import joblib
 
+global seed
+seed = 1001
+
 
 @contextmanager
 def timer(title):
@@ -49,7 +52,7 @@ def timer(title):
 
 
 # One-hot encoding for categorical columns with get_dummies
-def one_hot_encoder(df, nan_as_category=True):
+def one_hot_encoder(df, nan_as_category=True):  # TODO : refacto style P4 feature engineering
     original_columns = list(df.columns)
     categorical_columns = [col for col in df.columns if df[col].dtype == 'object']
     df = pd.get_dummies(df, columns=categorical_columns, dummy_na=nan_as_category)
@@ -58,12 +61,12 @@ def one_hot_encoder(df, nan_as_category=True):
 
 
 # Preprocess application_train.csv and application_test.csv
-def application_train_test(input_path, num_rows=None, nan_as_category=False):
+def application_train(input_path, num_rows=None, nan_as_category=False):
     # Read data and merge
     df = pd.read_csv(input_path + 'application_train.csv', nrows=num_rows)
-    test_df = pd.read_csv(input_path + 'application_test.csv', nrows=num_rows)
-    print("Train samples: {}, test samples: {}".format(len(df), len(test_df)))
-    df = df.append(test_df).reset_index()
+    # test_df = pd.read_csv(input_path + 'application_test.csv', nrows=num_rows)
+    print("Train samples: {}".format(len(df)))
+    # df = df.append(test_df).reset_index()
     # Optional: Remove 4 applications with XNA CODE_GENDER (train set)
     df = df[df['CODE_GENDER'] != 'XNA']
 
@@ -81,7 +84,7 @@ def application_train_test(input_path, num_rows=None, nan_as_category=False):
     df['INCOME_PER_PERSON'] = df['AMT_INCOME_TOTAL'] / df['CNT_FAM_MEMBERS']
     df['ANNUITY_INCOME_PERC'] = df['AMT_ANNUITY'] / df['AMT_INCOME_TOTAL']
     df['PAYMENT_RATE'] = df['AMT_ANNUITY'] / df['AMT_CREDIT']
-    del test_df
+    # del test_df
     gc.collect()
     return df
 
@@ -265,27 +268,29 @@ def credit_card_balance(input_path, num_rows=None, nan_as_category=True):
 
 # LightGBM GBDT with KFold or Stratified KFold
 # Parameters from Tilii kernel: https://www.kaggle.com/tilii7/olivier-lightgbm-parameters-by-bayesian-opt/code
-def kfold_lightgbm(df, num_folds, stratified=False, debug=False):
-    # Divide in training/validation and test data
-    train_df = df[df['TARGET'].notnull()]
-    test_df = df[df['TARGET'].isnull()]
-    print("Starting LightGBM. Train shape: {}, test shape: {}".format(train_df.shape, test_df.shape))
+def kfold_lightgbm(df, num_folds, stratified=False):
+    # Divide in training/validation set
+    train_df = df.copy()
+
+    print("Starting LightGBM. Train shape: {}".format(train_df.shape))
     del df
     gc.collect()
     # Cross validation model
     if stratified:
-        folds = StratifiedKFold(n_splits=num_folds, shuffle=True, random_state=1001)
+        folds = StratifiedKFold(n_splits=num_folds, shuffle=True, random_state=seed)
     else:
-        folds = KFold(n_splits=num_folds, shuffle=True, random_state=1001)
+        folds = KFold(n_splits=num_folds, shuffle=True, random_state=seed)
     # Create arrays and dataframes to store results
     oof_preds = np.zeros(train_df.shape[0])
-    sub_preds = np.zeros(test_df.shape[0])
+    # sub_preds = np.zeros(test_df.shape[0])
     feature_importance_df = pd.DataFrame()
     feats = [f for f in train_df.columns if f not in ['TARGET', 'SK_ID_CURR', 'SK_ID_BUREAU', 'SK_ID_PREV', 'index']]
 
     for n_fold, (train_idx, valid_idx) in enumerate(folds.split(train_df[feats], train_df['TARGET'])):
         i = 0
         print("Iteration : ", i, n_fold)
+        # train_idx = index of rows from the training set
+        # valid_idx = index of rows from the validation set
         train_x, train_y = train_df[feats].iloc[train_idx], train_df['TARGET'].iloc[train_idx]
         valid_x, valid_y = train_df[feats].iloc[valid_idx], train_df['TARGET'].iloc[valid_idx]
 
@@ -305,45 +310,45 @@ def kfold_lightgbm(df, num_folds, stratified=False, debug=False):
             silent=-1,
             verbose=-1, )
 
-        #print("HERE1", train_x.columns)
-        # print("HERE2", train_y.columns)
-
         train_x = train_x.rename(columns=lambda x: re.sub('[^A-Za-z0-9_]+', '', x))
         valid_x = valid_x.rename(columns=lambda x: re.sub('[^A-Za-z0-9_]+', '', x))
         # train_y = train_y.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
 
         print("Saving X_train, X_val, y_train and y_val")
-        train_x.to_csv("dataset/cleaned/X_train_fold_{}.csv".format(i), index=False)
-        valid_x.to_csv("dataset/cleaned/X_val_fold_{}.csv".format(i), index=False)
+        train_x.to_csv("dataset/cleaned/LGBM/X_train_fold_{}.csv".format(i), index=False)
+        valid_x.to_csv("dataset/cleaned/LGBM/X_val_fold_{}.csv".format(i), index=False)
 
-        #print("HERE", train_y.shape, valid_y.shape)
+        # print("HERE", train_y.shape, valid_y.shape)
         train_y_df = pd.DataFrame(data=train_y, columns=["target"], index=train_x.index)
         valid_y_df = pd.DataFrame(data=valid_y, columns=["target"], index=valid_x.index)
 
-        train_y_df.to_csv("dataset/cleaned/y_train_fold_{}.csv".format(i), index=False)
-        valid_y_df.to_csv("dataset/cleaned/y_val_fold_{}.csv".format(i), index=False)
+        train_y_df.to_csv("dataset/cleaned/LGBM/y_train_fold_{}.csv".format(i), index=False)
+        valid_y_df.to_csv("dataset/cleaned/LGBM/y_val_fold_{}.csv".format(i), index=False)
 
         print("Training LGBM")
         clf.fit(train_x, train_y, eval_set=[(train_x, train_y), (valid_x, valid_y)],
                 eval_metric='auc', verbose=200, early_stopping_rounds=200)
 
         # save model
-        print("Saving LGBM")
-        filename_txt = 'models/LGBMClassifier_fold_{}.txt'.format(i)
-        clf.booster_.save_model(filename_txt)
+        #print("Saving LGBM")
+        #filename_txt = 'models/LGBM/LGBMClassifier_fold_{}.txt'.format(i)
+        #clf.booster_.save_model(filename_txt)
 
         # save the model to disk
         print("Saving LGBM with joblib")
-        filename_joblib = 'models/LGBMClassifier_fold_{}.joblib'.format(i)
+        filename_joblib = 'models/LGBM/LGBMClassifier_fold_{}.joblib'.format(i)
         joblib.dump(clf, filename_joblib)
 
         # load model
-        #print("Loading LGBM")
-        #clf = load_model(filename_joblib)
-        #clf = lgb.Booster(model_file='models/LGBMClassifier_fold_{}.txt'.format(i))
-        #print("Predictions")
-        oof_preds[valid_idx] = clf.predict(valid_x, num_iteration=clf.best_iteration_)[:, 1]
-        sub_preds += clf.predict(test_df[feats], num_iteration=clf.best_iteration_)[:, 1] / folds.n_splits
+        print("Loading LGBM")
+        clf = joblib.load(filename_joblib)
+        # clf = lgb.Booster(model_file='models/LGBMClassifier_fold_{}.txt'.format(i))
+        # with Booster use predict : returns the proba
+
+        print("Predicting proba for class 1") # [:, 1] to get the column for class 1 proba, else saving two columns => problem
+        # valid_idx = validation set index
+        # saving the prediction proba of validation set into oof_preds np array
+        oof_preds[valid_idx] = clf.predict_proba(valid_x, num_iteration=clf.best_iteration_)[:, 1]
 
         fold_importance_df = pd.DataFrame()
         fold_importance_df["feature"] = feats
@@ -356,12 +361,8 @@ def kfold_lightgbm(df, num_folds, stratified=False, debug=False):
 
         i += 1
 
-
     print('Full AUC score %.6f' % roc_auc_score(train_df['TARGET'], oof_preds))
-    # Write submission file and plot feature importance
-    if not debug:
-        test_df['TARGET'] = sub_preds
-        test_df[['SK_ID_CURR', 'TARGET']].to_csv(submission_file_name, index=False)
+    # Plot feature importance
     display_importances(feature_importance_df)
     return feature_importance_df
 
@@ -379,9 +380,9 @@ def display_importances(feature_importance_df_):
     plt.savefig('lgbm_importances01.png')
 
 
-def main(input_path, debug=False):
+def generate_dataset(input_path, output_path, debug=False):
     num_rows = 10000 if debug else None
-    df = application_train_test(input_path, num_rows)
+    df = application_train(input_path, num_rows)
     with timer("Process bureau and bureau_balance"):
         bureau = bureau_and_balance(input_path, num_rows)
         print("Bureau df shape:", bureau.shape)
@@ -412,15 +413,29 @@ def main(input_path, debug=False):
         df = df.join(cc, how='left', on='SK_ID_CURR')
         del cc
         gc.collect()
+    print("Saving df")
+    df.to_csv(output_path, index=False)  # , index=False
+
+
+def modelling_lightgbm(df_path, debug=False):
+    print("__Loading DataFrame__")
+    df = pd.read_csv(df_path)
     with timer("Run LightGBM with kfold"):
-        feat_importance = kfold_lightgbm(df, num_folds=10, stratified=False, debug=debug)
+        feat_importance = kfold_lightgbm(df, num_folds=10, stratified=False)
 
 
 def load_model(model_file):
     model = joblib.load(model_file)
     return model
 
-if __name__ == "__main__":
-    submission_file_name = "dataset/submission_kernel02.csv"
+
+def main():
     with timer("Full model run"):
-        main(input_path="dataset/source/")
+        generate_dataset(input_path="dataset/source/", output_path="dataset/cleaned/df_cleaned.csv")
+        modelling_lightgbm(df_path="dataset/cleaned/df_cleaned.csv")
+
+
+if __name__ == "__main__":
+    with timer("Full model run"):
+        #generate_dataset(input_path="dataset/source/")
+        modelling_lightgbm(df_path="dataset/cleaned/df_cleaned.csv")

@@ -1,0 +1,6 @@
+version: v1
+preprocessing:
+  scaler: "models/preprocessing/scaler.gz"
+  svd: "models/preprocessing/SVD.gz"
+classifier: "models/DummyClassifier.joblib"
+
