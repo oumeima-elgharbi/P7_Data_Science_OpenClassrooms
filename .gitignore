@@ -130,3 +130,4 @@ dmypy.json
 .pyre/
 /dataset/
 /other_documents/
+/models/
