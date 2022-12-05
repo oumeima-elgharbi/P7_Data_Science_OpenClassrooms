@@ -6,7 +6,7 @@ Source : https://www.kaggle.com/code/jsaguiar/lightgbm-with-simple-features/scri
 
 # HOME CREDIT DEFAULT RISK COMPETITION
 # Most features are created by applying min, max, mean, sum and var functions to grouped tables.
-# Little feature selection is done and overfitting might be a problem since many features are related.
+# Little feature selection is done and over-fitting might be a problem since many features are related.
 # The following key ideas were used:
 # - Divide or subtract important features to get rates (like annuity and income)
 # - In Bureau Data: create specific features for Active credits and Closed credits
@@ -23,38 +23,39 @@ Source : https://www.kaggle.com/code/jsaguiar/lightgbm-with-simple-features/scri
 
 import numpy as np
 import pandas as pd
+# Garbage collector
 import gc
 from time import time
 from contextlib import contextmanager
-import joblib
 from sklearn.preprocessing import OneHotEncoder
 
 import warnings
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-global seed
-seed = 1001
-
 
 @contextmanager
 def timer(title):
     """
+    ??
 
-    :param title:
-    :return:
+    :param title: (string)
+    :return: None
+    :rtype: None
     """
     t0 = time()
-    yield
+    yield # ??
     print("{} - done in {:.0f}s".format(title, time() - t0))
 
 
-def one_hot_encoder(df, nan_as_category=True):  # TODO : refacto style P4 feature engineering
+def one_hot_encoder(df, nan_as_category=True):
     """
     One-hot encoding for categorical columns with get_dummies
-    :param df:
-    :param nan_as_category:
-    :return:
+
+    :param df: (DataFrame)
+    :param nan_as_category: (True or False) to get dummies (one hot encoder) with a NaN column
+    :return: The encoded dataframe and the list of the new columns generated
+    :rtype: tuple
     """
     original_columns = list(df.columns)
     categorical_columns = [col for col in df.columns if df[col].dtype == 'object']
@@ -66,12 +67,13 @@ def one_hot_encoder(df, nan_as_category=True):  # TODO : refacto style P4 featur
 def one_hot_encoding(df):
     """
     TO DELETE ?
-    :param df:
-    :return:
+    :param df: (DataFrame)
+    :return: The encoded dataframe
+    :rtype: DataFrame
     """
     # 0) creating instance of one-hot-encoder
-    one_hot_encoder = OneHotEncoder(handle_unknown='ignore',
-                                    sparse=False)  # if sparse=True (by default), we need to add .toarray() to encoded_categorical_data
+    one_hot_encoder = OneHotEncoder(handle_unknown='ignore', sparse=False)
+    # if sparse=True (by default), we need to add .toarray() to encoded_categorical_data
 
     # 1) Fit the encoder on the training set
     categorical_columns = [col for col in df.columns if df[col].dtype == 'object']
@@ -95,11 +97,13 @@ def one_hot_encoding(df):
 
 def application_train(input_path, num_rows=None, nan_as_category=False):
     """
-    Preprocess application_train.csv and application_test.csv
-    :param input_path:
-    :param num_rows:
-    :param nan_as_category:
+    Preprocess application_train.csv
+
+    :param input_path: (string) the path to the file "application_train.csv"
+    :param num_rows: (int or None) if we do not want to read all the csv file but only a certain number of rows
+    :param nan_as_category: (True or False) to get dummies (one hot encoder) with a NaN column
     :return:
+    :rtype: DataFrame
     """
     # Read data and merge
     df = pd.read_csv(input_path + 'application_train.csv', nrows=num_rows)
@@ -123,7 +127,6 @@ def application_train(input_path, num_rows=None, nan_as_category=False):
     df['INCOME_PER_PERSON'] = df['AMT_INCOME_TOTAL'] / df['CNT_FAM_MEMBERS']
     df['ANNUITY_INCOME_PERC'] = df['AMT_ANNUITY'] / df['AMT_INCOME_TOTAL']
     df['PAYMENT_RATE'] = df['AMT_ANNUITY'] / df['AMT_CREDIT']
-    # del test_df
     gc.collect()
     return df
 
@@ -131,10 +134,12 @@ def application_train(input_path, num_rows=None, nan_as_category=False):
 def bureau_and_balance(input_path, num_rows=None, nan_as_category=True):
     """
     Preprocess bureau.csv and bureau_balance.csv
-    :param input_path:
-    :param num_rows:
-    :param nan_as_category:
+
+    :param input_path: the path to the file " bureau.csv" and "bureau_balance.csv"
+    :param num_rows: (int or None) if we do not want to read all the csv file but only a certain number of rows
+    :param nan_as_category: (True or False) to get dummies (one hot encoder) with a NaN column
     :return:
+    :rtype: DataFrame
     """
     bureau = pd.read_csv(input_path + 'bureau.csv', nrows=num_rows)
     bb = pd.read_csv(input_path + 'bureau_balance.csv', nrows=num_rows)
@@ -196,13 +201,15 @@ def bureau_and_balance(input_path, num_rows=None, nan_as_category=True):
 def previous_applications(input_path, num_rows=None, nan_as_category=True):
     """
     Preprocess previous_applications.csv
-    :param input_path:
-    :param num_rows:
-    :param nan_as_category:
+
+    :param input_path: (string) the path to the file "previous_application.csv"
+    :param num_rows: (int or None) if we do not want to read all the csv file but only a certain number of rows
+    :param nan_as_category: (True or False) to get dummies (one hot encoder) with a NaN column
     :return:
+    :rtype: DataFrame
     """
     prev = pd.read_csv(input_path + 'previous_application.csv', nrows=num_rows)
-    prev, cat_cols = one_hot_encoder(prev, nan_as_category=True)
+    prev, cat_cols = one_hot_encoder(prev, nan_as_category=nan_as_category)
     # Days 365.243 values -> nan
     prev['DAYS_FIRST_DRAWING'].replace(365243, np.nan, inplace=True)
     prev['DAYS_FIRST_DUE'].replace(365243, np.nan, inplace=True)
@@ -249,13 +256,15 @@ def previous_applications(input_path, num_rows=None, nan_as_category=True):
 def pos_cash(input_path, num_rows=None, nan_as_category=True):
     """
     Preprocess POS_CASH_balance.csv
-    :param input_path:
-    :param num_rows:
-    :param nan_as_category:
+
+    :param input_path: (string) the path to the file "POS_CASH_balance.csv"
+    :param num_rows: (int or None) if we do not want to read all the csv file but only a certain number of rows
+    :param nan_as_category: (True or False) to get dummies (one hot encoder) with a NaN column
     :return:
+    :rtype: DataFrame
     """
     pos = pd.read_csv(input_path + 'POS_CASH_balance.csv', nrows=num_rows)
-    pos, cat_cols = one_hot_encoder(pos, nan_as_category=True)
+    pos, cat_cols = one_hot_encoder(pos, nan_as_category=nan_as_category)
     # Features
     aggregations = {
         'MONTHS_BALANCE': ['max', 'mean', 'size'],
@@ -277,13 +286,14 @@ def pos_cash(input_path, num_rows=None, nan_as_category=True):
 def installments_payments(input_path, num_rows=None, nan_as_category=True):
     """
     Preprocess installments_payments.csv
-    :param input_path:
-    :param num_rows:
-    :param nan_as_category:
+    :param input_path: (string)
+    :param num_rows: (int or None) if we do not want to read all the csv file but only a certain number of rows
+    :param nan_as_category: (True or False) to get dummies (one hot encoder) with a NaN column
     :return:
+    :rtype: (DataFrame)
     """
     ins = pd.read_csv(input_path + 'installments_payments.csv', nrows=num_rows)
-    ins, cat_cols = one_hot_encoder(ins, nan_as_category=True)
+    ins, cat_cols = one_hot_encoder(ins, nan_as_category=nan_as_category)
     # Percentage and difference paid in each installment (amount paid and installment value)
     ins['PAYMENT_PERC'] = ins['AMT_PAYMENT'] / ins['AMT_INSTALMENT']
     ins['PAYMENT_DIFF'] = ins['AMT_INSTALMENT'] - ins['AMT_PAYMENT']
@@ -317,13 +327,15 @@ def installments_payments(input_path, num_rows=None, nan_as_category=True):
 def credit_card_balance(input_path, num_rows=None, nan_as_category=True):
     """
     Preprocess credit_card_balance.csv
-    :param input_path:
-    :param num_rows:
-    :param nan_as_category:
+
+    :param input_path: (string) the path to the file "credit_card_balance.csv"
+    :param num_rows: (int or None) if we do not want to read all the csv file but only a certain number of rows
+    :param nan_as_category: (True or False) to get dummies (one hot encoder) with a NaN column
     :return:
+    :rtype: DataFrame
     """
     cc = pd.read_csv(input_path + 'credit_card_balance.csv', nrows=num_rows)
-    cc, cat_cols = one_hot_encoder(cc, nan_as_category=True)
+    cc, cat_cols = one_hot_encoder(cc, nan_as_category=nan_as_category)
     # General aggregations
     cc.drop(['SK_ID_PREV'], axis=1, inplace=True)
     cc_agg = cc.groupby('SK_ID_CURR').agg(['min', 'max', 'mean', 'sum', 'var'])
@@ -337,11 +349,13 @@ def credit_card_balance(input_path, num_rows=None, nan_as_category=True):
 
 def generate_dataset(input_path, output_file, debug=False):
     """
+    Main function : orchestrates the generation of the dataset such as named in the output_file parameter.
 
-    :param input_path:
-    :param output_file:
-    :param debug:
-    :return:
+    :param input_path: (string) the root path to all the csv files to preprocess
+    :param output_file: (string) path + filename
+    :param debug: (True or False) if debug is True, then we only rad 10000 rows
+    :return: None
+    :rtype: None
     """
     num_rows = 10000 if debug else None
     df = application_train(input_path, num_rows)
