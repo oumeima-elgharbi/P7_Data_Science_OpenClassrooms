@@ -30,6 +30,7 @@ import joblib
 from sklearn.preprocessing import OneHotEncoder
 
 import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 global seed
@@ -38,22 +39,39 @@ seed = 1001
 
 @contextmanager
 def timer(title):
+    """
+
+    :param title:
+    :return:
+    """
     t0 = time()
     yield
     print("{} - done in {:.0f}s".format(title, time() - t0))
 
 
-# One-hot encoding for categorical columns with get_dummies
 def one_hot_encoder(df, nan_as_category=True):  # TODO : refacto style P4 feature engineering
+    """
+    One-hot encoding for categorical columns with get_dummies
+    :param df:
+    :param nan_as_category:
+    :return:
+    """
     original_columns = list(df.columns)
     categorical_columns = [col for col in df.columns if df[col].dtype == 'object']
     df = pd.get_dummies(df, columns=categorical_columns, dummy_na=nan_as_category)
     new_columns = [c for c in df.columns if c not in original_columns]
     return df, new_columns
 
+
 def one_hot_encoding(df):
+    """
+    TO DELETE ?
+    :param df:
+    :return:
+    """
     # 0) creating instance of one-hot-encoder
-    one_hot_encoder = OneHotEncoder(handle_unknown='ignore', sparse=False) # if sparse=True (by default), we need to add .toarray() to encoded_categorical_data
+    one_hot_encoder = OneHotEncoder(handle_unknown='ignore',
+                                    sparse=False)  # if sparse=True (by default), we need to add .toarray() to encoded_categorical_data
 
     # 1) Fit the encoder on the training set
     categorical_columns = [col for col in df.columns if df[col].dtype == 'object']
@@ -75,8 +93,14 @@ def one_hot_encoding(df):
     return df_encoded
 
 
-# Preprocess application_train.csv and application_test.csv
 def application_train(input_path, num_rows=None, nan_as_category=False):
+    """
+    Preprocess application_train.csv and application_test.csv
+    :param input_path:
+    :param num_rows:
+    :param nan_as_category:
+    :return:
+    """
     # Read data and merge
     df = pd.read_csv(input_path + 'application_train.csv', nrows=num_rows)
     # test_df = pd.read_csv(input_path + 'application_test.csv', nrows=num_rows)
@@ -104,8 +128,14 @@ def application_train(input_path, num_rows=None, nan_as_category=False):
     return df
 
 
-# Preprocess bureau.csv and bureau_balance.csv
 def bureau_and_balance(input_path, num_rows=None, nan_as_category=True):
+    """
+    Preprocess bureau.csv and bureau_balance.csv
+    :param input_path:
+    :param num_rows:
+    :param nan_as_category:
+    :return:
+    """
     bureau = pd.read_csv(input_path + 'bureau.csv', nrows=num_rows)
     bb = pd.read_csv(input_path + 'bureau_balance.csv', nrows=num_rows)
     bb, bb_cat = one_hot_encoder(bb, nan_as_category)
@@ -163,8 +193,14 @@ def bureau_and_balance(input_path, num_rows=None, nan_as_category=True):
     return bureau_agg
 
 
-# Preprocess previous_applications.csv
 def previous_applications(input_path, num_rows=None, nan_as_category=True):
+    """
+    Preprocess previous_applications.csv
+    :param input_path:
+    :param num_rows:
+    :param nan_as_category:
+    :return:
+    """
     prev = pd.read_csv(input_path + 'previous_application.csv', nrows=num_rows)
     prev, cat_cols = one_hot_encoder(prev, nan_as_category=True)
     # Days 365.243 values -> nan
@@ -210,8 +246,14 @@ def previous_applications(input_path, num_rows=None, nan_as_category=True):
     return prev_agg
 
 
-# Preprocess POS_CASH_balance.csv
 def pos_cash(input_path, num_rows=None, nan_as_category=True):
+    """
+    Preprocess POS_CASH_balance.csv
+    :param input_path:
+    :param num_rows:
+    :param nan_as_category:
+    :return:
+    """
     pos = pd.read_csv(input_path + 'POS_CASH_balance.csv', nrows=num_rows)
     pos, cat_cols = one_hot_encoder(pos, nan_as_category=True)
     # Features
@@ -232,8 +274,14 @@ def pos_cash(input_path, num_rows=None, nan_as_category=True):
     return pos_agg
 
 
-# Preprocess installments_payments.csv
 def installments_payments(input_path, num_rows=None, nan_as_category=True):
+    """
+    Preprocess installments_payments.csv
+    :param input_path:
+    :param num_rows:
+    :param nan_as_category:
+    :return:
+    """
     ins = pd.read_csv(input_path + 'installments_payments.csv', nrows=num_rows)
     ins, cat_cols = one_hot_encoder(ins, nan_as_category=True)
     # Percentage and difference paid in each installment (amount paid and installment value)
@@ -266,8 +314,14 @@ def installments_payments(input_path, num_rows=None, nan_as_category=True):
     return ins_agg
 
 
-# Preprocess credit_card_balance.csv
 def credit_card_balance(input_path, num_rows=None, nan_as_category=True):
+    """
+    Preprocess credit_card_balance.csv
+    :param input_path:
+    :param num_rows:
+    :param nan_as_category:
+    :return:
+    """
     cc = pd.read_csv(input_path + 'credit_card_balance.csv', nrows=num_rows)
     cc, cat_cols = one_hot_encoder(cc, nan_as_category=True)
     # General aggregations
@@ -281,8 +335,14 @@ def credit_card_balance(input_path, num_rows=None, nan_as_category=True):
     return cc_agg
 
 
+def generate_dataset(input_path, output_file, debug=False):
+    """
 
-def generate_dataset(input_path, output_path, debug=False):
+    :param input_path:
+    :param output_file:
+    :param debug:
+    :return:
+    """
     num_rows = 10000 if debug else None
     df = application_train(input_path, num_rows)
     with timer("Process bureau and bureau_balance"):
@@ -315,15 +375,11 @@ def generate_dataset(input_path, output_path, debug=False):
         df = df.join(cc, how='left', on='SK_ID_CURR')
         del cc
         gc.collect()
-    print("Saving df")
-    df.to_csv(output_path, index=False)  # , index=False
-
-
-def load_model(model_file):
-    model = joblib.load(model_file)
-    return model
+    print("Saving cleaned dataset")
+    print("Cleaned dataset shape :", df.shape)
+    df.to_csv(output_file, index=False)  # , index=False
 
 
 if __name__ == "__main__":
     with timer("Full model run"):
-        generate_dataset(input_path="dataset/source/")
+        generate_dataset(input_path="dataset/source/", output_file="dataset/cleaned/data_cleaned.csv")
