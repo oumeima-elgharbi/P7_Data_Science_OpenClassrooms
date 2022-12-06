@@ -95,7 +95,7 @@ def one_hot_encoding(df):
     return df_encoded
 
 
-def application_train(input_path, num_rows=None, nan_as_category=False):
+def application_train(input_path, application_filename, num_rows=None, nan_as_category=False):
     """
     Preprocess application_train.csv
 
@@ -109,6 +109,13 @@ def application_train(input_path, num_rows=None, nan_as_category=False):
     df = pd.read_csv(input_path + 'application_train.csv', nrows=num_rows)
     print("Train samples: {}".format(len(df)))
     print("Application train df shape:", df.shape)
+
+    #test_df = pd.read_csv(input_path + 'application_test.csv', nrows=num_rows)
+    #print("Test samples: {}".format(len(test_df)))
+    #print("Application test df shape:", test_df.shape)
+    #df = df.append(test_df).reset_index()
+    #print("Application train and test df shape:", df.shape)
+
     # Optional: Remove 4 applications with XNA CODE_GENDER (train set)
     df = df[df['CODE_GENDER'] != 'XNA']
 
@@ -126,6 +133,7 @@ def application_train(input_path, num_rows=None, nan_as_category=False):
     df['INCOME_PER_PERSON'] = df['AMT_INCOME_TOTAL'] / df['CNT_FAM_MEMBERS']
     df['ANNUITY_INCOME_PERC'] = df['AMT_ANNUITY'] / df['AMT_INCOME_TOTAL']
     df['PAYMENT_RATE'] = df['AMT_ANNUITY'] / df['AMT_CREDIT']
+    #del test_df
     gc.collect()
     return df
 
