@@ -33,15 +33,15 @@ def evaluate_models(model_name, result, y_test, y_pred):
     roc_auc = auc(false_positive_rate, true_positive_rate).round(3)
 
     result = pd.concat([result, pd.DataFrame({"Model": [model_name],
-                                              "F1-score": [f1_score_positif],
-                                              "F1-score weighted": [f1_score_weighted],
+                                              "ROC-AUC": [roc_auc],
                                               "Precision": [precision],
                                               "Recall": [recall],
-                                              "Accuracy": [accuracy],
-                                              "ROC-AUC": [roc_auc],
+                                              "F1-score": [f1_score_positif],
+                                              "F1-score weighted": [f1_score_weighted],
+                                              "Accuracy": [accuracy]
                                               })])
     # we sort the datafraeme of results by best : by=["F1-score]
-    result = result.sort_values(by=["F1-score"], ascending=False)
+    result = result.sort_values(by=["ROC-AUC"], ascending=False)
     display(result)
 
     return result

@@ -37,14 +37,14 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 @contextmanager
 def timer(title):
     """
-    ??
+    Computes processing time when called
 
-    :param title: (string)
+    :param title: (string) Name of the task being timed
     :return: None
     :rtype: None
     """
     t0 = time()
-    yield # ??
+    yield  # ??
     print("{} - done in {:.0f}s".format(title, time() - t0))
 
 
@@ -107,9 +107,8 @@ def application_train(input_path, num_rows=None, nan_as_category=False):
     """
     # Read data and merge
     df = pd.read_csv(input_path + 'application_train.csv', nrows=num_rows)
-    # test_df = pd.read_csv(input_path + 'application_test.csv', nrows=num_rows)
     print("Train samples: {}".format(len(df)))
-    # df = df.append(test_df).reset_index()
+    print("Application train df shape:", df.shape)
     # Optional: Remove 4 applications with XNA CODE_GENDER (train set)
     df = df[df['CODE_GENDER'] != 'XNA']
 
@@ -359,39 +358,40 @@ def generate_dataset(input_path, output_file, debug=False):
     """
     num_rows = 10000 if debug else None
     df = application_train(input_path, num_rows)
-    with timer("Process bureau and bureau_balance"):
+    with timer("1) Process bureau and bureau_balance"):
         bureau = bureau_and_balance(input_path, num_rows)
         print("Bureau df shape:", bureau.shape)
         df = df.join(bureau, how='left', on='SK_ID_CURR')
         del bureau
         gc.collect()
-    with timer("Process previous_applications"):
+    with timer("2) Process previous_applications"):
         prev = previous_applications(input_path, num_rows)
         print("Previous applications df shape:", prev.shape)
         df = df.join(prev, how='left', on='SK_ID_CURR')
         del prev
         gc.collect()
-    with timer("Process POS-CASH balance"):
+    with timer("3) Process POS-CASH balance"):
         pos = pos_cash(input_path, num_rows)
         print("Pos-cash balance df shape:", pos.shape)
         df = df.join(pos, how='left', on='SK_ID_CURR')
         del pos
         gc.collect()
-    with timer("Process installments payments"):
+    with timer("4) Process installments payments"):
         ins = installments_payments(input_path, num_rows)
         print("Installments payments df shape:", ins.shape)
         df = df.join(ins, how='left', on='SK_ID_CURR')
         del ins
         gc.collect()
-    with timer("Process credit card balance"):
+    with timer("5) Process credit card balance"):
         cc = credit_card_balance(input_path, num_rows)
         print("Credit card balance df shape:", cc.shape)
         df = df.join(cc, how='left', on='SK_ID_CURR')
         del cc
         gc.collect()
-    print("Saving cleaned dataset")
-    print("Cleaned dataset shape :", df.shape)
-    df.to_csv(output_file, index=False)  # , index=False
+    with timer("6) Saving cleaned dataset"):
+        print("Cleaned dataset shape :", df.shape)
+        df.to_csv(output_file, index=False)
+        gc.collect()  # good here ??
 
 
 if __name__ == "__main__":
