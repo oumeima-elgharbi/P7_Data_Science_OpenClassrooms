@@ -13,11 +13,10 @@ import joblib
 from contextlib import contextmanager
 
 import warnings
-
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 global seed
-seed = 1001
+seed = 42
 
 
 @contextmanager
@@ -149,4 +148,4 @@ def modelling_lightgbm(df_path, debug=False):
 if __name__ == "__main__":
     with timer("Full model run"):
         print("Running time 2h50min lol : 10170s")
-        modelling_lightgbm(df_path="dataset/cleaned/data_cleaned.csv")
+        modelling_lightgbm(df_path="dataset/cleaned/data_train_preprocessed.csv")

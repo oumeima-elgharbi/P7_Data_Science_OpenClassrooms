@@ -2,6 +2,8 @@
 
 Source : https://www.kaggle.com/code/jsaguiar/lightgbm-with-simple-features/script
 
+Author : Oumeima EL GHARBI
+Modified code : OneHotEncoder, installation, train/test
 """
 
 # HOME CREDIT DEFAULT RISK COMPETITION
@@ -27,10 +29,11 @@ import pandas as pd
 import gc
 from time import time
 from contextlib import contextmanager
+
 from sklearn.preprocessing import OneHotEncoder
+import joblib
 
 import warnings
-
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
@@ -64,57 +67,96 @@ def one_hot_encoder(df, nan_as_category=True):
     return df, new_columns
 
 
-def one_hot_encoding(df):
+def one_hot_encoder_2(df, df_name, training=True, nan_as_category=True):
     """
     TO DELETE ?
     :param df: (DataFrame)
-    :return: The encoded dataframe
-    :rtype: DataFrame
+    :param df_name:
+    :param training:
+    :param nan_as_category: (True or False) to get dummies (one hot encoder) with a NaN column
+    :return: The encoded dataframe and the list of the new columns generated
+    :rtype: tuple
     """
-    # 0) creating instance of one-hot-encoder
-    one_hot_encoder = OneHotEncoder(handle_unknown='ignore', sparse=False)
-    # if sparse=True (by default), we need to add .toarray() to encoded_categorical_data
+    # df = dataframe.copy()
 
-    # 1) Fit the encoder on the training set
+    original_columns = list(df.columns)
+    filename_joblib = 'models/preprocessing/OneHotEncoder_{}.joblib'.format(df_name)
     categorical_columns = [col for col in df.columns if df[col].dtype == 'object']
-    encoded_categorical_data = one_hot_encoder.fit_transform(df[categorical_columns])
+    print("Number of columns to encode :", len(categorical_columns))
+
+    col_not_cat = [col for col in df.columns if df[col].dtype != 'object']  # or not in categorical_columns
+    print("Number of columns to merge with the encoded df :", len(col_not_cat))
+
+    if training:
+        # 1) Creating instance of one-hot-encoder and Fit the encoder on the training set
+        encoder = OneHotEncoder(handle_unknown='ignore', sparse=False).fit(df[categorical_columns])
+        # if sparse=True (by default), we need to add .toarray() to encoded_categorical_data
+
+        # 2) save the OHE to disk
+        print("Saving One Hot Encoder")
+        joblib.dump(encoder, filename_joblib)
+    else:
+        # load model
+        print("Loading One Hot Encoder")
+        encoder = joblib.load(filename_joblib)
+
+    encoded_categorical_data = encoder.transform(df[categorical_columns])
 
     # 3) we make a list of the columns names
-    encoded_categorical_data_names = one_hot_encoder.get_feature_names_out().tolist()
-    print("We have indeed :", len(encoded_categorical_data_names), "labels after encoding the categorical variables.")
+    encoded_categorical_data_names = encoder.get_feature_names_out().tolist()
+    print("We have indeed :", len(encoded_categorical_data_names),
+          "labels after encoding the categorical variables with nan counted.")
 
     # 4) we recreate a dataframe with the column names and the numpy array
     df_encoded = pd.DataFrame(columns=encoded_categorical_data_names,
                               data=encoded_categorical_data,
                               index=df.index)
-    # we remove NaN columns
-    l = [s for s in encoded_categorical_data_names if s.endswith("nan")]
-    df_encoded = df_encoded.drop(columns=l)
-    display(df_encoded.sort_index())
 
-    return df_encoded
+    # 5) Concatenate the two dataframes for the training set
+
+    # when merging, we put the categorical features first so that the targets will be at the end of the dataframe.  // INVERSE
+    df_all_encoded = pd.merge(df[col_not_cat].sort_index(), df_encoded.sort_index(), left_index=True, right_index=True)
+
+    # nan_columns = [s for s in encoded_categorical_data_names if s.endswith("nan")]
+    # print("HEREEE NAN", nan_columns)
+    # The OHE will automatically create a nan column for NaN / if we don't want it, we drop these columns
+    if not nan_as_category:
+        # we remove NaN columns
+        nan_columns = [s for s in encoded_categorical_data_names if s.endswith("nan")]
+        print("We drop these columns :", nan_columns)
+        df_all_encoded = df_all_encoded.drop(columns=nan_columns)
+
+    new_columns = [c for c in df_all_encoded.columns if c not in original_columns]
+    print("Number of new columns :", len(new_columns))
+
+    ###
+    # print(encoded_categorical_data_names)
+    # l = [col for col in encoded_categorical_data_names if col not in new_columns]
+    # print("HHEREE", l)
+    return df_all_encoded, new_columns
 
 
-def application_train(input_path, application_filename, num_rows=None, nan_as_category=False):
+def application(input_path, application_filename, num_rows=None, nan_as_category=False, training=True):
     """
-    Preprocess application_train.csv
+    Preprocess application_train.csv (or application_test.csv)
 
     :param input_path: (string) the path to the file "application_train.csv"
+    :param application_filename: (string) name of csv file
     :param num_rows: (int or None) if we do not want to read all the csv file but only a certain number of rows
     :param nan_as_category: (True or False) to get dummies (one hot encoder) with a NaN column
     :return:
     :rtype: DataFrame
     """
     # Read data and merge
-    df = pd.read_csv(input_path + 'application_train.csv', nrows=num_rows)
-    print("Train samples: {}".format(len(df)))
-    print("Application train df shape:", df.shape)
+    df = pd.read_csv(input_path + application_filename, nrows=num_rows)
+    print("Application samples: {}".format(len(df)))
+    print("Application {} df shape:".format(application_filename), df.shape)
 
-    #test_df = pd.read_csv(input_path + 'application_test.csv', nrows=num_rows)
-    #print("Test samples: {}".format(len(test_df)))
-    #print("Application test df shape:", test_df.shape)
-    #df = df.append(test_df).reset_index()
-    #print("Application train and test df shape:", df.shape)
+    # test_df = pd.read_csv(input_path + 'application_test.csv', nrows=num_rows)
+    # print("Test samples: {}".format(len(test_df)))
+    # print("Application test df shape:", test_df.shape)
+    # df = df.append(test_df).reset_index()
+    # print("Application train and test df shape:", df.shape)
 
     # Optional: Remove 4 applications with XNA CODE_GENDER (train set)
     df = df[df['CODE_GENDER'] != 'XNA']
@@ -123,7 +165,11 @@ def application_train(input_path, application_filename, num_rows=None, nan_as_ca
     for bin_feature in ['CODE_GENDER', 'FLAG_OWN_CAR', 'FLAG_OWN_REALTY']:
         df[bin_feature], uniques = pd.factorize(df[bin_feature])
     # Categorical features with One-Hot encode
-    df, cat_cols = one_hot_encoder(df, nan_as_category)
+    # df1, cat_cols1 = one_hot_encoder(df, nan_as_category)
+    df, cat_cols = one_hot_encoder_2(df, df_name="application", training=training, nan_as_category=nan_as_category)
+
+    # to_print = pd.concat([df1, df]).drop_duplicates(keep=False)
+    # print("HERE", to_print.empty)
 
     # NaN values for DAYS_EMPLOYED: 365.243 -> nan
     df['DAYS_EMPLOYED'].replace(365243, np.nan, inplace=True)
@@ -133,12 +179,12 @@ def application_train(input_path, application_filename, num_rows=None, nan_as_ca
     df['INCOME_PER_PERSON'] = df['AMT_INCOME_TOTAL'] / df['CNT_FAM_MEMBERS']
     df['ANNUITY_INCOME_PERC'] = df['AMT_ANNUITY'] / df['AMT_INCOME_TOTAL']
     df['PAYMENT_RATE'] = df['AMT_ANNUITY'] / df['AMT_CREDIT']
-    #del test_df
+    # del test_df
     gc.collect()
     return df
 
 
-def bureau_and_balance(input_path, num_rows=None, nan_as_category=True):
+def bureau_and_balance(input_path, num_rows=None, nan_as_category=True, training=True):
     """
     Preprocess bureau.csv and bureau_balance.csv
 
@@ -150,8 +196,17 @@ def bureau_and_balance(input_path, num_rows=None, nan_as_category=True):
     """
     bureau = pd.read_csv(input_path + 'bureau.csv', nrows=num_rows)
     bb = pd.read_csv(input_path + 'bureau_balance.csv', nrows=num_rows)
-    bb, bb_cat = one_hot_encoder(bb, nan_as_category)
-    bureau, bureau_cat = one_hot_encoder(bureau, nan_as_category)
+    # bb1, bb_cat1 = one_hot_encoder(bb, nan_as_category)
+    # bureau1, bureau_cat1 = one_hot_encoder(bureau, nan_as_category)
+
+    bb, bb_cat = one_hot_encoder_2(bb, df_name="bureau_balance", training=training, nan_as_category=nan_as_category)
+    bureau, bureau_cat = one_hot_encoder_2(bureau, df_name="bureau", training=training, nan_as_category=nan_as_category)
+
+    # to_print1 = pd.concat([bb1, bb]).drop_duplicates(keep=False)
+    # print("HERE", to_print1.empty)
+
+    # to_print2 = pd.concat([bureau1, bureau]).drop_duplicates(keep=False)
+    # print("HERE", to_print2.empty)
 
     # Bureau balance: Perform aggregations and merge with bureau.csv
     bb_aggregations = {'MONTHS_BALANCE': ['min', 'max', 'size']}
@@ -205,7 +260,7 @@ def bureau_and_balance(input_path, num_rows=None, nan_as_category=True):
     return bureau_agg
 
 
-def previous_applications(input_path, num_rows=None, nan_as_category=True):
+def previous_applications(input_path, num_rows=None, nan_as_category=True, training=True):
     """
     Preprocess previous_applications.csv
 
@@ -216,7 +271,13 @@ def previous_applications(input_path, num_rows=None, nan_as_category=True):
     :rtype: DataFrame
     """
     prev = pd.read_csv(input_path + 'previous_application.csv', nrows=num_rows)
-    prev, cat_cols = one_hot_encoder(prev, nan_as_category=nan_as_category)
+    # prev1, cat_cols1 = one_hot_encoder(prev, nan_as_category=nan_as_category)
+    prev, cat_cols = one_hot_encoder_2(prev, df_name="previous_application", training=training,
+                                       nan_as_category=nan_as_category)
+
+    # to_print = pd.concat([prev1, prev]).drop_duplicates(keep=False)
+    # print("HERE", to_print.empty)
+
     # Days 365.243 values -> nan
     prev['DAYS_FIRST_DRAWING'].replace(365243, np.nan, inplace=True)
     prev['DAYS_FIRST_DUE'].replace(365243, np.nan, inplace=True)
@@ -260,7 +321,7 @@ def previous_applications(input_path, num_rows=None, nan_as_category=True):
     return prev_agg
 
 
-def pos_cash(input_path, num_rows=None, nan_as_category=True):
+def pos_cash(input_path, num_rows=None, nan_as_category=True, training=True):
     """
     Preprocess POS_CASH_balance.csv
 
@@ -271,7 +332,13 @@ def pos_cash(input_path, num_rows=None, nan_as_category=True):
     :rtype: DataFrame
     """
     pos = pd.read_csv(input_path + 'POS_CASH_balance.csv', nrows=num_rows)
-    pos, cat_cols = one_hot_encoder(pos, nan_as_category=nan_as_category)
+    # pos1, cat_cols1 = one_hot_encoder(pos, nan_as_category=nan_as_category)
+    pos, cat_cols = one_hot_encoder_2(pos, df_name="POS_CASH_balance", training=training,
+                                      nan_as_category=nan_as_category)
+
+    # to_print = pd.concat([pos1, pos]).drop_duplicates(keep=False)
+    # print("HERE", to_print.empty)
+
     # Features
     aggregations = {
         'MONTHS_BALANCE': ['max', 'mean', 'size'],
@@ -290,7 +357,7 @@ def pos_cash(input_path, num_rows=None, nan_as_category=True):
     return pos_agg
 
 
-def installments_payments(input_path, num_rows=None, nan_as_category=True):
+def installments_payments(input_path, num_rows=None, nan_as_category=True, training=True):
     """
     Preprocess installments_payments.csv
     :param input_path: (string)
@@ -300,7 +367,14 @@ def installments_payments(input_path, num_rows=None, nan_as_category=True):
     :rtype: (DataFrame)
     """
     ins = pd.read_csv(input_path + 'installments_payments.csv', nrows=num_rows)
-    ins, cat_cols = one_hot_encoder(ins, nan_as_category=nan_as_category)
+    # ins1, cat_cols1 = one_hot_encoder(ins, nan_as_category=nan_as_category)
+    # ins, cat_cols = one_hot_encoder_2(ins, df_name="installments_payments", training=training,
+    #                                 nan_as_category=nan_as_category)
+    # print("HERE CAT COL,", cat_cols)
+
+    # to_print = pd.concat([ins1, ins]).drop_duplicates(keep=False)
+    # print("HERE", to_print.empty)
+
     # Percentage and difference paid in each installment (amount paid and installment value)
     ins['PAYMENT_PERC'] = ins['AMT_PAYMENT'] / ins['AMT_INSTALMENT']
     ins['PAYMENT_DIFF'] = ins['AMT_INSTALMENT'] - ins['AMT_PAYMENT']
@@ -320,8 +394,8 @@ def installments_payments(input_path, num_rows=None, nan_as_category=True):
         'AMT_PAYMENT': ['min', 'max', 'mean', 'sum'],
         'DAYS_ENTRY_PAYMENT': ['max', 'mean', 'sum']
     }
-    for cat in cat_cols:
-        aggregations[cat] = ['mean']
+    # for cat in cat_cols: # TODO delete ??
+    #   aggregations[cat] = ['mean']
     ins_agg = ins.groupby('SK_ID_CURR').agg(aggregations)
     ins_agg.columns = pd.Index(['INSTAL_' + e[0] + "_" + e[1].upper() for e in ins_agg.columns.tolist()])
     # Count installments accounts
@@ -331,7 +405,7 @@ def installments_payments(input_path, num_rows=None, nan_as_category=True):
     return ins_agg
 
 
-def credit_card_balance(input_path, num_rows=None, nan_as_category=True):
+def credit_card_balance(input_path, num_rows=None, nan_as_category=True, training=True):
     """
     Preprocess credit_card_balance.csv
 
@@ -342,7 +416,13 @@ def credit_card_balance(input_path, num_rows=None, nan_as_category=True):
     :rtype: DataFrame
     """
     cc = pd.read_csv(input_path + 'credit_card_balance.csv', nrows=num_rows)
-    cc, cat_cols = one_hot_encoder(cc, nan_as_category=nan_as_category)
+    # cc1, cat_cols1 = one_hot_encoder(cc, nan_as_category=nan_as_category)
+    cc, cat_cols = one_hot_encoder_2(cc, df_name="credit_card_balance", training=training,
+                                     nan_as_category=nan_as_category)
+
+    # to_print = pd.concat([cc1, cc]).drop_duplicates(keep=False)
+    # print("HERE", to_print.empty)
+
     # General aggregations
     cc.drop(['SK_ID_PREV'], axis=1, inplace=True)
     cc_agg = cc.groupby('SK_ID_CURR').agg(['min', 'max', 'mean', 'sum', 'var'])
@@ -354,44 +434,45 @@ def credit_card_balance(input_path, num_rows=None, nan_as_category=True):
     return cc_agg
 
 
-def generate_dataset(input_path, output_file, debug=False):
+def generate_dataset(input_path, application_filename, output_file, training=True, debug=False):
     """
     Main function : orchestrates the generation of the dataset such as named in the output_file parameter.
 
     :param input_path: (string) the root path to all the csv files to preprocess
+    :param application_filename: (string) name of csv file
     :param output_file: (string) path + filename
     :param debug: (True or False) if debug is True, then we only rad 10000 rows
     :return: None
     :rtype: None
     """
     num_rows = 10000 if debug else None
-    df = application_train(input_path, num_rows)
+    df = application(input_path, application_filename, num_rows, training=training)
     with timer("1) Process bureau and bureau_balance"):
-        bureau = bureau_and_balance(input_path, num_rows)
+        bureau = bureau_and_balance(input_path, num_rows, training=training)
         print("Bureau df shape:", bureau.shape)
         df = df.join(bureau, how='left', on='SK_ID_CURR')
         del bureau
         gc.collect()
     with timer("2) Process previous_applications"):
-        prev = previous_applications(input_path, num_rows)
+        prev = previous_applications(input_path, num_rows, training=training)
         print("Previous applications df shape:", prev.shape)
         df = df.join(prev, how='left', on='SK_ID_CURR')
         del prev
         gc.collect()
     with timer("3) Process POS-CASH balance"):
-        pos = pos_cash(input_path, num_rows)
+        pos = pos_cash(input_path, num_rows, training=training)
         print("Pos-cash balance df shape:", pos.shape)
         df = df.join(pos, how='left', on='SK_ID_CURR')
         del pos
         gc.collect()
     with timer("4) Process installments payments"):
-        ins = installments_payments(input_path, num_rows)
+        ins = installments_payments(input_path, num_rows, training=training)  # need to remove OHE TODO
         print("Installments payments df shape:", ins.shape)
         df = df.join(ins, how='left', on='SK_ID_CURR')
         del ins
         gc.collect()
     with timer("5) Process credit card balance"):
-        cc = credit_card_balance(input_path, num_rows)
+        cc = credit_card_balance(input_path, num_rows, training=training)
         print("Credit card balance df shape:", cc.shape)
         df = df.join(cc, how='left', on='SK_ID_CURR')
         del cc
@@ -399,9 +480,12 @@ def generate_dataset(input_path, output_file, debug=False):
     with timer("6) Saving cleaned dataset"):
         print("Cleaned dataset shape :", df.shape)
         df.to_csv(output_file, index=False)
-        gc.collect()  # good here ??
+        gc.collect()  # delete ??
 
 
 if __name__ == "__main__":
     with timer("Full model run"):
-        generate_dataset(input_path="dataset/source/", output_file="dataset/cleaned/data_cleaned.csv")
+        # generate_dataset(input_path="dataset/source/", application_filename='application_train.csv',
+        #                output_file="dataset/cleaned/data_train_preprocessed.csv", training=True)
+        generate_dataset(input_path="dataset/source/", application_filename='application_test.csv',
+                         output_file="dataset/cleaned/data_test_preprocessed.csv", training=False)

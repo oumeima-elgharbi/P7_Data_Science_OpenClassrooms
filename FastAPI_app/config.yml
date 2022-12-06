@@ -1,6 +1,10 @@
 version: v1
 preprocessing:
-  #scaler: "models/preprocessing/scaler.gz"
-  #svd: "models/preprocessing/SVD.gz"
+  application: "models/preprocessing/OneHotEncoder_application.joblib"
+  bureau: "models/preprocessing/OneHotEncoder_bureau.joblib"
+  bureau_balance: "models/preprocessing/OneHotEncoder_bureau_balance.joblib"
+  credit_card_balance: "models/preprocessing/OneHotEncoder_credit_card_balance.joblib"
+  POS_CASH_balance: "models/preprocessing/OneHotEncoder_POS_CASH_balance.joblib"
+  previous_application: "models/preprocessing/OneHotEncoder_previous_application.joblib"
 classifier: "models/best_model.joblib"
 
