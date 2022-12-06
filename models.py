@@ -16,7 +16,7 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 global seed
-seed = 42
+seed = 1001
 
 
 @contextmanager
