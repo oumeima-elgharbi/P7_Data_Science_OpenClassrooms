@@ -31,9 +31,12 @@ from time import time
 from contextlib import contextmanager
 
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
 import joblib
+import pickle
 
 import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
@@ -51,7 +54,7 @@ def timer(title):
     print("{} - done in {:.0f}s".format(title, time() - t0))
 
 
-def OLD_one_hot_encoder(df, nan_as_category=True): # TODO Delete
+def OLD_one_hot_encoder(df, nan_as_category=True):  # TODO Delete
     """
     One-hot encoding for categorical columns with get_dummies
 
@@ -81,8 +84,11 @@ def one_hot_encoder(df, df_name, training=True, nan_as_category=True):
     :rtype: tuple
     """
     original_columns = list(df.columns)
+
     filename_joblib = 'models/preprocessing/OneHotEncoder_{}.joblib'.format(df_name)
-    categorical_columns = [col for col in df.columns if df[col].dtype == 'object']
+    filename_pickle = 'models/preprocessing/OneHotEncoder_with_columns_{}.sav'.format(df_name)
+
+    categorical_columns = [col for col in df.columns if df[col].dtype == 'object']  ## TODO
     print("Number of columns to encode :", len(categorical_columns))
 
     col_not_cat = [col for col in df.columns if df[col].dtype != 'object']  # or not in categorical_columns
@@ -90,18 +96,44 @@ def one_hot_encoder(df, df_name, training=True, nan_as_category=True):
 
     if training:
         # 1) Creating instance of one-hot-encoder and Fit the encoder on the training set
-        encoder = OneHotEncoder(handle_unknown='ignore', sparse=False).fit(df[categorical_columns])
+        ##encoder = OneHotEncoder(handle_unknown='ignore', sparse=False).fit(df[categorical_columns])
+        # encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False, categories=categorical_columns).fit(df)
+
         # if sparse=True (by default), we need to add .toarray() to encoded_categorical_data
 
+        encoder = ColumnTransformer(
+            [('encoder', OneHotEncoder(handle_unknown='ignore', sparse=False), categorical_columns)],
+            remainder='passthrough'
+        ).fit(df)  # handle_unknown='ignore', sparse_output=False
+
         # 2) save the OHE to disk
-        print("Saving One Hot Encoder")
+        print("Saving One Hot Encoder and categorical columns")
+
+        model = {'encoder': encoder, 'encoder_features': categorical_columns}
+        with open(filename_pickle, "wb") as f:
+            pickle.dump(model, f)
+        ##pickle.dump(model, open(filename_pickle, 'wb'))
+
         joblib.dump(encoder, filename_joblib)
+        encoded_categorical_data = encoder.transform(df)
+
     else:
+        ###df[categorical_columns] = df[categorical_columns] ## TODO fillnan ?
         # load model
-        print("Loading One Hot Encoder")
+        print("Loading One Hot Encoder and columns")
         encoder = joblib.load(filename_joblib)
 
-    encoded_categorical_data = encoder.transform(df[categorical_columns])
+        # with open(filename_pickle, 'rb') as pickle_file:
+        #   encoder_model = pickle.load(pickle_file)
+        # encoder = encoder_model["encoder"]
+        # categorical_columns = encoder_model["encoder_features"]
+        ##encoded_categorical_data = encoder.transform(df[categorical_columns])
+        encoded_categorical_data = encoder.transform(df)
+
+    #
+    # encoded_categorical_data = encoder.transform(df)  ###
+
+    ##encoded_categorical_data = encoder.transform(df[categorical_columns]) ## TODO remettre
 
     # 3) we make a list of the columns names
     encoded_categorical_data_names = encoder.get_feature_names_out().tolist()
@@ -137,7 +169,8 @@ def one_hot_encoder(df, df_name, training=True, nan_as_category=True):
     return df_all_encoded, new_columns
 
 
-def application(input_path, application_filename, num_rows=None, nan_as_category=True, training=True):  #TODO put back True
+def application(input_path, application_filename, num_rows=None, nan_as_category=True,
+                training=True):  # TODO put back True
     """
     Preprocess application_train.csv (or application_test.csv)
 
@@ -489,9 +522,17 @@ def generate_dataset(input_path, application_filename, output_file, training=Tru
         gc.collect()  # delete ??
 
 
+# TOMORROW : RUN THIS AND SEE if OHE for one query works !!
 if __name__ == "__main__":
     with timer("Full model run"):
         generate_dataset(input_path="dataset/source/", application_filename='application_train.csv',
-                        output_file="dataset/cleaned/data_train_preprocessed.csv", training=True)
+                         output_file="dataset/cleaned/data_train_preprocessed2.csv", training=True)
         generate_dataset(input_path="dataset/source/", application_filename='application_test.csv',
-                         output_file="dataset/cleaned/data_test_preprocessed.csv", training=False)
+                         output_file="dataset/cleaned/data_test_preprocessed2.csv", training=False)
+        print("END")
+        preprocessed_one_query = generate_dataset(input_path="dataset/cleaned/",
+                                                  application_filename='one_query_test.csv',
+                                                  output_file="dataset/cleaned/preprocessed_one_query_test.csv",
+                                                  training=False)
+
+# selection de feature / retirer les variables pas importantes pour la décision

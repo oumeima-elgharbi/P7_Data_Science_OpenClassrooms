@@ -1,5 +1,7 @@
 # P7_Data_Science_OpenClassrooms
 
+#### C:\ProgramData\Anaconda3\python.exe -m pip install evidently
+
 - EDA + model : Kaggle
 - **SHAPE : Feature importance
 - **SMOTE
@@ -7,6 +9,8 @@
 - FastAPI
 - Dashboard (Streamlit)
 - Cloud (Heroku, Azure Web App)
+- Evidently
+- MLflow track experiments
 
 #### Spécifications du dashboard
 

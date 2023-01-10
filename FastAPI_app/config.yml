@@ -8,3 +8,8 @@ preprocessing:
   previous_application: "models/preprocessing/OneHotEncoder_previous_application.joblib"
 classifier: "models/best_model.joblib"
 
+# dashboard : selectionner un num de client et ds infos sur lui, feature importance etc
+# score obtenu : proba / accepté ou pas
+# cas réel : ici sûr pas d'ajout de client / dans dashboard : variable avec curseur
+# evaluation sur le dashboard si tout apparait bien et sur modelisation : Grid, SMOTE, fonction cout métier
+# api pas trop
