@@ -96,15 +96,15 @@ def one_hot_encoder(df, df_name, training=True, nan_as_category=True):
 
     if training:
         # 1) Creating instance of one-hot-encoder and Fit the encoder on the training set
-        ##encoder = OneHotEncoder(handle_unknown='ignore', sparse=False).fit(df[categorical_columns])
+        encoder = OneHotEncoder(handle_unknown='ignore', sparse=False).fit(df[categorical_columns])
         # encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False, categories=categorical_columns).fit(df)
 
         # if sparse=True (by default), we need to add .toarray() to encoded_categorical_data
 
-        encoder = ColumnTransformer(
-            [('encoder', OneHotEncoder(handle_unknown='ignore', sparse=False), categorical_columns)],
-            remainder='passthrough'
-        ).fit(df)  # handle_unknown='ignore', sparse_output=False
+        # encoder = ColumnTransformer(
+        #   [('encoder', OneHotEncoder(handle_unknown='ignore', sparse=False), categorical_columns)],
+        #   remainder='passthrough'
+        # ).fit(df)  # handle_unknown='ignore', sparse_output=False
 
         # 2) save the OHE to disk
         print("Saving One Hot Encoder and categorical columns")
@@ -112,28 +112,21 @@ def one_hot_encoder(df, df_name, training=True, nan_as_category=True):
         model = {'encoder': encoder, 'encoder_features': categorical_columns}
         with open(filename_pickle, "wb") as f:
             pickle.dump(model, f)
-        ##pickle.dump(model, open(filename_pickle, 'wb'))
 
         joblib.dump(encoder, filename_joblib)
-        encoded_categorical_data = encoder.transform(df)
 
     else:
         ###df[categorical_columns] = df[categorical_columns] ## TODO fillnan ?
         # load model
         print("Loading One Hot Encoder and columns")
-        encoder = joblib.load(filename_joblib)
+        # encoder = joblib.load(filename_joblib)
 
-        # with open(filename_pickle, 'rb') as pickle_file:
-        #   encoder_model = pickle.load(pickle_file)
-        # encoder = encoder_model["encoder"]
-        # categorical_columns = encoder_model["encoder_features"]
-        ##encoded_categorical_data = encoder.transform(df[categorical_columns])
-        encoded_categorical_data = encoder.transform(df)
+        with open(filename_pickle, 'rb') as pickle_file:
+            encoder_model = pickle.load(pickle_file)
+        encoder = encoder_model["encoder"]
+        categorical_columns = encoder_model["encoder_features"]
 
-    #
-    # encoded_categorical_data = encoder.transform(df)  ###
-
-    ##encoded_categorical_data = encoder.transform(df[categorical_columns]) ## TODO remettre
+    encoded_categorical_data = encoder.transform(df[categorical_columns])
 
     # 3) we make a list of the columns names
     encoded_categorical_data_names = encoder.get_feature_names_out().tolist()
