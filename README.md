@@ -1,25 +1,32 @@
 # P7_Data_Science_OpenClassrooms
 
-#### Web Service
-
-```bash
-cd FastAPI_app
-uvicorn main:app --reload
-```
-
-POST http://localhost:8000/v1/predict/client/100001
-
 #### C:\ProgramData\Anaconda3\python.exe -m pip install evidently
 
-- EDA + model : Kaggle
-- **SHAPE : Feature importance
-- **SMOTE
-- precision / recall
-- FastAPI
+if you have packages problems with Streamlit :
+#### C:\ProgramData\Anaconda3\python.exe -m pip install --upgrade --force-reinstall streamlit --user
+
+
+For Wednesday
 - Dashboard (Streamlit)
+- SHAP : Feature importance
+
+Thursday :
 - Cloud (Heroku, Azure Web App)
+- unittest / pytest
+
+Friday :
+- SMOTE
+- CV + GridSearch
+- EDA + model : Kaggle
+
+Saturday :
+- notes : precision / recall
+
+Later :
+- Preprocess one client
+- MLFlow track experiments
+- MLFlow registry
 - Evidently
-- MLflow track experiments
 
 #### Spécifications du dashboard
 

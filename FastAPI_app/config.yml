@@ -1,9 +1,8 @@
 version: v1
-clients_database: "../dataset/source/application_test.csv"
+clients_database_preprocessed: "../dataset/cleaned/data_test_preprocessed_vf.csv"
 classifier: "../models/LGBM/LGBMClassifier_fold_0.joblib"
 
-
-clients_database_preprocessed: "../dataset/cleaned/data_test_preprocessed_vf.csv"
+clients_database: "../dataset/source/application_test.csv"
 preprocessing:
   application: "../models/preprocessing/OneHotEncoder_application.joblib"
   bureau: "../models/preprocessing/OneHotEncoder_bureau.joblib"
