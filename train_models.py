@@ -44,7 +44,7 @@ def kfold_lightgbm(df, num_folds, stratified=False):
     oof_preds = np.zeros(train_df.shape[0])
     # sub_preds = np.zeros(test_df.shape[0])
     feature_importance_df = pd.DataFrame()
-    feats = [f for f in train_df.columns if f not in ['TARGET', 'SK_ID_CURR', 'SK_ID_BUREAU', 'SK_ID_PREV', 'index']]
+    feats = [f for f in train_df.columns if f not in ['TARGET', 'SK_ID_CURR']] # 'SK_ID_BUREAU', 'SK_ID_PREV', 'index' # deleted
 
     for n_fold, (train_idx, valid_idx) in enumerate(folds.split(train_df[feats], train_df['TARGET'])):
         print("Iteration : ", n_fold)
@@ -85,6 +85,7 @@ def kfold_lightgbm(df, num_folds, stratified=False):
         valid_y_df.to_csv("dataset/cleaned/LGBM/y_val_fold_{}.csv".format(n_fold), index=False)
 
         print("Training LGBM")
+        print("Training shape :", train_x.shape, "Validation shape :", valid_x.shape)
         clf.fit(train_x, train_y, eval_set=[(train_x, train_y), (valid_x, valid_y)],
                 eval_metric='auc', verbose=200, early_stopping_rounds=200)
 
@@ -148,4 +149,4 @@ def modelling_lightgbm(df_path, debug=False):
 if __name__ == "__main__":
     with timer("Full model run"):
         print("Running time 2h30min lol : 9026s")
-        modelling_lightgbm(df_path="dataset/cleaned/data_train_preprocessed.csv")
+        modelling_lightgbm(df_path="dataset/cleaned/data_train_preprocessed_vf.csv")

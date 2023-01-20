@@ -519,13 +519,13 @@ def generate_dataset(input_path, application_filename, output_file, training=Tru
 if __name__ == "__main__":
     with timer("Full model run"):
         generate_dataset(input_path="dataset/source/", application_filename='application_train.csv',
-                         output_file="dataset/cleaned/data_train_preprocessed2.csv", training=True)
+                         output_file="dataset/cleaned/data_train_preprocessed_vf.csv", training=True)
         generate_dataset(input_path="dataset/source/", application_filename='application_test.csv',
-                         output_file="dataset/cleaned/data_test_preprocessed2.csv", training=False)
+                         output_file="dataset/cleaned/data_test_preprocessed_vf.csv", training=False)
         print("END")
-        preprocessed_one_query = generate_dataset(input_path="dataset/cleaned/",
-                                                  application_filename='one_query_test.csv',
-                                                  output_file="dataset/cleaned/preprocessed_one_query_test.csv",
-                                                  training=False)
+        #preprocessed_one_query = generate_dataset(input_path="dataset/cleaned/",
+         #                                         application_filename='one_query_test.csv',
+          #                                        output_file="dataset/cleaned/preprocessed_one_query_test.csv",
+           #                                       training=False)
 
 # selection de feature / retirer les variables pas importantes pour la décision

@@ -1,5 +1,17 @@
 # P7_Data_Science_OpenClassrooms
 
+#### Web Service
+```bash
+cd FastAPI_app
+uvicorn main:app --reload
+```
+
+POST http://localhost:8000/v1/predict/
+Body:
+{"client_id": 100001}
+
+
+
 #### C:\ProgramData\Anaconda3\python.exe -m pip install evidently
 
 - EDA + model : Kaggle
