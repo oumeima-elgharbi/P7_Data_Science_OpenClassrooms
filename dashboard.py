@@ -33,22 +33,27 @@ def main():
         'Quelle API souhaitez vous utiliser',
         ['FastAPI'])
 
-    st.title('Client n° application for a loan')
+    st.title('Client n°{} application for a loan'.format(client_id))
 
     revenu_med = st.number_input('Revenu médian dans le secteur (en 10K de dollars)',
                                  min_value=0., value=3.87, step=1.)
 
     predict_btn = st.button('Prédire')
     if predict_btn:
-        pred = None
+        #pred = None
+        #if api_choice == 'FastAPI':
+        pred = request_prediction(FASTAPI_URI, client_id)
 
-        if api_choice == 'FastAPI':
-            pred = request_prediction(FASTAPI_URI, client_id)
-
-        st.write(
-            'Response {}'.format(pred))
+        st.write('Probability that the client pays back the loan {} %'.format(round(100 * pred, 2)))
 
 
 if __name__ == '__main__':
     main()
     # streamlit run dashboard.py
+
+
+## I need the data from the client in the body ???
+## {client_data: [], probability: []}
+
+## GET get_client_data ??
+## POST prediction

@@ -34,8 +34,9 @@ async def predict(client_id: int):  # remove async def ?? # :dict = Body({})
     probability = get_prediction_proba(model, client_preprocessed)
     # print(probability)
     # print(probability[:, 1])
-    proba = round(probability[:, 1][0] * 100, 2)
-    response = [{'client ID': client_id}, {'probability of paying back the loan in %': proba}]
+    #proba = round(probability[:, 1][0] * 100, 2)
+    #response = [{'client ID': client_id}, {'probability of paying back the loan in %': proba}]
+    response = probability[:, 1][0]
     return response  # return prediction / [0] to get the value
 
 # analyse sur le client (stat) : sur les 3 var les plus importantes // comaprer avec la moy des clients refusés et acceptes /
