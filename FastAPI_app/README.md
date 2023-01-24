@@ -1,44 +1,8 @@
 # Prediction API
 
-### Context
+### I) Context
 
-#### Dashboard 
-url : http://localhost:8501/
-
-##### run :
-```bash
-streamlit run dashboard.py
-
-```
-
-#### Web Service / POSTMAN
-
-```bash
-cd FastAPI_app
-uvicorn main:app --reload
-```
-
-Doc : http://127.0.0.1:8000/docs
-
-POST http://localhost:8000/v1/predict/client/100001
-
-
-### Postman
-
-Using FastAPI : main.py
-
-body : {}
-
-```bash
-cd app
-uvicorn main:app --reload
-```
-
-POST http://localhost:8000/predict
-
-(for Flask : POST http://localhost:8080/predict)
-
-### Before starting
+### II) Before starting
 
 #### Requirements
 
@@ -46,22 +10,13 @@ POST http://localhost:8000/predict
 pip install -r requirements.txt
 ```
 
-??? check syntax
-
-### Data
-
 #### Dataset folder
 
 #### Data folder
 
-- ##### preprocessing
-    - input
-    - output
+- dataset/cleaned/data_test_preprocessed_vf.csv
 
-- ##### prediction
-    - output
-
-### Models
+#### Models
 
 ##### Preprocessing
 
@@ -71,11 +26,34 @@ pip install -r requirements.txt
 
 - LGBMClassifier
 
-### Execution
+### III) Run
 
-To launch a local server ?
+#### 1) Web Service / POSTMAN
 
 ```bash
-cd app
+cd FastAPI_app
 uvicorn main:app --reload
+```
+
+Doc : http://127.0.0.1:8000/docs
+
+Using POSTMAN
+
+- GET http://localhost:8000/clients/100001
+  => response : you will get a preprocessed client in json format.
+
+After getting the client's data, copy/paste the response as the body of the two following requests
+
+- POST http://localhost:8000/predict/
+  => response : you will get the proba that the client will repay the loan
+
+- POST http://localhost:8000/shap/
+  => response : you will get the SHAP values for feature of your preprocessed client
+
+#### 2) Dashboard
+
+url : http://localhost:8501/
+
+```bash
+streamlit run dashboard.py
 ```
