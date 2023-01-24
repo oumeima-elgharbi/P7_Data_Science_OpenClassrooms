@@ -22,7 +22,7 @@ print("__Getting config")
 config = read_yml("config.yml")
 
 
-def get_client(client_id, real_time=False):
+def get_client_from_database(client_id, real_time=False):
     """
 
     :param client_id:
@@ -50,10 +50,10 @@ def preprocess_one_application(client_id, real_time=False):
     if not real_time:
         # data = pd.read_csv(config["clients_database_preprocessed"])
         # preprocessed_client = data[data["SK_ID_CURR"] == client_id]
-        preprocessed_client = get_client(client_id, real_time=False)
+        preprocessed_client = get_client_from_database(client_id, real_time=False)
     else:
         print("__Getting client's application from database__")
-        client = get_client(client_id, real_time=True)
+        client = get_client_from_database(client_id, real_time=True)
 
         print("Preprocessing for selected client")
 

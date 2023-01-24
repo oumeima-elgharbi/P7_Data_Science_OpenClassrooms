@@ -26,12 +26,12 @@ def load_model(model_file):
     return model
 
 
-def get_prediction_proba(model, query):
+def get_prediction_proba(model, client_df):
     """
 
     :param model:
-    :param query:
+    :param client_df:
     :return:
     """
-    probability = model.predict_proba(query)
+    probability = model.predict_proba(client_df)
     return probability

@@ -25,6 +25,20 @@ def request_prediction(model_uri, client_id):
 
     return response.json()
 
+######################
+def request_client_data(model_uri, client_id):
+    # headers = {"Content-Type": "application/json"}
+
+    # data_json = {'data': data}
+    response = requests.request(
+        method='GET', url=model_uri.format(client_id))  # headers=headers, url=model_uri)#, json=data_json)
+
+    if response.status_code != 200:
+        raise Exception(
+            "Request failed with status {}, {}".format(response.status_code, response.text))
+
+    return response.json()
+##########################
 
 def main():
     FASTAPI_URI = HOST + '/clients/{}/predict/'
