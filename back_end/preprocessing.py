@@ -18,7 +18,7 @@ warnings.filterwarnings(action="once")
 global seed
 seed = 42
 
-print("__Getting config")
+print("__Preprocessing : getting config")
 config = read_yml("config.yml")
 
 

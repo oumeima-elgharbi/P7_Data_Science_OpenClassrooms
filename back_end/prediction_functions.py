@@ -1,5 +1,9 @@
 import yaml
 import joblib
+import shap
+import pandas as pd
+
+from functions import *
 
 
 def read_yml(file):
@@ -19,8 +23,9 @@ def read_yml(file):
 def load_model(model_file):
     """
 
-    :param model_file:
+    :param model_file: (string)
     :return:
+    :rtype:
     """
     model = joblib.load(model_file)
     return model
@@ -29,9 +34,29 @@ def load_model(model_file):
 def get_prediction_proba(model, client_df):
     """
 
-    :param model:
+    :param model: serialized model that has a predict_proba method
     :param client_df:
     :return:
     """
     probability = model.predict_proba(client_df)
     return probability
+
+
+def get_shap_values(model, client_df):
+    """
+
+    :param model: serialized model that has a predict_proba method
+    :param client_df: (DataFrame)
+    :return:
+    :rtype: (DataFrame)
+    """
+
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(client_df)
+    df_shap = pd.DataFrame({
+        'SHAP value': shap_values[1][0],
+        'feature': client_df.columns
+    })
+    df_shap.sort_values(by='SHAP value', inplace=True, ascending=False)
+
+    return df_shap

@@ -31,7 +31,7 @@ pip install -r requirements.txt
 #### 1) Web Service / POSTMAN
 
 ```bash
-cd FastAPI_app
+cd back_end
 uvicorn main:app --reload
 ```
 
@@ -55,5 +55,6 @@ After getting the client's data, copy/paste the response as the body of the two 
 url : http://localhost:8501/
 
 ```bash
+cd front_end
 streamlit run dashboard.py
 ```

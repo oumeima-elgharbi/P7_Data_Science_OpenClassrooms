@@ -1,12 +1,31 @@
+# to find the parent direcory
+
+import sys
+import os
+
+# getting the name of the directory
+# where the this file is present.
+current = os.path.dirname(os.path.realpath(__file__))
+
+# Getting the parent directory name
+# where the current directory is present.
+parent = os.path.dirname(current)
+
+# adding the parent directory to
+# the sys.path.
+sys.path.append(parent)
+
+# now we can import the module in the parent
+# directory.
+
+####################################
+
 # Library imports
 from fastapi import FastAPI, Body
 
-from prediction_functions import load_model, get_prediction_proba, read_yml
-from preprocessing import preprocess_one_application
-import pandas as pd
-
-import shap
-import json
+from prediction_functions import *
+from preprocessing import *
+from functions import *
 
 HOST = 'http://127.0.0.1:8000'
 # HOST = 'https://project7-api-ml.herokuapp.com'
@@ -35,10 +54,7 @@ def get_client_data(client_id: int):
     """
     print("__Getting client's application data from database__")
     client_df = preprocess_one_application(client_id)
-
-    client_string = client_df.to_json(orient="records")
-    client_json = json.loads(client_string)  # list of dict
-    # json.dumps(client_json, indent=4)
+    client_json = df_to_json(client_df)
     return client_json[0]
 
 
@@ -54,8 +70,7 @@ async def predict(client_json: dict = Body({})):  # remove async def ?? # :dict 
     """
     print("_____Start of prediction pipeline_____")
     print("_____Getting client_____")
-    client_df = pd.DataFrame.from_dict(client_json, orient="index").transpose()
-    # client_df = pd.Series(client_json).to_frame().transpose()
+    client_df = json_to_df(client_json)
 
     print("_____Predicting_____")
     probability = get_prediction_proba(model, client_df)
@@ -74,28 +89,17 @@ def get_shap(client_json: dict = Body({})):
     :rtype: (list)
     """
     print("_____Start of SHAP_____")
-
-    print("_____Getting client_____")
-    client_df = pd.DataFrame.from_dict(client_json, orient="index").transpose()
-    # client_df = pd.Series(client_json).to_frame().transpose()
+    client_df = json_to_df(client_json)
 
     print("_____Getting SHAP for our client_____")
-    explainer = shap.TreeExplainer(model)
-    shap_values = explainer.shap_values(client_df)
-    df_shap = pd.DataFrame({
-        'SHAP value': shap_values[1][0],
-        'feature': client_df.columns
-    })
-    df_shap.sort_values(by='SHAP value', inplace=True, ascending=False)
+    df_shap = get_shap_values(model, client_df)
 
     # transforming df to json response
-    client_shap_string = df_shap.to_json(orient='records')
-    client_shap_json = json.loads(client_shap_string)  # list of dict
+    client_shap_json = df_to_json(df_shap)
 
     print("We can verify that we have as much SHAP values as we have features for our client : ", len(client_shap_json),
           len(client_shap_json) == client_df.shape[1])
     return client_shap_json
-
 
 # analyse sur le client (stat) : sur les 3 var les plus importantes // comaprer avec la moy des clients refusés et acceptes /
 # application_train : SUR UNE VAR moy des clients 0 / moy des clients 1 // place mon client par rapport à eux (revenus)

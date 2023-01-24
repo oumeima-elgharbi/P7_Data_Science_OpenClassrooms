@@ -130,5 +130,6 @@ dmypy.json
 .pyre/
 /dataset/
 /other_documents/
-/models/
-/to_delete/
+/model_preparation/models/
+/other_documents/to_delete/
+/model_preparation/models/
