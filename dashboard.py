@@ -17,7 +17,7 @@ def request_prediction(model_uri, client_id):
 
     # data_json = {'data': data}
     response = requests.request(
-        method='POST', url=model_uri + str(client_id))  # headers=headers, url=model_uri)#, json=data_json)
+        method='POST', url=model_uri.format(client_id))  # headers=headers, url=model_uri)#, json=data_json)
 
     if response.status_code != 200:
         raise Exception(
@@ -27,7 +27,7 @@ def request_prediction(model_uri, client_id):
 
 
 def main():
-    FASTAPI_URI = HOST + '/v1/prediction/client/'
+    FASTAPI_URI = HOST + '/clients/{}/predict/'
 
     api_choice = st.sidebar.selectbox(
         'Quelle API souhaitez vous utiliser',

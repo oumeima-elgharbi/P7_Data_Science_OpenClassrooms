@@ -3,6 +3,7 @@ from fastapi import FastAPI, Body
 
 from prediction_functions import load_model, get_prediction_proba, read_yml
 from preprocessing import preprocess_one_application
+import pandas as pd
 
 HOST = 'http://127.0.0.1:8000'
 # HOST = 'https://project7-api-ml.herokuapp.com'
@@ -19,8 +20,26 @@ config = read_yml("config.yml")
 print("__Loading classifier")
 model = load_model(config["classifier"])
 
+@app.get('/clients/{client_id}')
+def base(client_id: int):
+    return f"Client id is {client_id} & it's type is : {type(client_id)}"
 
-@app.post("/v1/prediction/client/{client_id}")
+@app.get('/clients/{client_id}')
+def get_client_data(client_id: int):
+    """
+
+    :param client_id:
+    :param real_time: if False, we return the preprocessed client's application
+    :return:
+    """
+    print("__Getting client's application from database__")
+    data = pd.read_csv(config["clients_database"])
+    client = data[data["SK_ID_CURR"] == client_id]
+    client_json = client.to_json()
+    print("HEREEE", client_json)
+    return client_json
+
+@app.post("/clients/{client_id}/predict/")
 async def predict(client_id: int):  # remove async def ?? # :dict = Body({})
     """
 
