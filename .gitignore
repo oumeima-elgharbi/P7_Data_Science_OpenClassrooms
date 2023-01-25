@@ -136,3 +136,4 @@ dmypy.json
 /venv/Scripts/
 
 *.cfg
+/tests/

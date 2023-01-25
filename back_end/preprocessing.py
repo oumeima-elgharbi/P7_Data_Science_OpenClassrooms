@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import json
-import pandas as pd
-import numpy as np
-from tqdm import tqdm
-
-import joblib
-from prediction_functions import read_yml  # FastAPI_app.
+from utils import *  # FastAPI_app.
 # from feature_engineering import generate_dataset
 
 import warnings
@@ -19,7 +13,7 @@ global seed
 seed = 42
 
 print("__Preprocessing : getting config")
-config = read_yml("config.yml")
+config = read_yml("config_backend.yml")
 
 
 def get_client_from_database(client_id, real_time=False):

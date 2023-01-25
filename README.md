@@ -50,7 +50,7 @@ python -V
 
 python -V to check which version of Python is being run locally
 
-#### Heroku
+#### Heroku stack-22
 
 Using Windows CMD, go to repo with cd..
 

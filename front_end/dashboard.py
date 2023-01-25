@@ -21,7 +21,6 @@ sys.path.append(parent)
 ####################################
 
 import requests
-
 from functions_dashboard import *
 from utils import *
 
@@ -31,13 +30,24 @@ from utils import *
 # SMOTE : classes desequilibrées : dummy 0 : pour améliorer score sur classe 1 et réequilibrer dataset
 # voir si ca améliore le score
 
+##### TODO check 307 Temporary Redirect
 
 # 0) Variables
-THRESHOLD = 0.4
+
+print("__Getting config")
+config = read_yml("../config.yml")
+
+print("__Getting threshold__")
+THRESHOLD = config["threshold"]
+
+print("Deploiment ? {}".format(config["deploy"]))
+if config["deploy"]:
+    HOST = 'https://p7-data-science-openclassrooms.herokuapp.com/'
+else:
+    HOST = 'http://127.0.0.1:8000'
 
 # 1) Endpoints declaration
 
-HOST = 'http://127.0.0.1:8000'
 
 endpoint_get_client_data = "/clients/{}/"
 endpoint_predict = "/predict/"
