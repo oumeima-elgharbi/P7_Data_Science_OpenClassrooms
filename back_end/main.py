@@ -1,4 +1,4 @@
-# to find the parent direcory
+# to find the parent directory
 
 import sys
 import os
@@ -25,7 +25,7 @@ from fastapi import FastAPI, Body
 
 from prediction_functions import *
 from preprocessing import *
-from functions import *
+from utils import *
 
 HOST = 'http://127.0.0.1:8000'
 # HOST = 'https://project7-api-ml.herokuapp.com'

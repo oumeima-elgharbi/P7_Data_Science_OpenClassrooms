@@ -1,9 +1,8 @@
 import yaml
 import joblib
 import shap
-import pandas as pd
 
-from functions import *
+from utils import *
 
 
 def read_yml(file):

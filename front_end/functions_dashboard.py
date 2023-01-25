@@ -1,6 +1,5 @@
 import streamlit as st
 
-import pylab
 import matplotlib.pyplot as plt
 
 from matplotlib.patches import Rectangle, FancyArrowPatch

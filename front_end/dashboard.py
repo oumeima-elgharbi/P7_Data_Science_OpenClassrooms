@@ -1,4 +1,4 @@
-# to find the parent direcory
+# to find the parent directory
 
 import sys
 import os
@@ -23,7 +23,7 @@ sys.path.append(parent)
 import requests
 
 from functions_dashboard import *
-from functions import *
+from utils import *
 
 # SHAP : featu importance globale (constt) // local : le client 4 : telle var plus impacte sur son score et diff de feat importance
 # global : 3e dans la lsite mais si client X : 1er revenu
@@ -116,21 +116,19 @@ def main():
     # get shap values for the selected client
     client_shap_json = request_shap(HOST + endpoint_shap, client_json)
 
-
     # Local SHAP
     ### ?? ### "---------------------------"
     st.header('Impact of features on prediction')
-    df_shap = json_to_df(client_shap_json) # just need pd.Dataframe()
+    df_shap = json_to_df(client_shap_json)  # just need pd.Dataframe()
     ##st.write(df_shap.shape) ### for test purposes
     shap_barplot(df_shap)
-
 
     predict_btn = st.button('Prédire')
     if predict_btn:
         proba = None  # ??
         pred = None
 
-        proba = request_prediction(HOST + endpoint_predict, client_json) # we get the prediction
+        proba = request_prediction(HOST + endpoint_predict, client_json)  # we get the prediction
 
         if proba <= THRESHOLD:
             pred = 0
@@ -147,9 +145,6 @@ def main():
         st.header('Gauge prediction')
         rectangle_gauge(client_id, proba)
         ###################################""
-
-
-
 
 
 if __name__ == '__main__':

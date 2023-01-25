@@ -12,3 +12,13 @@ import unittest
 import pytest
 import virtualenv
 import pydantic
+
+import sys
+import shap
+import sklearn
+import streamlit
+
+print("User Current Version:-", sys.version)
+print("Scikit-Learn Version : {}".format(sklearn.__version__))
+print("SHAP Version : {}".format(shap.__version__))
+print("Streamlit Version : {}".format(streamlit.__version__))
