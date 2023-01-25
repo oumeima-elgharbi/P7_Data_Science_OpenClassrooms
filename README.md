@@ -5,6 +5,7 @@
 if you have packages problems with Streamlit :
 #### C:\ProgramData\Anaconda3\python.exe -m pip install --upgrade --force-reinstall streamlit --user
 
+##### Reference : https://leandeep.com/datalab-kaggle/kb002.html
 
 For Wednesday
 - Dashboard (Streamlit)

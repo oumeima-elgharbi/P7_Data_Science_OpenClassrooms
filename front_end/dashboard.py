@@ -124,23 +124,29 @@ def main():
 
         proba = request_prediction(HOST + endpoint_predict, client_json) # we get the prediction
 
-        if proba >= THRESHOLD:
+        if proba <= THRESHOLD:
             pred = 1
             result = "yes"
         else:
             pred = 0
             result = "no"
 
-        st.write('Probability that the client pays back the loan {} %'.format(round(100 * proba, 2)))
+        st.write('Probability that the loan is not payed back {} %'.format(round(100 * proba, 2)))
         st.write('Loan accepted : {}'.format(result))
+
+        ############################################################
+        # Gauge ??
+        st.header('Gauge prediction')
+        rectangle_gauge(client_id, proba)
+        ###################################""
 
     # Local SHAP
     ### ?? ### "---------------------------"
     st.header('Impact of features on prediction')
     df_shap = json_to_df(client_shap_json) # just need pd.Dataframe()
-
-    st.write(df_shap.shape) ### for test purposes
+    ##st.write(df_shap.shape) ### for test purposes
     shap_barplot(df_shap)
+
 
 
 if __name__ == '__main__':

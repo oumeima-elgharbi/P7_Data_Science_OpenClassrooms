@@ -15,7 +15,7 @@ df_description = pd.read_csv(
 THRESHOLD = 0.4
 
 
-def rectangle_gauge(id, client_probability):
+def rectangle_gauge(client_id, client_probability):
     """Draws a gauge for the result of credit application, and an arrow at the client probability of default.
     Args :
     - id (int) : client ID.
@@ -25,7 +25,7 @@ def rectangle_gauge(id, client_probability):
     """
     plt.style.use('default')
     fig, ax = plt.subplots(figsize=(10, 1))
-    fig.suptitle(f"Client {id}: probability of credit default (%)",
+    fig.suptitle(f"Client {client_id}: probability of credit default (%)",
                  size=15,
                  y=1.1)
     ax.add_patch(
@@ -77,7 +77,13 @@ def shap_barplot(df_shap):
     """
     # Preparation of data
     df = df_shap.sort_values(by='SHAP value', ascending=False)
-    df = df.head(5).append(df.tail(5)).copy()
+
+    df_head = df.head(5).copy()
+    df_tail = df.tail(5).copy()
+    df = pd.concat([df_head, df_tail])
+    #df = pd.concat([df.head(5), df.tail(5)])
+    #df = df.head(5).append(df.tail(5)).copy()
+
     # Plotting
     plt.style.use('seaborn')
     fig = plt.figure(edgecolor='black', linewidth=4)
