@@ -10,4 +10,5 @@ from os.path import isfile, join
 
 import unittest
 import pytest
-
+import virtualenv
+import pydantic

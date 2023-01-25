@@ -14,3 +14,4 @@ shap==0.41.0
 streamlit==1.17.0
 tqdm==4.64.1
 uvicorn==0.20.0
+virtualenv==20.17.1

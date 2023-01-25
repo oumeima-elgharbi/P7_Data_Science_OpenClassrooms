@@ -14,7 +14,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+venv/Lib/
 lib64/
 parts/
 sdist/
@@ -133,3 +133,6 @@ dmypy.json
 /model_preparation/models/
 /other_documents/to_delete/
 /model_preparation/models/
+/venv/Scripts/
+
+*.cfg

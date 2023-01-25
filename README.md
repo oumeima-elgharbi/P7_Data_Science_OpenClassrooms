@@ -1,29 +1,67 @@
 # P7_Data_Science_OpenClassrooms
 
+#### Virtual environment
+
+##### 1)
+
+runtime.txt contains the python version, run like below to check the version
+
+````bash
+cat runtime.txt
+
+python -V
+````
+
+python -V to check which version of Python is being run locally
+
+##### 2)
+
+To get a virtual env run the following
+You need to install virtualenv via pip before
+
+````bash
+virtualenv --python C:\ProgramData\Anaconda3\python.exe venv
+````
+
+
+#### Heroku
+
+````bash
+heroku login
+heroku create
+````
+
+
 #### C:\ProgramData\Anaconda3\python.exe -m pip install evidently
 
 if you have packages problems with Streamlit :
+
 #### C:\ProgramData\Anaconda3\python.exe -m pip install --upgrade --force-reinstall streamlit --user
 
 ##### Reference : https://leandeep.com/datalab-kaggle/kb002.html
 
 For Wednesday
+
 - Dashboard (Streamlit)
 - SHAP : Feature importance
 
 Thursday :
+
 - Cloud (Heroku, Azure Web App)
 - unittest / pytest
 
 Friday :
+
 - SMOTE
 - CV + GridSearch
 - EDA + model : Kaggle
 
 Saturday :
+
 - notes : precision / recall
 
 Later :
+
 - Preprocess one client
 - MLFlow track experiments
 - MLFlow registry
