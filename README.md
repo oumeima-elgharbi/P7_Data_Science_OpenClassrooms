@@ -14,6 +14,19 @@ python -V
 
 python -V to check which version of Python is being run locally
 
+###### Verification
+
+cd venv ??
+
+- to get the list of packages installed in **venv**
+- to get the python version used **TODO check python version in code and in venv**
+
+````bash
+pip list
+python --version
+
+````
+
 ##### 2)
 
 To get a virtual env run the following
@@ -23,14 +36,14 @@ You need to install virtualenv via pip before
 virtualenv --python C:\ProgramData\Anaconda3\python.exe venv
 ````
 
-
 #### Heroku
+
+go to repo with cd..
 
 ````bash
 heroku login
 heroku create
 ````
-
 
 #### C:\ProgramData\Anaconda3\python.exe -m pip install evidently
 
