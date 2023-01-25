@@ -116,29 +116,6 @@ def main():
     # get shap values for the selected client
     client_shap_json = request_shap(HOST + endpoint_shap, client_json)
 
-    predict_btn = st.button('Prédire')
-    if predict_btn:
-        proba = None  # ??
-        pred = None
-
-
-        proba = request_prediction(HOST + endpoint_predict, client_json) # we get the prediction
-
-        if proba <= THRESHOLD:
-            pred = 1
-            result = "yes"
-        else:
-            pred = 0
-            result = "no"
-
-        st.write('Probability that the loan is not payed back {} %'.format(round(100 * proba, 2)))
-        st.write('Loan accepted : {}'.format(result))
-
-        ############################################################
-        # Gauge ??
-        st.header('Gauge prediction')
-        rectangle_gauge(client_id, proba)
-        ###################################""
 
     # Local SHAP
     ### ?? ### "---------------------------"
@@ -146,6 +123,32 @@ def main():
     df_shap = json_to_df(client_shap_json) # just need pd.Dataframe()
     ##st.write(df_shap.shape) ### for test purposes
     shap_barplot(df_shap)
+
+
+    predict_btn = st.button('Prédire')
+    if predict_btn:
+        proba = None  # ??
+        pred = None
+
+        proba = request_prediction(HOST + endpoint_predict, client_json) # we get the prediction
+
+        if proba <= THRESHOLD:
+            pred = 0
+            result = "yes"
+        else:
+            pred = 1
+            result = "no"
+
+        st.write('Probability that the loan is not payed back {} %'.format(round(100 * proba, 2)))
+        st.write('Loan accepted : {}'.format(result))
+
+        ############################################################
+        # Gauge
+        st.header('Gauge prediction')
+        rectangle_gauge(client_id, proba)
+        ###################################""
+
+
 
 
 

@@ -10,7 +10,7 @@ import pandas as pd
 ## TO REMOVE LATER
 df_description = pd.read_csv(
     r"C:\Users\oumei\Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms\dataset\source\HomeCredit_columns_description.csv",
-    encoding="ISO-8859-1") # not encoded in utf-8
+    encoding="ISO-8859-1")  # not encoded in utf-8
 
 THRESHOLD = 0.4
 
@@ -81,8 +81,8 @@ def shap_barplot(df_shap):
     df_head = df.head(5).copy()
     df_tail = df.tail(5).copy()
     df = pd.concat([df_head, df_tail])
-    #df = pd.concat([df.head(5), df.tail(5)])
-    #df = df.head(5).append(df.tail(5)).copy()
+    # df = pd.concat([df.head(5), df.tail(5)])
+    # df = df.head(5).append(df.tail(5)).copy()
 
     # Plotting
     plt.style.use('seaborn')
