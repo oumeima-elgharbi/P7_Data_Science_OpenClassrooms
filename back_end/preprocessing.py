@@ -13,7 +13,7 @@ global seed
 seed = 42
 
 print("__Preprocessing : getting config")
-config = read_yml("config_backend.yml")
+config = read_yml("back_end/config_backend.yml")
 
 
 def get_client_from_database(client_id, real_time=False):

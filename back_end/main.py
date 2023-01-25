@@ -24,9 +24,9 @@ sys.path.append(parent)
 from fastapi import FastAPI, Body
 import uvicorn
 
-from prediction_functions import *
-from preprocessing import *
 from utils import *
+from back_end.prediction_functions import * # TODO remove
+from back_end.preprocessing import * # TODO remove
 
 # Create a FastAPI instance
 app = FastAPI()
@@ -34,16 +34,21 @@ app = FastAPI()
 # at the opening of the web service, we load all the models and files
 
 print("__Getting config")
-config = read_yml("../config.yml")
+# if deploy == False
+#config = read_yml("../config.yml")
+
+# if deploy == True
+config = read_yml("config.yml")
 
 print("Deploiment ? {}".format(config["deploy"]))
 if config["deploy"]:
     HOST = 'https://p7-data-science-openclassrooms.herokuapp.com/'
+
 else:
     HOST = 'http://127.0.0.1:8000'
 
 print("__Getting config back-end")
-config_back = read_yml("config_backend.yml")
+config_back = read_yml("back_end/config_backend.yml")
 
 print("__Loading classifier")
 model = load_model(config_back["classifier"])

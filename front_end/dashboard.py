@@ -35,7 +35,7 @@ from utils import *
 # 0) Variables
 
 print("__Getting config")
-config = read_yml("../config.yml")
+config = read_yml("config.yml")
 
 print("__Getting threshold__")
 THRESHOLD = config["threshold"]

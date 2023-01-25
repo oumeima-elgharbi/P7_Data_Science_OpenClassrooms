@@ -1,15 +1,15 @@
 version: v1
-clients_database_preprocessed: "../dataset/cleaned/data_test_preprocessed_vf.csv"
-classifier: "../model_preparation/models/LGBM/LGBMClassifier_fold_0.joblib"
+clients_database_preprocessed: "dataset/cleaned/data_test_preprocessed_vf.csv"
+classifier: "model_preparation/models/LGBM/LGBMClassifier_fold_0.joblib"
 
-clients_database: "../dataset/source/application_test.csv"
+clients_database: "dataset/source/application_test.csv"
 preprocessing:
-  application: "../model_preparation/models/preprocessing/OneHotEncoder_application.joblib"
-  bureau: "../model_preparation/models/preprocessing/OneHotEncoder_bureau.joblib"
-  bureau_balance: "../model_preparation/models/preprocessing/OneHotEncoder_bureau_balance.joblib"
-  credit_card_balance: "../model_preparation/models/preprocessing/OneHotEncoder_credit_card_balance.joblib"
-  POS_CASH_balance: "../model_preparation/models/preprocessing/OneHotEncoder_POS_CASH_balance.joblib"
-  previous_application: "../model_preparation/models/preprocessing/OneHotEncoder_previous_application.joblib"
+  application: "model_preparation/models/preprocessing/OneHotEncoder_application.joblib"
+  bureau: "model_preparation/models/preprocessing/OneHotEncoder_bureau.joblib"
+  bureau_balance: "model_preparation/models/preprocessing/OneHotEncoder_bureau_balance.joblib"
+  credit_card_balance: "model_preparation/models/preprocessing/OneHotEncoder_credit_card_balance.joblib"
+  POS_CASH_balance: "model_preparation/models/preprocessing/OneHotEncoder_POS_CASH_balance.joblib"
+  previous_application: "model_preparation/models/preprocessing/OneHotEncoder_previous_application.joblib"
 
 # dashboard : selectionner un num de client et ds infos sur lui, feature importance etc
 # score obtenu : proba / accepté ou pas
