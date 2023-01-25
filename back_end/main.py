@@ -22,6 +22,7 @@ sys.path.append(parent)
 
 # Library imports
 from fastapi import FastAPI, Body
+import uvicorn
 
 from prediction_functions import *
 from preprocessing import *
@@ -46,6 +47,18 @@ config_back = read_yml("config_backend.yml")
 
 print("__Loading classifier")
 model = load_model(config_back["classifier"])
+
+
+@app.get('/')
+def index():
+    """
+    Welcome message.
+    Args:
+    - None.
+    Returns:
+    - Message (string).
+    """
+    return 'Hello, you are accessing an API'
 
 
 @app.get('/clients/{client_id}')
@@ -115,3 +128,8 @@ def get_shap(client_json: dict = Body({})):
 # sur DB : ajouter info sur client / genre - salaire - etc
 
 # salaire : si modifie / personne acceptée ou pas (bonus)
+
+# if __name__ == '__main__':
+#   uvicorn.run(app,
+#              host=HOST.split(":")[0],
+#             port=HOST.split(":")[1])
