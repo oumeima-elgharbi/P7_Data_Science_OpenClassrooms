@@ -52,15 +52,15 @@ python -V to check which version of Python is being run locally
 
 #### Heroku-22 stack
 
-#### Procfile
+#### Files : Procfile and setup.sh
 
 - API :
   web: uvicorn back_end.main:app --host=0.0.0.0 --port=${PORT:-5000}
 
 - Streamlit :
-  web: sh setup.sh && streamlit run dashboard.py &&
+  web: sh setup.sh && streamlit run dashboard.py
 
-setup.sh
+We need a setup.sh to run streamlit dashboard
 
 Using Windows CMD, go to repo with cd..
 
@@ -92,7 +92,7 @@ To open the web service at : https://p7-data-science-openclassrooms.herokuapp.co
 heroku open
 ````
 
-######  
+######   
 
 #### C:\ProgramData\Anaconda3\python.exe -m pip install evidently
 
