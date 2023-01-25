@@ -1,2 +1,2 @@
-deploy: False # False # False for dev purpose
+deploy: True # False # False for dev purpose
 threshold: 0.4
