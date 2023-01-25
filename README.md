@@ -50,7 +50,7 @@ python -V
 
 python -V to check which version of Python is being run locally
 
-#### Heroku stack-22
+#### Heroku-22 stack
 
 Using Windows CMD, go to repo with cd..
 
@@ -58,6 +58,26 @@ Using Windows CMD, go to repo with cd..
 heroku login
 heroku create
 ````
+
+Clone the repository
+Use Git to clone p7-data-science-openclassrooms's source code to your local machine.
+
+````bash
+$ heroku git:clone -a p7-data-science-openclassrooms
+$ cd p7-data-science-openclassrooms
+````
+
+
+Deploy your changes
+Make some changes to the code you just cloned and deploy them to Heroku using Git.
+
+````bash
+$ git add .
+$ git commit -am "make it better"
+$ git push heroku master
+
+````
+
 
 ###### URL : https://p7-data-science-openclassrooms.herokuapp.com/
 
