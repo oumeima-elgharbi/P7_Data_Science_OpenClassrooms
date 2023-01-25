@@ -49,18 +49,6 @@ print("__Loading classifier")
 model = load_model(config_back["classifier"])
 
 
-@app.get('/')
-def index():
-    """
-    Welcome message.
-    Args:
-    - None.
-    Returns:
-    - Message (string).
-    """
-    return 'Hello, you are accessing an API'
-
-
 @app.get('/clients/{client_id}')
 def get_client_data(client_id: int):
     """
