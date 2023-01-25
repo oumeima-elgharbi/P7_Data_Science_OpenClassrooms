@@ -49,6 +49,18 @@ print("__Loading classifier")
 model = load_model(config_back["classifier"])
 
 
+@app.get('/')
+def index():
+    """
+    Welcome message.
+    Args:
+    - None.
+    Returns:
+    - Message (string).
+    """
+    return 'Hello, you are accessing an API'
+
+
 @app.get('/clients/{client_id}')
 def get_client_data(client_id: int):
     """
@@ -107,6 +119,7 @@ def get_shap(client_json: dict = Body({})):
           len(client_shap_json) == client_df.shape[1])
     return client_shap_json
 
+
 # analyse sur le client (stat) : sur les 3 var les plus importantes // comaprer avec la moy des clients refusés et acceptes /
 # application_train : SUR UNE VAR moy des clients 0 / moy des clients 1 // place mon client par rapport à eux (revenus)
 # barre jauge proba / (PM)
@@ -117,7 +130,7 @@ def get_shap(client_json: dict = Body({})):
 
 # salaire : si modifie / personne acceptée ou pas (bonus)
 
-# if __name__ == '__main__':
-#   uvicorn.run(app,
-#              host=HOST.split(":")[0],
-#             port=HOST.split(":")[1])
+if __name__ == '__main__':
+    uvicorn.run(app,
+                host=HOST.split(":")[0],
+                port=HOST.split(":")[1])
