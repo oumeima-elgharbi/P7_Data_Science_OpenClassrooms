@@ -67,7 +67,6 @@ $ heroku git:clone -a p7-data-science-openclassrooms
 $ cd p7-data-science-openclassrooms
 ````
 
-
 Deploy your changes
 Make some changes to the code you just cloned and deploy them to Heroku using Git.
 
@@ -75,11 +74,15 @@ Make some changes to the code you just cloned and deploy them to Heroku using Gi
 $ git add .
 $ git commit -am "make it better"
 $ git push heroku master
-
 ````
 
+To open the web service at : https://p7-data-science-openclassrooms.herokuapp.com/
 
-###### URL : https://p7-data-science-openclassrooms.herokuapp.com/
+````bash
+heroku open
+````
+
+###### 
 
 #### C:\ProgramData\Anaconda3\python.exe -m pip install evidently
 
