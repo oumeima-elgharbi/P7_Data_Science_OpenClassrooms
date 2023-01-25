@@ -1,5 +1,7 @@
 # P7_Data_Science_OpenClassrooms
 
+Add readme for frontend and for backend
+
 #### Virtual environment
 
 ##### 1) Install python
@@ -92,7 +94,7 @@ To open the web service at : https://p7-data-science-openclassrooms.herokuapp.co
 heroku open
 ````
 
-######   
+######    
 
 #### C:\ProgramData\Anaconda3\python.exe -m pip install evidently
 
