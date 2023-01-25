@@ -137,5 +137,4 @@ dmypy.json
 
 *.cfg
 /tests/
-/model_preparation/
 *.ipynb
