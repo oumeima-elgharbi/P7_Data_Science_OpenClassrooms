@@ -5,7 +5,7 @@ import seaborn as sns
 
 # metrics
 from sklearn.metrics import roc_curve, auc, confusion_matrix
-from sklearn.metrics import f1_score, recall_score, precision_score, accuracy_score, classification_report
+from sklearn.metrics import f1_score, recall_score, precision_score, accuracy_score, classification_report, fbeta_score
 
 global results
 results = pd.DataFrame({})
@@ -25,6 +25,9 @@ def evaluate_models(model_name, result, y_test, y_pred):
     print("Prediction for : ", y_test.name)  # name Pandas Series
     f1_score_positif = f1_score(y_test, y_pred, average='binary').round(3)
     f1_score_weighted = f1_score(y_test, y_pred, average='weighted').round(3)
+    b = 3
+    f_score_beta = fbeta_score(y_test, y_pred, beta=b).round(3)
+
     recall = recall_score(y_test, y_pred).round(3)
     precision = precision_score(y_test, y_pred).round(3)
     accuracy = accuracy_score(y_test, y_pred).round(3)
@@ -32,10 +35,11 @@ def evaluate_models(model_name, result, y_test, y_pred):
     false_positive_rate, true_positive_rate, thresholds = roc_curve(y_test, y_pred)
     roc_auc = auc(false_positive_rate, true_positive_rate).round(3)
 
-    result = pd.concat([result, pd.DataFrame({"Model": [model_name],
-                                              "ROC-AUC": [roc_auc],
+    result = pd.concat([result, pd.DataFrame({"___Model___": [model_name],
+                                              "__ROC-AUC__": [roc_auc],
+                                              "__F-score Beta = {}__".format(b): [f_score_beta],
+                                              "__Recall__": [recall],
                                               "Precision": [precision],
-                                              "Recall": [recall],
                                               "F1-score": [f1_score_positif],
                                               "F1-score weighted": [f1_score_weighted],
                                               "Accuracy": [accuracy]
