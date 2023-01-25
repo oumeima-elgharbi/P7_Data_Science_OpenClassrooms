@@ -45,6 +45,8 @@ heroku login
 heroku create
 ````
 
+###### URL : https://p7-data-science-openclassrooms.herokuapp.com/
+
 #### C:\ProgramData\Anaconda3\python.exe -m pip install evidently
 
 if you have packages problems with Streamlit :
