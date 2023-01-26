@@ -28,18 +28,13 @@ from utils import *
 from back_end.prediction_functions import * # TODO remove
 from back_end.preprocessing import * # TODO remove
 
-# Create a FastAPI instance
-app = FastAPI()
-
 # at the opening of the web service, we load all the models and files
-
 print("__Getting config")
 config = read_yml("config.yml")
 
 print("Deployment ? {}".format(config["deploy"]))
 if config["deploy"]:
     HOST = 'https://p7-data-science-openclassrooms.herokuapp.com/'
-
 else:
     HOST = 'http://127.0.0.1:8000'
 
@@ -52,6 +47,9 @@ unzip_file(path_to_zip_file=config_back["resources"]["zip"], directory_to_extrac
 print("__Loading classifier")
 model = load_model(config_back["classifier"])
 
+
+# Create a FastAPI instance
+app = FastAPI()
 
 @app.get('/')
 def index():
