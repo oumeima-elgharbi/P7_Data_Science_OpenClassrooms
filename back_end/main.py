@@ -28,7 +28,7 @@ from utils import *
 from back_end.prediction_functions import * # TODO remove
 from back_end.preprocessing import * # TODO remove
 
-# at the opening of the web service, we load all the models and files
+# before opening the web service, we load all the models and files
 print("__Getting config")
 config = read_yml("config.yml")
 
@@ -47,12 +47,11 @@ unzip_file(path_to_zip_file=config_back["resources"]["zip"], directory_to_extrac
 print("__Loading classifier")
 model = load_model(config_back["classifier"])
 
-
 # Create a FastAPI instance
 app = FastAPI()
 
 @app.get('/')
-def index():
+async def index():
     """
     Welcome message.
     Args:
@@ -64,7 +63,7 @@ def index():
 
 
 @app.get('/clients/{client_id}')
-def get_client_data(client_id: int):
+async def get_client_data(client_id: int):
     """
     Body empty, using the client's id, we get the client's preprocessed data
 
@@ -99,7 +98,7 @@ async def predict(client_json: dict = Body({})):  # remove async def ?? # :dict 
 
 
 @app.post('/shap/')
-def get_shap(client_json: dict = Body({})):
+async def get_shap(client_json: dict = Body({})):
     """
     Computes SHAP values for each feature for a client
     ##the probability of default for a client.
@@ -132,11 +131,9 @@ def get_shap(client_json: dict = Body({})):
 
 # salaire : si modifie / personne acceptée ou pas (bonus)
 
-if __name__ == '__main__':
-    # before opening the web service
-
-
-    # opening the web service
-    uvicorn.run(app,
-                host=HOST.split(":")[0],
-                port=HOST.split(":")[1])
+#if __name__ == '__main__':
+#    # opening the web service
+#    uvicorn.run(app,
+#                host=HOST.split(":")[0],
+#                port=HOST.split(":")[1])
+#ipython

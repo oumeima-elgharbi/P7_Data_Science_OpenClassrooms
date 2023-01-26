@@ -63,6 +63,4 @@ def preprocess_one_application(client_id, real_time=False):
         #                                       application_filename='one_query_test.csv',
         #                                       output_file="dataset/cleaned/preprocessed_one_query_test.csv",
         #                                       training=False)
-
-    features = [f for f in preprocessed_client.columns if f not in ['SK_ID_CURR']]
-    return preprocessed_client[features]
+    return preprocessed_client.iloc[:, 1:]

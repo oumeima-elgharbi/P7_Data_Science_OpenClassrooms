@@ -15,6 +15,7 @@ tqdm==4.64.1
 uvicorn==0.20.0
 virtualenv==20.17.1
 joblib
+ipython
 
 
 
