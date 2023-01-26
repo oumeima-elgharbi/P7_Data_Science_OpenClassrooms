@@ -2,7 +2,7 @@
 
 import sys
 import os
-#import gc
+import gc
 
 # getting the name of the directory
 # where the this file is present.
@@ -23,11 +23,17 @@ sys.path.append(parent)
 
 # Library imports
 from fastapi import FastAPI, Body
-#import uvicorn
+import uvicorn
 
-#from utils import *
-from back_end.prediction_functions import * # TODO remove
-from back_end.preprocessing import * # TODO remove
+# from utils import *
+from back_end.prediction_functions import *  # TODO remove
+from back_end.preprocessing import *  # TODO remove
+
+# pip install modin[ray]
+import ray
+ray.init(num_cpus=4)
+import modin.pandas as pd
+##export MODIN_OUT_OF_CORE=true
 
 # before opening the web service, we load all the models and files
 print("__Getting config")
@@ -53,6 +59,7 @@ data_all_clients = pd.read_csv(config_back["clients_database_preprocessed"])
 
 # Create a FastAPI instance
 app = FastAPI()
+
 
 @app.get('/')
 async def index():
@@ -137,9 +144,8 @@ async def get_shap(client_json: dict = Body({})):
 
 # salaire : si modifie / personne acceptée ou pas (bonus)
 
-#if __name__ == '__main__':
-#    # opening the web service
-#    uvicorn.run(app,
-#                host=HOST.split(":")[0],
-#                port=HOST.split(":")[1])
-#ipython
+if __name__ == '__main__':
+    # opening the web service
+    uvicorn.run(app,
+                host=HOST.split(":")[0],
+                port=HOST.split(":")[1])
