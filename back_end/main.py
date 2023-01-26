@@ -73,7 +73,9 @@ async def get_client_data(client_id: int):
     """
     print("__Getting client's application data from database__")
     client_df = preprocess_one_application(client_id)
+    print("HERE4")
     client_json = df_to_json(client_df)
+    print("HERE5")
     return client_json[0]
 
 

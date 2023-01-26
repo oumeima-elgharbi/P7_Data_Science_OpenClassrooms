@@ -25,8 +25,11 @@ def get_client_from_database(client_id, real_time=False):
     """
     print("__Getting client's application from database__")
     if not real_time:
+        print("HERE1")
         data = pd.read_csv(config["clients_database_preprocessed"])
+        print("HERE2")
         client = data[data["SK_ID_CURR"] == client_id]
+        print("HERE3")
     else:
         print("__Getting client's application from database__")
         data = pd.read_csv(config["clients_database"])
