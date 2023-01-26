@@ -1,4 +1,38 @@
-# Prediction API
+# P7_Data_Science_OpenClassrooms : Back-end
+
+#### Methods
+
+- Using client id, we get a preprocessed client (meaning with all his data and history of loans)
+  GET /clients/{client_id}/
+
+- We compute the probability that the client might not repay the loan
+  POST /predict/
+
+- We compute Shapley values for each feature of client (local feature importance)
+  POST /shap/
+
+#### Run
+
+If deploy == False :
+
+- url : http://127.0.0.1:8000/
+  Else:
+- url : https://p7-data-science-openclassrooms.herokuapp.com/
+
+To run the back-end from the root of the repository (we only have one repository for back and front)
+
+**For dev purposes add --reload**
+
+```bash
+uvicorn back_end.main:app -- reload
+```
+
+We could have done like below if we wanted to separate the front-end from the back-end in two different repositories.
+
+```bash
+cd back_end
+uvicorn main:app --reload 
+```
 
 ### I) Context
 

@@ -34,13 +34,9 @@ app = FastAPI()
 # at the opening of the web service, we load all the models and files
 
 print("__Getting config")
-# if deploy == False
-#config = read_yml("../config.yml")
-
-# if deploy == True
 config = read_yml("config.yml")
 
-print("Deploiment ? {}".format(config["deploy"]))
+print("Deployment ? {}".format(config["deploy"]))
 if config["deploy"]:
     HOST = 'https://p7-data-science-openclassrooms.herokuapp.com/'
 
@@ -49,6 +45,9 @@ else:
 
 print("__Getting config back-end")
 config_back = read_yml("back_end/config_backend.yml")
+
+print("__Unzip model and dataset__")
+unzip_file(path_to_zip_file=config_back["resources"]["zip"], directory_to_extract_to=config_back["resources"]["unzip"])
 
 print("__Loading classifier")
 model = load_model(config_back["classifier"])
@@ -136,6 +135,10 @@ def get_shap(client_json: dict = Body({})):
 # salaire : si modifie / personne acceptée ou pas (bonus)
 
 if __name__ == '__main__':
+    # before opening the web service
+
+
+    # opening the web service
     uvicorn.run(app,
                 host=HOST.split(":")[0],
                 port=HOST.split(":")[1])

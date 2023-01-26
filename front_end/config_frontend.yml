@@ -1,0 +1,7 @@
+columns_description: "resources/HomeCredit_columns_description.csv"
+threshold: 0.4
+endpoints:
+  endpoint_get_client_data: "/clients/{}/"
+  endpoint_predict: "/predict/"
+  endpoint_shap: "/shap/"
+
