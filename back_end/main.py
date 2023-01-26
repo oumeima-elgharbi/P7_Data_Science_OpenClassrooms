@@ -62,7 +62,7 @@ async def index():
     return 'Hello, you are accessing an API'
 
 
-@app.get('/clients/{client_id}')
+@app.post('/client/{client_id}/')
 async def get_client_data(client_id: int):
     """
     Body empty, using the client's id, we get the client's preprocessed data

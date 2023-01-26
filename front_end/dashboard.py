@@ -65,7 +65,7 @@ def request_client_data(model_uri, client_id):
     :return:
     """
     response = requests.request(
-        method='GET', url=model_uri.format(client_id))
+        method='POST', url=model_uri.format(client_id))
 
     if response.status_code != 200:
         raise Exception(
