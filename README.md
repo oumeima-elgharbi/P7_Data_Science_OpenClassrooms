@@ -68,8 +68,12 @@ Using Windows CMD, go to repo with cd..
 
 ````bash
 heroku login
-heroku create
+cd Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
+heroku git:remote -a p7-data-science-openclassrooms
+git push heroku master
 ````
+
+dashboard: sh -c 'cd ./front_end/ setup.sh && streamlit run front_end.dashboard.py'
 
 Clone the repository
 Use Git to clone p7-data-science-openclassrooms's source code to your local machine.
