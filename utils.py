@@ -1,6 +1,11 @@
 import pandas as pd
 import json
 import yaml
+from zipfile import ZipFile
+import os
+
+
+##path_root = os.getenv('P7_ROOT') # C:\Users\oumei\Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
 
 
 def read_yml(file):
@@ -20,7 +25,7 @@ def read_yml(file):
 def json_to_df(client_json):
     """
 
-    :param client_json:
+    :param client_json: (dict)
     :return: (DataFrame)
     """
     if type(client_json) == dict:  # one dict / for clients
@@ -34,10 +39,25 @@ def json_to_df(client_json):
 def df_to_json(client_df):
     """
 
-    :param client_df:
-    :return: (list) list of dict
+    :param client_df: (DataFrame)
+    :return: list of dict
+    :rtype: list
     """
     client_string = client_df.to_json(orient="records")
     client_json = json.loads(client_string)  # list of dict
     # json.dumps(client_json, indent=4)
     return client_json
+
+
+def unzip_file(path_to_zip_file, directory_to_extract_to):
+    """
+
+    :param path_to_zip_file: (string)
+    :param directory_to_extract_to: (string) the name of the zip will be kept
+    :return: None
+    :rtype: None
+    """
+
+    with ZipFile(path_to_zip_file, 'r') as zip_ref:
+        zip_ref.extractall(directory_to_extract_to)
+    # os.remove(path_to_zip_file)

@@ -1,7 +1,11 @@
 version: v1
-clients_database_preprocessed: "dataset/cleaned/data_test_preprocessed_vf.csv"
-classifier: "model_preparation/models/LGBM/LGBMClassifier_fold_0.joblib"
+resources:
+  zip: "resources.zip"
+  unzip: ""
+clients_database_preprocessed: "resources/data_test_preprocessed_vf.csv"
+classifier: "resources/LGBMClassifier_fold_0.joblib"
 
+# For v2
 clients_database: "dataset/source/application_test.csv"
 preprocessing:
   application: "model_preparation/models/preprocessing/OneHotEncoder_application.joblib"

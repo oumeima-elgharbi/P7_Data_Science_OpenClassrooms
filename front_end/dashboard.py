@@ -37,27 +37,26 @@ from utils import *
 print("__Getting config")
 config = read_yml("config.yml")
 
-print("__Getting threshold__")
-THRESHOLD = config["threshold"]
-
-print("Deploiment ? {}".format(config["deploy"]))
+print("Deployment ? {}".format(config["deploy"]))
 if config["deploy"]:
     HOST = 'https://p7-data-science-openclassrooms.herokuapp.com/'
 else:
     HOST = 'http://127.0.0.1:8000'
 
-# 1) Endpoints declaration
+# 1) Config front-end
+print("__Getting config front-end")
+config_front = read_yml("front_end/config_frontend.yml")
 
+THRESHOLD = config_front["threshold"]
+ENDPOINT_GET_CLIENT_DATA = config_front["endpoints"]["endpoint_get_client_data"]
+ENDPOINT_PREDICT = config_front["endpoints"]["endpoint_predict"]
+ENDPOINT_SHAP = config_front["endpoints"]["endpoint_shap"]
+DF_DESCRIPTION = pd.read_csv(config_front["columns_description"], encoding="ISO-8859-1")  # not encoded in utf-8
 
-endpoint_get_client_data = "/clients/{}/"
-endpoint_predict = "/predict/"
-endpoint_shap = "/shap/"
-
-client_id = st.sidebar.number_input('Insert client id', value=100001)  # default value 100001 # to change later to 0
+CLIENT_ID = st.sidebar.number_input('Insert client id', value=100001)  # default value 100001 # to change later to 0
 
 
 # 2) GET client / POST predict / POST shap
-
 def request_client_data(model_uri, client_id):
     """
 
@@ -117,28 +116,28 @@ def request_shap(model_uri, client_json):
 
 def main():
     st.title("Home Credit Default Risk Prediction")
-    st.title('Client n°{} application for a loan'.format(client_id))
+    st.title('Client n°{} application for a loan'.format(CLIENT_ID))
 
     # Get client data
     # we get the json body for the client_id selected
-    client_json = request_client_data(HOST + endpoint_get_client_data, client_id)
+    client_json = request_client_data(HOST + ENDPOINT_GET_CLIENT_DATA, CLIENT_ID)
 
     # get shap values for the selected client
-    client_shap_json = request_shap(HOST + endpoint_shap, client_json)
+    client_shap_json = request_shap(HOST + ENDPOINT_SHAP, client_json)
 
     # Local SHAP
     ### ?? ### "---------------------------"
     st.header('Impact of features on prediction')
     df_shap = json_to_df(client_shap_json)  # just need pd.Dataframe()
     ##st.write(df_shap.shape) ### for test purposes
-    shap_barplot(df_shap)
+    shap_barplot(df_shap, DF_DESCRIPTION)
 
     predict_btn = st.button('Prédire')
     if predict_btn:
         proba = None  # ??
         pred = None
 
-        proba = request_prediction(HOST + endpoint_predict, client_json)  # we get the prediction
+        proba = request_prediction(HOST + ENDPOINT_PREDICT, client_json)  # we get the prediction
 
         if proba <= THRESHOLD:
             pred = 0
@@ -153,7 +152,7 @@ def main():
         ############################################################
         # Gauge
         st.header('Gauge prediction')
-        rectangle_gauge(client_id, proba)
+        rectangle_gauge(CLIENT_ID, proba, THRESHOLD)
         ###################################""
 
 

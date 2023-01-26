@@ -1,5 +1,7 @@
 # P7_Data_Science_OpenClassrooms
 
+Add readme for frontend and for backend
+
 #### Virtual environment
 
 ##### 1) Install python
@@ -82,7 +84,7 @@ Make some changes to the code you just cloned and deploy them to Heroku using Gi
 
 ````bash
 $ git add .
-$ git commit -am "make it better"
+$ git commit -am "deploy True again 3!"
 $ git push heroku master
 ````
 
@@ -92,7 +94,7 @@ To open the web service at : https://p7-data-science-openclassrooms.herokuapp.co
 heroku open
 ````
 
-######   
+######    
 
 #### C:\ProgramData\Anaconda3\python.exe -m pip install evidently
 

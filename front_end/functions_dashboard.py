@@ -1,20 +1,34 @@
+# to find the parent directory
+
+import sys
+import os
+
+# getting the name of the directory
+# where the this file is present.
+current = os.path.dirname(os.path.realpath(__file__))
+
+# Getting the parent directory name
+# where the current directory is present.
+parent = os.path.dirname(current)
+
+# adding the parent directory to
+# the sys.path.
+sys.path.append(parent)
+
+# now we can import the module in the parent
+# directory.
+
+####################################
+
 import streamlit as st
-
 import matplotlib.pyplot as plt
-
 from matplotlib.patches import Rectangle, FancyArrowPatch
 from matplotlib.cm import RdYlGn
-import pandas as pd
 
-## TO REMOVE LATER
-df_description = pd.read_csv(
-    r"C:\Users\oumei\Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms\dataset\source\HomeCredit_columns_description.csv",
-    encoding="ISO-8859-1")  # not encoded in utf-8
-
-THRESHOLD = 0.4
+from utils import *
 
 
-def rectangle_gauge(client_id, client_probability):
+def rectangle_gauge(client_id, client_probability, threshold):
     """Draws a gauge for the result of credit application, and an arrow at the client probability of default.
     Args :
     - id (int) : client ID.
@@ -29,15 +43,15 @@ def rectangle_gauge(client_id, client_probability):
                  y=1.1)
     ax.add_patch(
         Rectangle((0, 0),
-                  width=THRESHOLD * 100,
+                  width=threshold * 100,
                   height=1,
                   color=(0.5, 0.9, 0.5, 0.5)))
     ax.add_patch(
-        Rectangle((THRESHOLD * 100, 0),
-                  width=100 - THRESHOLD * 100,
+        Rectangle((threshold * 100, 0),
+                  width=100 - threshold * 100,
                   height=1,
                   color=(1, 0, 0, 0.5)))
-    ax.plot((THRESHOLD * 100, THRESHOLD * 100), (0, 1),
+    ax.plot((threshold * 100, threshold * 100), (0, 1),
             color='#FF8C00',
             ls=(0, (0.5, 0.5)),
             lw=6)
@@ -52,7 +66,7 @@ def rectangle_gauge(client_id, client_probability):
     st.pyplot(fig)
 
 
-def feature_description(feature):
+def feature_description(feature, df_description):
     """Returns a description of the feature, taken from the table HomeCredit_columns_description.csv.
     Args :
     - feature (string).
@@ -67,7 +81,7 @@ def feature_description(feature):
     return description
 
 
-def shap_barplot(df_shap):
+def shap_barplot(df_shap, df_description):
     """Plots an horizontal barplot of 10 SHAP values (the 5 most positive contributions and the 5 most negatives to the probability of default)
     Args :
     - df_shap (dataframe) : SHAP values and feature names.
@@ -97,4 +111,4 @@ def shap_barplot(df_shap):
         "Horizontal scale : contribution to log odds of credit default.")
     with st.expander("Features description", expanded=False):
         for feature in list(df['feature']):
-            st.caption(feature + ": " + feature_description(feature))
+            st.caption(feature + ": " + feature_description(feature, df_description))
