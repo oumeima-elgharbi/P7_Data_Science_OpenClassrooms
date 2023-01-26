@@ -2,7 +2,7 @@ version: v1
 resources:
   zip: "resources.zip"
   unzip: ""
-clients_database_preprocessed: "resources/data_test_preprocessed_vf.csv"
+clients_database_preprocessed: "resources/data_test_preprocessed_vf.csv.gz"
 classifier: "resources/LGBMClassifier_fold_0.joblib"
 
 # For v2
