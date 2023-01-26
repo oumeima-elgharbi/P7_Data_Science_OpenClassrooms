@@ -29,11 +29,6 @@ import uvicorn
 from back_end.prediction_functions import *  # TODO remove
 from back_end.preprocessing import *  # TODO remove
 
-# pip install modin[ray]
-import ray
-ray.init(num_cpus=4)
-import modin.pandas as pd
-##export MODIN_OUT_OF_CORE=true
 
 # before opening the web service, we load all the models and files
 print("__Getting config")
@@ -55,7 +50,7 @@ print("__Loading classifier__")
 model = load_model(config_back["classifier"])
 
 print("__Loading database of preprocessed clients__")
-data_all_clients = pd.read_csv(config_back["clients_database_preprocessed"])
+data_all_clients = pd.read_csv(config_back["clients_database_preprocessed"]) # TODO read db when getting client / like before
 
 # Create a FastAPI instance
 app = FastAPI()
