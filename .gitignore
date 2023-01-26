@@ -131,9 +131,6 @@ dmypy.json
 /dataset/
 /other_documents/
 /model_preparation/models/
-/other_documents/to_delete/
-/model_preparation/models/
-/venv/Scripts/
-
-*.cfg
+/venv/
 /tests/
+/resources/
