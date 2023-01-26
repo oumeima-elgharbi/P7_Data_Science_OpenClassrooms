@@ -84,7 +84,7 @@ Make some changes to the code you just cloned and deploy them to Heroku using Gi
 
 ````bash
 $ git add .
-$ git commit -am "deploy True again !"
+$ git commit -am "deploy True again 3!"
 $ git push heroku master
 ````
 
