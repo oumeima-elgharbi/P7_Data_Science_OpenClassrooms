@@ -13,10 +13,11 @@ global seed
 seed = 42
 
 print("__Preprocessing : getting config")
-config = read_yml("back_end/config_backend.yml")
+config_back = read_yml("back_end/config_backend.yml")
+##from main import config_back ## TODO remove / trying to save memory...
 
 
-def get_client_from_database(client_id, real_time=False):
+def get_client_from_database(data, client_id, real_time=False):
     """
 
     :param client_id:
@@ -26,18 +27,18 @@ def get_client_from_database(client_id, real_time=False):
     print("__Getting client's application from database__")
     if not real_time:
         print("HERE1")
-        data = pd.read_csv(config["clients_database_preprocessed"])
+        #data = pd.read_csv(config_back["clients_database_preprocessed"]) # MEMORY PB / TODO refacto and clean code !!
         print("HERE2")
         client = data[data["SK_ID_CURR"] == client_id]
         print("HERE3")
     else:
         print("__Getting client's application from database__")
-        data = pd.read_csv(config["clients_database"])
+        data = pd.read_csv(config_back["clients_database"])
         client = data[data["SK_ID_CURR"] == client_id]
     return client
 
 
-def preprocess_one_application(client_id, real_time=False):
+def preprocess_one_application(data, client_id, real_time=False):
     """
 
     :param client_id:
@@ -47,7 +48,7 @@ def preprocess_one_application(client_id, real_time=False):
     if not real_time:
         # data = pd.read_csv(config["clients_database_preprocessed"])
         # preprocessed_client = data[data["SK_ID_CURR"] == client_id]
-        preprocessed_client = get_client_from_database(client_id, real_time=False)
+        preprocessed_client = get_client_from_database(data, client_id, real_time=False)
     else:
         print("__Getting client's application from database__")
         client = get_client_from_database(client_id, real_time=True)
@@ -55,15 +56,16 @@ def preprocess_one_application(client_id, real_time=False):
         print("Preprocessing for selected client")
 
         print("Not working yet !")
-        encoder_application = config["preprocessing"]["application"]
-        encoder_bureau = config["preprocessing"]["bureau"]
-        encoder_bureau_balance = config["preprocessing"]["bureau_balance"]
-        encoder_credit_card = config["preprocessing"]["credit_card_balance"]
-        encoder_pos = config["preprocessing"]["POS_CASH_balance"]
-        encoder_previous_application = config["preprocessing"]["previous_application"]
+        encoder_application = config_back["preprocessing"]["application"]
+        encoder_bureau = config_back["preprocessing"]["bureau"]
+        encoder_bureau_balance = config_back["preprocessing"]["bureau_balance"]
+        encoder_credit_card = config_back["preprocessing"]["credit_card_balance"]
+        encoder_pos = config_back["preprocessing"]["POS_CASH_balance"]
+        encoder_previous_application = config_back["preprocessing"]["previous_application"]
 
         # preprocessed_client = generate_dataset(input_path="dataset/cleaned/",
         #                                       application_filename='one_query_test.csv',
         #                                       output_file="dataset/cleaned/preprocessed_one_query_test.csv",
         #                                       training=False)
+    # to remove the column with the id
     return preprocessed_client.iloc[:, 1:]

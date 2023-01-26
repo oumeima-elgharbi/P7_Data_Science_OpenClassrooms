@@ -2,6 +2,7 @@
 
 import sys
 import os
+#import gc
 
 # getting the name of the directory
 # where the this file is present.
@@ -22,9 +23,9 @@ sys.path.append(parent)
 
 # Library imports
 from fastapi import FastAPI, Body
-import uvicorn
+#import uvicorn
 
-from utils import *
+#from utils import *
 from back_end.prediction_functions import * # TODO remove
 from back_end.preprocessing import * # TODO remove
 
@@ -32,20 +33,23 @@ from back_end.preprocessing import * # TODO remove
 print("__Getting config")
 config = read_yml("config.yml")
 
-print("Deployment ? {}".format(config["deploy"]))
+print("__Deployment : {}__".format(config["deploy"]))
 if config["deploy"]:
     HOST = 'https://p7-data-science-openclassrooms.herokuapp.com/'
 else:
     HOST = 'http://127.0.0.1:8000'
 
-print("__Getting config back-end")
+print("__Getting config back-end__")
 config_back = read_yml("back_end/config_backend.yml")
 
 print("__Unzip model and dataset__")
 unzip_file(path_to_zip_file=config_back["resources"]["zip"], directory_to_extract_to=config_back["resources"]["unzip"])
 
-print("__Loading classifier")
+print("__Loading classifier__")
 model = load_model(config_back["classifier"])
+
+print("__Loading database of preprocessed clients__")
+data_all_clients = pd.read_csv(config_back["clients_database_preprocessed"])
 
 # Create a FastAPI instance
 app = FastAPI()
@@ -72,7 +76,7 @@ async def get_client_data(client_id: int):
     :rtype: (dict)
     """
     print("__Getting client's application data from database__")
-    client_df = preprocess_one_application(client_id)
+    client_df = preprocess_one_application(data_all_clients, client_id)
     print("HERE4")
     client_json = df_to_json(client_df)
     print("HERE5")
