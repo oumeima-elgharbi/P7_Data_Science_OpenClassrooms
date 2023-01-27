@@ -1,1 +1,5 @@
+version: v1
 deploy: True # False # False for dev purpose
+resources:
+  zip: "resources.zip"
+  unzip: ""

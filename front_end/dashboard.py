@@ -30,12 +30,13 @@ from utils import *
 # SMOTE : classes desequilibrées : dummy 0 : pour améliorer score sur classe 1 et réequilibrer dataset
 # voir si ca améliore le score
 
-##### TODO check 307 Temporary Redirect
+# 0) Config : unzip data and check host if deployment or not
 
-# 0) Variables
-
-print("__Getting config")
+print("_____Getting config_____")
 config = read_yml("config.yml")
+
+print("__Unzip model and dataset__")
+unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
 
 print("Deployment ? {}".format(config["deploy"]))
 if config["deploy"]:
@@ -44,7 +45,7 @@ else:
     HOST = 'http://127.0.0.1:8000'
 
 # 1) Config front-end
-print("__Getting config front-end")
+print("_____Getting config front-end_____")
 config_front = read_yml("front_end/config_frontend.yml")
 
 THRESHOLD = config_front["threshold"]

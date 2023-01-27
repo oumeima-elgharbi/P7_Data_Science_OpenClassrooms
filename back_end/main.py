@@ -35,17 +35,17 @@ from back_end.preprocessing import *  # TODO remove
 print("_____Getting config_____")
 config = read_yml("config.yml")
 
+print("__Unzip model and dataset__")
+unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
+
 print("__Deployment : {}__".format(config["deploy"]))
 if config["deploy"]:
     HOST = 'https://p7-data-science-openclassrooms.herokuapp.com/'
 else:
     HOST = 'http://127.0.0.1:8000'
 
-print("__Getting config back-end__")
+print("_____Getting config back-end_____")
 config_back = read_yml("back_end/config_backend.yml")
-
-print("__Unzip model and dataset__")
-unzip_file(path_to_zip_file=config_back["resources"]["zip"], directory_to_extract_to=config_back["resources"]["unzip"])
 
 ##print("__Loading database of preprocessed clients__")
 ##data_all_clients = pd.read_csv(

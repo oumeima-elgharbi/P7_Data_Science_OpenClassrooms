@@ -98,7 +98,7 @@ To open the web service at : https://p7-data-science-openclassrooms.herokuapp.co
 heroku open
 ````
 
-######    
+######     
 
 #### C:\ProgramData\Anaconda3\python.exe -m pip install evidently
 
@@ -134,7 +134,6 @@ Later :
 - MLFlow track experiments
 - MLFlow registry
 - Evidently
-
 
 ### Dataset
 
