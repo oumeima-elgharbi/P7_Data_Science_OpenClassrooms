@@ -1,11 +1,6 @@
 # to find the parent directory
-
 import sys
 import os
-import gc
-import time
-import asyncio
-
 # getting the name of the directory
 # where the this file is present.
 current = os.path.dirname(os.path.realpath(__file__))

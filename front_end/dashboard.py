@@ -1,13 +1,9 @@
 # to find the parent directory
-
 import sys
 import os
-import gc
 
 # getting the name of the directory
 # where the this file is present.
-import time
-
 current = os.path.dirname(os.path.realpath(__file__))
 
 # Getting the parent directory name
@@ -26,6 +22,11 @@ sys.path.append(parent)
 import requests
 from functions_dashboard import *
 from utils import *
+
+from clear_cache import clear as clear_cache
+
+clear_cache(dir=".")
+import gc
 
 # SHAP : featu importance globale (constt) // local : le client 4 : telle var plus impacte sur son score et diff de feat importance
 # global : 3e dans la lsite mais si client X : 1er revenu
