@@ -40,16 +40,12 @@ unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=
 
 print("__Deployment : {}__".format(config["deploy"]["is"]))
 if config["deploy"]["is"]:
-    HOST = config["deploy"]["dev"] # config["deploy"]["prod"] # TODO remove just for dev purposes
+    HOST = config["deploy"]["prod"]
 else:
     HOST = config["deploy"]["dev"]
 
 print("_____Getting config back-end_____")
 config_back = read_yml("back_end/config_backend.yml")
-
-##print("__Loading database of preprocessed clients__")
-##data_all_clients = pd.read_csv(
-##config_back["clients_database_preprocessed"])  # TODO read db when getting client / like before
 
 print("__Loading classifier__")
 model = load_model(config_back["classifier"])
@@ -85,10 +81,7 @@ async def get_client_data(client_id: int):
     gc.collect()
     # await asyncio.sleep(5)
     client_df = preprocess_one_application(client_id)
-    # client_df = await preprocess_one_application(data_all_clients, client_id)
-    print("HERE4")
     client_json = df_to_json(client_df)
-    print("HERE5")
     return client_json[0]
 
 

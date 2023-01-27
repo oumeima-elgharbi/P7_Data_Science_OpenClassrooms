@@ -73,7 +73,13 @@ heroku git:remote -a p7-data-science-openclassrooms
 git push heroku master
 ````
 
-dashboard: sh -c 'cd ./front_end/ setup.sh && streamlit run front_end.dashboard.py'
+````bash
+web: sh -c 'cd ./front_end/ && sh setup.sh && cd .. && streamlit run front_end/dashboard.py'
+server: uvicorn back_end.main:app --host=0.0.0.0 --port=${PORT:-5000}
+
+web: sh setup.sh && streamlit run front_end/dashboard.py
+````
+
 
 Clone the repository
 Use Git to clone p7-data-science-openclassrooms's source code to your local machine.

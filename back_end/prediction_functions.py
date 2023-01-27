@@ -35,7 +35,7 @@ def get_shap_values(model, client_df):
     :rtype: (DataFrame)
     """
 
-    explainer = shap.TreeExplainer(model)
+    explainer = shap.TreeExplainer(model) # TODO : LightGBM binary classifier with TreeExplainer shap values output has changed to a list of ndarray
     shap_values = explainer.shap_values(client_df)
     df_shap = pd.DataFrame({
         'SHAP value': shap_values[1][0],
