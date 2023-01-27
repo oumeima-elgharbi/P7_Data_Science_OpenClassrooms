@@ -47,19 +47,14 @@ config_back = read_yml("back_end/config_backend.yml")
 print("__Unzip model and dataset__")
 unzip_file(path_to_zip_file=config_back["resources"]["zip"], directory_to_extract_to=config_back["resources"]["unzip"])
 
-gc.collect()
-
-print("__Loading database of preprocessed clients__")
-data_all_clients = pd.read_csv(
-    config_back["clients_database_preprocessed"])  # TODO read db when getting client / like before
-
-gc.collect()
+##print("__Loading database of preprocessed clients__")
+##data_all_clients = pd.read_csv(
+    ##config_back["clients_database_preprocessed"])  # TODO read db when getting client / like before
 
 print("__Loading classifier__")
 model = load_model(config_back["classifier"])
 
 gc.collect()
-
 
 # Create a FastAPI instance
 app = FastAPI()
@@ -89,7 +84,7 @@ async def get_client_data(client_id: int):
     print("__Getting client's application data from database__")
     gc.collect()
     # await asyncio.sleep(5)
-    client_df = preprocess_one_application(data_all_clients, client_id)
+    client_df = preprocess_one_application(client_id)
     # client_df = await preprocess_one_application(data_all_clients, client_id)
     print("HERE4")
     client_json = df_to_json(client_df)

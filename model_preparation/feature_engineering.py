@@ -511,7 +511,10 @@ def generate_dataset(input_path, application_filename, output_file, training=Tru
         gc.collect()
     with timer("6) Saving cleaned dataset"):
         print("Cleaned dataset shape :", df.shape)
-        df.to_csv(output_file, index=False)
+        print("Setting client's id as index")  # TODO check that this works !!
+        df = df.set_index("SK_ID_CURR")
+        print("Re-indexed dataset shape :", df.shape)
+        df.to_csv(output_file, index_label="SK_ID_CURR", sep=",")  # read with index_col = "SK_ID_CURR"
         gc.collect()  # delete ??
 
 
@@ -523,9 +526,9 @@ if __name__ == "__main__":
         generate_dataset(input_path="../dataset/source/", application_filename='application_test.csv',
                          output_file="../dataset/cleaned/data_test_preprocessed_vf.csv", training=False)
         print("END")
-        #preprocessed_one_query = generate_dataset(input_path="dataset/cleaned/",
-         #                                         application_filename='one_query_test.csv',
-          #                                        output_file="dataset/cleaned/preprocessed_one_query_test.csv",
-           #                                       training=False)
+        # preprocessed_one_query = generate_dataset(input_path="dataset/cleaned/",
+        #                                         application_filename='one_query_test.csv',
+        #                                        output_file="dataset/cleaned/preprocessed_one_query_test.csv",
+        #                                       training=False)
 
 # selection de feature / retirer les variables pas importantes pour la décision

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# import gc
 import gc
 
 from utils import *  # FastAPI_app.
@@ -10,15 +11,14 @@ import warnings
 # warnings.filterwarnings(action="ignore")
 warnings.filterwarnings(action="once")
 
-global seed
-seed = 42
-
 print("_____Preprocessing : getting config_____")
 config_back = read_yml("back_end/config_backend.yml")
+
+
 ##from main import config_back ## TODO remove / trying to save memory...
 
 
-def get_client_from_database(data, client_id, real_time=False):
+def get_client_from_database(client_id, real_time=False):  # data
     """
 
     :param client_id:
@@ -30,16 +30,23 @@ def get_client_from_database(data, client_id, real_time=False):
         print("HERE1")
         # data = pd.read_csv(config_back["clients_database_preprocessed"]) # MEMORY PB / TODO refacto and clean code !!
         print("HERE2")
-        client = data[data["SK_ID_CURR"] == client_id]
+        for data in pd.read_csv(config_back["clients_database_preprocessed"], index_col="SK_ID_CURR", chunksize=10000):
+            print("HERE : ", data.info(verbose=False, memory_usage="deep"))
+            if client_id in data.index:
+                client = data[data.index == client_id]
+                return client
+            gc.collect()
+        return None  # TODO if client not in database
+        # client = data[data["SK_ID_CURR"] == client_id]
         print("HERE3")
     else:
         print("__Getting client's application from database__")
         # data = pd.read_csv(config_back["clients_database"])
-        client = data[data["SK_ID_CURR"] == client_id]
+        # client = data[data["SK_ID_CURR"] == client_id]
     return client
 
 
-def preprocess_one_application(data, client_id, real_time=False):
+def preprocess_one_application(client_id, real_time=False):  # data
     """
 
     :param client_id:
@@ -50,10 +57,10 @@ def preprocess_one_application(data, client_id, real_time=False):
         # data = pd.read_csv(config["clients_database_preprocessed"])
         # preprocessed_client = data[data["SK_ID_CURR"] == client_id]
         # preprocessed_client = get_client_from_database(data, client_id, real_time=False)
-        preprocessed_client = get_client_from_database(data, client_id, real_time=False)
+        preprocessed_client = get_client_from_database(client_id, real_time=False)
     else:
         print("__Getting client's application from database__")
-        client = get_client_from_database(data, client_id, real_time=True)
+        client = get_client_from_database(client_id, real_time=True)
 
         print("Preprocessing for selected client")
 
@@ -70,4 +77,4 @@ def preprocess_one_application(data, client_id, real_time=False):
         #                                       output_file="dataset/cleaned/preprocessed_one_query_test.csv",
         #                                       training=False)
     # to remove the column with the id
-    return preprocessed_client.iloc[:, 1:]
+    return preprocessed_client  # .iloc[:, 1:] # we set the id as index
