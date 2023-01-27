@@ -67,6 +67,20 @@ async def index():
     """
     return 'Hello, you are accessing an API'
 
+@app.post('/client_data')
+async def client_data(client: dict = Body({})):
+    """
+    Body empty, using the client's id, we get the client's preprocessed data
+
+    :return: a preprocessed client with feature / value
+    :rtype: (dict)
+    """
+    print("__Getting client's application data from database__")
+    # {"client_id": 0}
+    client_df = preprocess_one_application(client["client_id"])
+    client_json = df_to_json(client_df)
+    return client_json[0]
+
 
 @app.get('/clients/{client_id}')
 async def get_client_data(client_id: int):

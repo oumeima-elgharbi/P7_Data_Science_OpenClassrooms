@@ -4,4 +4,5 @@ endpoints:
   endpoint_get_client_data: "/clients/{}"
   endpoint_predict: "/predict"
   endpoint_shap: "/shap"
+  endpoint_client_data: "/client_data"
 

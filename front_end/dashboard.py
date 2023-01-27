@@ -55,6 +55,8 @@ THRESHOLD = config_front["threshold"]
 ENDPOINT_GET_CLIENT_DATA = config_front["endpoints"]["endpoint_get_client_data"]
 ENDPOINT_PREDICT = config_front["endpoints"]["endpoint_predict"]
 ENDPOINT_SHAP = config_front["endpoints"]["endpoint_shap"]
+ENDPOINT_CLIENT_DATA = config_front["endpoints"]["endpoint_client_data"]
+
 DF_DESCRIPTION = pd.read_csv(config_front["columns_description"], encoding="ISO-8859-1")  # not encoded in utf-8
 
 gc.collect()
@@ -63,10 +65,12 @@ gc.collect()
 st.set_page_config(layout="wide")  ## remove ??
 
 CLIENT_ID = st.sidebar.number_input('Insert client id', value=100001)  # default value 100001 # to change later to 0
+
+
 # 456250
 
 # 2) GET client / POST predict / POST shap
-def request_client_data(model_uri, client_id):
+def get_client_data(model_uri, client_id):
     """
 
     :param model_uri:
@@ -75,6 +79,23 @@ def request_client_data(model_uri, client_id):
     """
     response = requests.request(
         method='GET', url=model_uri.format(client_id))
+
+    if response.status_code != 200:
+        raise Exception(
+            "Request failed with status {}, {}".format(response.status_code, response.text))
+
+    return response.json()
+
+
+def request_client_data(model_uri, client_id):
+    """
+
+    :param model_uri:
+    :param client_id: (int)
+    :return:
+    """
+    response = requests.request(
+        method='POST', url=model_uri, json={"client_id": client_id})
 
     if response.status_code != 200:
         raise Exception(
@@ -131,7 +152,7 @@ def main():
     gc.collect()
 
     try:
-        CLIENT_JSON = request_client_data(HOST + ENDPOINT_GET_CLIENT_DATA, CLIENT_ID)
+        CLIENT_JSON = request_client_data(HOST + ENDPOINT_CLIENT_DATA, CLIENT_ID)
     except Exception as e:
         print("Exception raised while trying to get client data :\n\n", e)
 
