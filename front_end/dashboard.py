@@ -23,9 +23,8 @@ import requests
 from functions_dashboard import *
 from utils import *
 
-from clear_cache import clear as clear_cache
+import functools
 
-clear_cache(dir=".")
 import gc
 
 # SHAP : featu importance globale (constt) // local : le client 4 : telle var plus impacte sur son score et diff de feat importance
@@ -71,6 +70,7 @@ CLIENT_ID = st.sidebar.number_input('Insert client id', value=100001)  # default
 # 456250
 
 # 2) GET client / POST predict / POST shap
+
 def get_client_data(model_uri, client_id):
     """
 
@@ -146,7 +146,7 @@ def request_shap(model_uri, client_json):
 
 
 # 3) dashboard front-end
-
+@functools.lru_cache(maxsize=None)
 def main():
     ####################################################
     st.title("Home Credit Default Risk Prediction")
