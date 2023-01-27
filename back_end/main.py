@@ -40,7 +40,7 @@ unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=
 
 print("__Deployment : {}__".format(config["deploy"]["is"]))
 if config["deploy"]["is"]:
-    HOST = config["deploy"]["prod"]
+    HOST = config["deploy"]["dev"] # config["deploy"]["prod"] # TODO remove just for dev purposes
 else:
     HOST = config["deploy"]["dev"]
 
