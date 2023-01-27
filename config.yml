@@ -1,5 +1,9 @@
 version: v1
-deploy: True # False # False for dev purpose
+deploy:
+  is: True # False # False for dev purpose
+  dev: 'http://127.0.0.1:8000'
+  prod: 'https://p7-data-science-openclassrooms.herokuapp.com'
+
 resources:
   zip: "resources.zip"
   unzip: ""

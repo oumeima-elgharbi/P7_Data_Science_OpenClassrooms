@@ -38,11 +38,11 @@ config = read_yml("config.yml")
 print("__Unzip model and dataset__")
 unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
 
-print("Deployment ? {}".format(config["deploy"]))
-if config["deploy"]:
-    HOST = 'https://p7-data-science-openclassrooms.herokuapp.com/'
+print("Deployment ? {}".format(config["deploy"]["is"]))
+if config["deploy"]["is"]:
+    HOST = config["deploy"]["prod"]
 else:
-    HOST = 'http://127.0.0.1:8000'
+    HOST = config["deploy"]["dev"]
 
 # 1) Config front-end
 print("_____Getting config front-end_____")

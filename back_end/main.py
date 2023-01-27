@@ -38,11 +38,11 @@ config = read_yml("config.yml")
 print("__Unzip model and dataset__")
 unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
 
-print("__Deployment : {}__".format(config["deploy"]))
-if config["deploy"]:
-    HOST = 'https://p7-data-science-openclassrooms.herokuapp.com/'
+print("__Deployment : {}__".format(config["deploy"]["is"]))
+if config["deploy"]["is"]:
+    HOST = config["deploy"]["prod"]
 else:
-    HOST = 'http://127.0.0.1:8000'
+    HOST = config["deploy"]["dev"]
 
 print("_____Getting config back-end_____")
 config_back = read_yml("back_end/config_backend.yml")
@@ -72,7 +72,7 @@ async def index():
     return 'Hello, you are accessing an API'
 
 
-@app.get('/clients/{client_id}/')
+@app.get('/clients/{client_id}')
 async def get_client_data(client_id: int):
     """
     Body empty, using the client's id, we get the client's preprocessed data
@@ -92,7 +92,7 @@ async def get_client_data(client_id: int):
     return client_json[0]
 
 
-@app.post("/predict/")
+@app.post("/predict")
 async def predict(client_json: dict = Body({})):  # remove async def ?? # :dict = Body({})
     """
     Put the preprocessed data of the client in the Body
@@ -112,7 +112,7 @@ async def predict(client_json: dict = Body({})):  # remove async def ?? # :dict 
     return response
 
 
-@app.post('/shap/')
+@app.post('/shap')
 async def get_shap(client_json: dict = Body({})):
     """
     Computes SHAP values for each feature for a client
