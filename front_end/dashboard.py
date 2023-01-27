@@ -2,9 +2,12 @@
 
 import sys
 import os
+import gc
 
 # getting the name of the directory
 # where the this file is present.
+import time
+
 current = os.path.dirname(os.path.realpath(__file__))
 
 # Getting the parent directory name
@@ -54,8 +57,13 @@ ENDPOINT_PREDICT = config_front["endpoints"]["endpoint_predict"]
 ENDPOINT_SHAP = config_front["endpoints"]["endpoint_shap"]
 DF_DESCRIPTION = pd.read_csv(config_front["columns_description"], encoding="ISO-8859-1")  # not encoded in utf-8
 
-CLIENT_ID = st.sidebar.number_input('Insert client id', value=456250)  # default value 100001 # to change later to 0
+gc.collect()
 
+##################################################################################################################
+st.set_page_config(layout="wide")  ## remove ??
+
+CLIENT_ID = st.sidebar.number_input('Insert client id', value=100001)  # default value 100001 # to change later to 0
+# 456250
 
 # 2) GET client / POST predict / POST shap
 def request_client_data(model_uri, client_id):
@@ -116,36 +124,46 @@ def request_shap(model_uri, client_json):
 # 3) dashboard front-end
 
 def main():
+    ####################################################
     st.title("Home Credit Default Risk Prediction")
     st.title('Client n°{} application for a loan'.format(CLIENT_ID))
 
-    # Get client data
-    # we get the json body for the client_id selected
-    client_json = request_client_data(HOST + ENDPOINT_GET_CLIENT_DATA, CLIENT_ID)
+    gc.collect()
 
-    # get shap values for the selected client
-    client_shap_json = request_shap(HOST + ENDPOINT_SHAP, client_json)
+    try:
+        CLIENT_JSON = request_client_data(HOST + ENDPOINT_GET_CLIENT_DATA, CLIENT_ID)
+    except Exception as e:
+        print("Exception raised while trying to get client data :\n\n", e)
 
     # Local SHAP
-    ### ?? ### "---------------------------"
+    #####################################################
     st.header('Impact of features on prediction')
-    df_shap = json_to_df(client_shap_json)  # just need pd.Dataframe()
-    ##st.write(df_shap.shape) ### for test purposes
-    shap_barplot(df_shap, DF_DESCRIPTION)
+    try:
+        # get shap values for the selected client
+        client_shap_json = request_shap(HOST + ENDPOINT_SHAP, CLIENT_JSON)
+        df_shap = json_to_df(client_shap_json)  # just need pd.Dataframe()
+        ##st.write(df_shap.shape) ### for test purposes
+        shap_barplot(df_shap, DF_DESCRIPTION)
 
+    except Exception as e:
+        print("Exception raised :", e)
+
+    ###################################################################################
     predict_btn = st.button('Prédire')
     if predict_btn:
-        proba = None  # ??
-        pred = None
+        proba = 0  # ??
+        pred = -1
 
-        proba = request_prediction(HOST + ENDPOINT_PREDICT, client_json)  # we get the prediction
-
-        if proba <= THRESHOLD:
-            pred = 0
-            result = "yes"
-        else:
-            pred = 1
-            result = "no"
+        try:
+            proba = request_prediction(HOST + ENDPOINT_PREDICT, CLIENT_JSON)  # we get the prediction
+            if proba <= THRESHOLD:
+                pred = 0
+                result = "yes"
+            else:
+                pred = 1
+                result = "no"
+        except Exception as e:
+            print("Exception raised :", e)
 
         st.write('Probability that the loan is not payed back {} %'.format(round(100 * proba, 2)))
         st.write('Loan accepted : {}'.format(result))
@@ -155,6 +173,9 @@ def main():
         st.header('Gauge prediction')
         rectangle_gauge(CLIENT_ID, proba, THRESHOLD)
         ###################################""
+
+    ### ???
+    st.markdown(10 * "<br />", unsafe_allow_html=True)  # ??? remove ??
 
 
 if __name__ == '__main__':
