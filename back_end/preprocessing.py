@@ -17,12 +17,6 @@ print("_____Preprocessing : getting config_____")
 config_back = read_yml("back_end/config_backend.yml")
 ##from main import config_back ## TODO remove / trying to save memory...
 
-print("__Loading database of preprocessed clients__")
-data_all_clients = pd.read_csv(
-    config_back["clients_database_preprocessed"])  # TODO read db when getting client / like before
-
-gc.collect()
-
 
 def get_client_from_database(data, client_id, real_time=False):
     """
