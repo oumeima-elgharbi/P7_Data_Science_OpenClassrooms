@@ -158,4 +158,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # streamlit run dashboard.py
+    # streamlit run dashboard.py OR streamlit run front_end/dashboard.py
