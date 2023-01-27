@@ -30,11 +30,13 @@ def get_client_from_database(client_id, real_time=False):  # data
         print("HERE1")
         # data = pd.read_csv(config_back["clients_database_preprocessed"]) # MEMORY PB / TODO refacto and clean code !!
         print("HERE2")
+        i = 1
         for data in pd.read_csv(config_back["clients_database_preprocessed"], index_col="SK_ID_CURR", chunksize=10000):
-            print("HERE : ", data.info(verbose=False, memory_usage="deep"))
+            print("\nHERE :", i, data.info(verbose=False, memory_usage="deep"), end="\n\n")
             if client_id in data.index:
                 client = data[data.index == client_id]
                 return client
+            i += 1
             gc.collect()
         return None  # TODO if client not in database
         # client = data[data["SK_ID_CURR"] == client_id]

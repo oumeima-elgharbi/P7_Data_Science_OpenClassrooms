@@ -53,7 +53,7 @@ ENDPOINT_PREDICT = config_front["endpoints"]["endpoint_predict"]
 ENDPOINT_SHAP = config_front["endpoints"]["endpoint_shap"]
 DF_DESCRIPTION = pd.read_csv(config_front["columns_description"], encoding="ISO-8859-1")  # not encoded in utf-8
 
-CLIENT_ID = st.sidebar.number_input('Insert client id', value=100001)  # default value 100001 # to change later to 0
+CLIENT_ID = st.sidebar.number_input('Insert client id', value=456250)  # default value 100001 # to change later to 0
 
 
 # 2) GET client / POST predict / POST shap
