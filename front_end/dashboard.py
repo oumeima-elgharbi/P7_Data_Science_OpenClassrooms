@@ -94,8 +94,10 @@ def request_client_data(model_uri, client_id):
     :param client_id: (int)
     :return:
     """
+    headers = {"Content-Type": "application/json"}
+
     response = requests.request(
-        method='POST', url=model_uri, json={"client_id": client_id})
+        method='POST', headers=headers, url=model_uri, json={"client_id": client_id})
 
     if response.status_code != 200:
         raise Exception(
@@ -183,11 +185,10 @@ def main():
             else:
                 pred = 1
                 result = "no"
+            st.write('Probability that the loan is not payed back {} %'.format(round(100 * proba, 2)))
+            st.write('Loan accepted : {}'.format(result))
         except Exception as e:
             print("Exception raised :", e)
-
-        st.write('Probability that the loan is not payed back {} %'.format(round(100 * proba, 2)))
-        st.write('Loan accepted : {}'.format(result))
 
         ############################################################
         # Gauge
