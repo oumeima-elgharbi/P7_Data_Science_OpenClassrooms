@@ -1,0 +1,2 @@
+cd front_end
+sh setup.sh && streamlit run dashboard.py

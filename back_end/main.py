@@ -49,7 +49,7 @@ unzip_file(path_to_zip_file=config_back["resources"]["zip"], directory_to_extrac
 
 ##print("__Loading database of preprocessed clients__")
 ##data_all_clients = pd.read_csv(
-    ##config_back["clients_database_preprocessed"])  # TODO read db when getting client / like before
+##config_back["clients_database_preprocessed"])  # TODO read db when getting client / like before
 
 print("__Loading classifier__")
 model = load_model(config_back["classifier"])
@@ -72,7 +72,7 @@ async def index():
     return 'Hello, you are accessing an API'
 
 
-@app.get('/client/{client_id}/')
+@app.get('/clients/{client_id}/')
 async def get_client_data(client_id: int):
     """
     Body empty, using the client's id, we get the client's preprocessed data
