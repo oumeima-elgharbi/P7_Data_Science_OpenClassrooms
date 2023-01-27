@@ -31,9 +31,8 @@ import uvicorn
 from back_end.prediction_functions import *  # TODO remove
 from back_end.preprocessing import *  # TODO remove
 
-
 # before opening the web service, we load all the models and files
-print("__Getting config")
+print("_____Getting config_____")
 config = read_yml("config.yml")
 
 print("__Deployment : {}__".format(config["deploy"]))
@@ -50,9 +49,6 @@ unzip_file(path_to_zip_file=config_back["resources"]["zip"], directory_to_extrac
 
 print("__Loading classifier__")
 model = load_model(config_back["classifier"])
-
-#print("__Loading database of preprocessed clients__")
-#data_all_clients = pd.read_csv(config_back["clients_database_preprocessed"]) # TODO read db when getting client / like before
 
 gc.collect()
 
@@ -83,9 +79,9 @@ async def get_client_data(client_id: int):
     """
     print("__Getting client's application data from database__")
     gc.collect()
-    await asyncio.sleep(10)
-    client_df = preprocess_one_application(client_id)
-    #client_df = await preprocess_one_application(data_all_clients, client_id)
+    # await asyncio.sleep(5)
+    client_df = preprocess_one_application(data_all_clients, client_id)
+    # client_df = await preprocess_one_application(data_all_clients, client_id)
     print("HERE4")
     client_json = df_to_json(client_df)
     print("HERE5")

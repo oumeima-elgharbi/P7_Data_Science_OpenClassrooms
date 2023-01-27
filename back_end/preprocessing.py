@@ -13,12 +13,18 @@ warnings.filterwarnings(action="once")
 global seed
 seed = 42
 
-print("__Preprocessing : getting config")
+print("_____Preprocessing : getting config_____")
 config_back = read_yml("back_end/config_backend.yml")
 ##from main import config_back ## TODO remove / trying to save memory...
 
+print("__Loading database of preprocessed clients__")
+data_all_clients = pd.read_csv(
+    config_back["clients_database_preprocessed"])  # TODO read db when getting client / like before
 
-def get_client_from_database(client_id, real_time=False):
+gc.collect()
+
+
+def get_client_from_database(data, client_id, real_time=False):
     """
 
     :param client_id:
@@ -28,19 +34,18 @@ def get_client_from_database(client_id, real_time=False):
     print("__Getting client's application from database__")
     if not real_time:
         print("HERE1")
-        gc.collect()
-        data = pd.read_csv(config_back["clients_database_preprocessed"]) # MEMORY PB / TODO refacto and clean code !!
+        # data = pd.read_csv(config_back["clients_database_preprocessed"]) # MEMORY PB / TODO refacto and clean code !!
         print("HERE2")
         client = data[data["SK_ID_CURR"] == client_id]
         print("HERE3")
     else:
         print("__Getting client's application from database__")
-        data = pd.read_csv(config_back["clients_database"])
+        # data = pd.read_csv(config_back["clients_database"])
         client = data[data["SK_ID_CURR"] == client_id]
     return client
 
 
-def preprocess_one_application(client_id, real_time=False):
+def preprocess_one_application(data, client_id, real_time=False):
     """
 
     :param client_id:
@@ -50,11 +55,11 @@ def preprocess_one_application(client_id, real_time=False):
     if not real_time:
         # data = pd.read_csv(config["clients_database_preprocessed"])
         # preprocessed_client = data[data["SK_ID_CURR"] == client_id]
-        #preprocessed_client = get_client_from_database(data, client_id, real_time=False)
-        preprocessed_client = get_client_from_database(client_id, real_time=False)
+        # preprocessed_client = get_client_from_database(data, client_id, real_time=False)
+        preprocessed_client = get_client_from_database(data, client_id, real_time=False)
     else:
         print("__Getting client's application from database__")
-        client = get_client_from_database(client_id, real_time=True)
+        client = get_client_from_database(data, client_id, real_time=True)
 
         print("Preprocessing for selected client")
 
