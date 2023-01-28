@@ -29,24 +29,26 @@ from back_end.preprocessing import *  # TODO remove
 
 # before opening the web service, we load all the models and files
 print("_____Getting config_____")
-config = read_yml("config.yml")
+#path_config = parent + r"\config.yml"
+#config = read_yml(r'{}/config.yml'.format(parent))
+config = read_yml("../config.yml")
 
 print("__Unzip model and dataset__")
 unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
 
 print("__Deployment : {}__".format(config["deploy"]["is"]))
 if config["deploy"]["is"]:
-    HOST = config["deploy"]["prod"]
+    HOST = config["deploy"]["prod_api"]
 else:
     HOST = config["deploy"]["dev"]
 
 print("_____Getting config back-end_____")
-config_back = read_yml("back_end/config_backend.yml")
+config_back = read_yml("config_backend.yml")
 
 print("__Loading classifier__")
 model = load_model(config_back["classifier"])
 
-#gc.collect()
+# gc.collect()
 
 # Create a FastAPI instance
 app = FastAPI()

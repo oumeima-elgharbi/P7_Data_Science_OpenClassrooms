@@ -33,20 +33,20 @@ import gc
 # 0) Config : unzip data and check host if deployment or not
 
 print("_____Getting config_____")
-config = read_yml("config.yml")
+config = read_yml("../config.yml")
 
 print("__Unzip model and dataset__")
 unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
 
 print("Deployment ? {}".format(config["deploy"]["is"]))
 if config["deploy"]["is"]:
-    HOST = config["deploy"]["prod"]
+    HOST = config["deploy"]["prod_dashboard"]
 else:
     HOST = config["deploy"]["dev"]
 
 # 1) Config front-end
 print("_____Getting config front-end_____")
-config_front = read_yml("front_end/config_frontend.yml")
+config_front = read_yml("config_frontend.yml")
 
 THRESHOLD = config_front["threshold"]
 ENDPOINT_GET_CLIENT_DATA = config_front["endpoints"]["endpoint_get_client_data"]
