@@ -135,4 +135,8 @@ dmypy.json
 /tests/
 /resources/
 /backend/resources/
-/front_end/resources/
+/frontend/resources/
+*.csv
+*.joblib
+*.pkl
+*.gz
