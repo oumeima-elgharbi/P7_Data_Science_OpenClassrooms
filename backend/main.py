@@ -24,8 +24,8 @@ from fastapi import FastAPI, Body
 import uvicorn
 
 # from utils import *
-from back_end.prediction_functions import *  # TODO remove
-from back_end.preprocessing import *  # TODO remove
+from backend.prediction_functions import *  # TODO remove
+from backend.preprocessing import *  # TODO remove
 
 # before opening the web service, we load all the models and files
 print("_____Getting config_____")

@@ -134,5 +134,5 @@ dmypy.json
 /venv/
 /tests/
 /resources/
-/back_end/resources/
+/backend/resources/
 /front_end/resources/
