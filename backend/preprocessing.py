@@ -1,27 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# to find the parent directory
-import sys
-import os
-
-# getting the name of the directory
-# where the file is present.
-current = os.path.dirname(os.path.realpath(__file__))
-
-# Getting the parent directory name
-# where the current directory is present.
-parent = os.path.dirname(current)
-
-# adding the parent directory to
-# the sys.path.
-sys.path.append(parent)
-
-# now we can import the module in the parent
-# directory.
-
-####################################
-
 import gc
 
 from utils import *  # FastAPI_app.
@@ -34,7 +10,6 @@ warnings.filterwarnings(action="once")
 
 print("_____Preprocessing : getting config_____")
 config_back = read_yml("config_backend.yml")
-#config_back = read_yml("backend/config_backend.yml")
 
 
 def get_client_from_database(client_id, real_time=False):  # data

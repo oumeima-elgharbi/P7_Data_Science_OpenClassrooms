@@ -2,10 +2,6 @@ import pandas as pd
 import json
 import yaml
 from zipfile import ZipFile
-import os
-
-
-##path_root = os.getenv('P7_ROOT') # C:\Users\oumei\Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
 
 
 def read_yml(file):

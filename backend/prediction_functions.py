@@ -1,24 +1,3 @@
-# to find the parent directory
-import sys
-import os
-
-# getting the name of the directory
-# where the file is present.
-current = os.path.dirname(os.path.realpath(__file__))
-
-# Getting the parent directory name
-# where the current directory is present.
-parent = os.path.dirname(current)
-
-# adding the parent directory to
-# the sys.path.
-sys.path.append(parent)
-
-# now we can import the module in the parent
-# directory.
-
-####################################
-
 import joblib
 import shap
 
@@ -56,7 +35,8 @@ def get_shap_values(model, client_df):
     :rtype: (DataFrame)
     """
 
-    explainer = shap.TreeExplainer(model) # TODO : LightGBM binary classifier with TreeExplainer shap values output has changed to a list of ndarray
+    explainer = shap.TreeExplainer(
+        model)  # TODO : LightGBM binary classifier with TreeExplainer shap values output has changed to a list of ndarray
     shap_values = explainer.shap_values(client_df)
     df_shap = pd.DataFrame({
         'SHAP value': shap_values[1][0],

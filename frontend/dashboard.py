@@ -1,24 +1,3 @@
-# to find the parent directory
-import sys
-import os
-
-# getting the name of the directory
-# where the file is present.
-current = os.path.dirname(os.path.realpath(__file__))
-
-# Getting the parent directory name
-# where the current directory is present.
-parent = os.path.dirname(current)
-
-# adding the parent directory to
-# the sys.path.
-sys.path.append(parent)
-
-# now we can import the module in the parent
-# directory.
-
-####################################
-
 import requests
 from functions_dashboard import *
 from utils import *
@@ -33,7 +12,7 @@ import gc
 # 0) Config : unzip data and check host if deployment or not
 
 print("_____Getting config_____")
-config = read_yml("../config.yml")
+config = read_yml("config.yml")
 
 print("__Unzip model and dataset__")
 unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
@@ -156,8 +135,7 @@ def main():
         print("Exception raised while trying to get client data :\n\n", e)
         st.write('The client with the id {} is not in the database.'.format(CLIENT_ID))
 
-
-# Local SHAP
+    # Local SHAP
     #####################################################
     st.header('Impact of features on prediction')
     try:
