@@ -3,7 +3,7 @@ import sys
 import os
 
 # getting the name of the directory
-# where the this file is present.
+# where the file is present.
 current = os.path.dirname(os.path.realpath(__file__))
 
 # Getting the parent directory name
@@ -22,9 +22,6 @@ sys.path.append(parent)
 import requests
 from functions_dashboard import *
 from utils import *
-
-import functools
-
 import gc
 
 # SHAP : featu importance globale (constt) // local : le client 4 : telle var plus impacte sur son score et diff de feat importance
@@ -64,12 +61,12 @@ gc.collect()
 ##################################################################################################################
 st.set_page_config(layout="wide")  ## remove ??
 
-CLIENT_ID = st.sidebar.number_input('Insert client id', value=100001)  # default value 100001 # to change later to 0
+CLIENT_ID = st.sidebar.number_input('Insert client id', value=456250)  # default value 100001 # to change later to 0
 
 
 # 456250
 
-# 2) GET client / POST predict / POST shap
+# 2) POST client / POST predict / POST shap
 
 def get_client_data(model_uri, client_id):
     """
@@ -146,20 +143,21 @@ def request_shap(model_uri, client_json):
 
 
 # 3) dashboard front-end
-@functools.lru_cache(maxsize=None)
 def main():
     ####################################################
     st.title("Home Credit Default Risk Prediction")
     st.title('Client n°{} application for a loan'.format(CLIENT_ID))
 
-    gc.collect()
+    # gc.collect()
 
     try:
         CLIENT_JSON = request_client_data(HOST + ENDPOINT_CLIENT_DATA, CLIENT_ID)
     except Exception as e:
         print("Exception raised while trying to get client data :\n\n", e)
+        st.write('The client with the id {} is not in the database.'.format(CLIENT_ID))
 
-    # Local SHAP
+
+# Local SHAP
     #####################################################
     st.header('Impact of features on prediction')
     try:
@@ -196,9 +194,6 @@ def main():
         st.header('Gauge prediction')
         rectangle_gauge(CLIENT_ID, proba, THRESHOLD)
         ###################################""
-
-    ### ???
-    st.markdown(10 * "<br />", unsafe_allow_html=True)  # ??? remove ??
 
 
 if __name__ == '__main__':

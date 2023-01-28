@@ -1,8 +1,9 @@
 # to find the parent directory
 import sys
 import os
+
 # getting the name of the directory
-# where the this file is present.
+# where the file is present.
 current = os.path.dirname(os.path.realpath(__file__))
 
 # Getting the parent directory name
@@ -45,7 +46,7 @@ config_back = read_yml("back_end/config_backend.yml")
 print("__Loading classifier__")
 model = load_model(config_back["classifier"])
 
-gc.collect()
+#gc.collect()
 
 # Create a FastAPI instance
 app = FastAPI()
@@ -62,7 +63,8 @@ async def index():
     """
     return 'Hello, you are accessing an API'
 
-@app.post('/client_data')
+
+@app.post('/client_data')  # 3s
 async def client_data(client: dict = Body({})):
     """
     Body empty, using the client's id, we get the client's preprocessed data
@@ -77,7 +79,7 @@ async def client_data(client: dict = Body({})):
     return client_json[0]
 
 
-@app.get('/clients/{client_id}')
+@app.get('/clients/{client_id}')  # 12s...
 async def get_client_data(client_id: int):
     """
     Body empty, using the client's id, we get the client's preprocessed data
