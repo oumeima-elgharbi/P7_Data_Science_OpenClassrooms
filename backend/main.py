@@ -34,8 +34,8 @@ from backend.preprocessing import *  # TODO remove
 print("_____Getting config_____")
 #path_config = parent + r"\config.yml"
 #config = read_yml(r'{}/config.yml'.format(parent))
-#config = read_yml("../config.yml")
-config = read_yml("config.yml")
+config = read_yml("../config.yml")
+#config = read_yml("config.yml")
 
 print("__Unzip model and dataset__")
 unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
@@ -47,8 +47,8 @@ else:
     HOST = config["deploy"]["dev"]
 
 print("_____Getting config back-end_____")
-#config_back = read_yml("config_backend.yml")
-config_back = read_yml("backend/config_backend.yml")
+config_back = read_yml("config_backend.yml")
+#config_back = read_yml("backend/config_backend.yml")
 
 print("__Loading classifier__")
 model = load_model(config_back["classifier"])

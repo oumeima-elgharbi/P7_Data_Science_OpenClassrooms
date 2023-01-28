@@ -39,6 +39,13 @@ $ git push https://git.heroku.com/p7-data-science-oc-dashboard.git HEAD:master
 heroku git:remote -a p7-data-science-oc-api
 heroku git:remote -a p7-data-science-oc-dashboard
 
+
+
+ùùùùùùùùùùùùùù
+
+heroku config:set -a p7-frontend APP_BASE=frontend
+
+
 #### Virtual environment
 
 ##### 1) Install python
