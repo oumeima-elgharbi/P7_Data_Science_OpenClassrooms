@@ -19,7 +19,7 @@ unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=
 
 print("Deployment ? {}".format(config["deploy"]["is"]))
 if config["deploy"]["is"]:
-    HOST = config["deploy"]["prod_dashboard"]
+    HOST = config["deploy"]["prod_api"]
 else:
     HOST = config["deploy"]["dev"]
 
