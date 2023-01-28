@@ -28,8 +28,8 @@ cd Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
 $ heroku buildpacks:add -a p7-data-science-oc-api heroku/python
 $ heroku buildpacks:add -a p7-data-science-oc-dashboard heroku/python
 
-$ heroku config:set -a p7-data-science-oc-api PROCFILE='backend/Procfile'
-$ heroku config:set -a p7-data-science-oc-dashboard PROCFILE='frontend/Procfile'
+$ heroku config:set -a p7-data-science-oc-api PROCFILE=backend/Procfile
+$ heroku config:set -a p7-data-science-oc-dashboard PROCFILE=frontend/Procfile
 
 $ git push https://git.heroku.com/p7-data-science-oc-api.git HEAD:master
 $ git push https://git.heroku.com/p7-data-science-oc-dashboard.git HEAD:master
