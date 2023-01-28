@@ -11,7 +11,7 @@ import warnings
 warnings.filterwarnings(action="once")
 
 print("_____Preprocessing : getting config_____")
-config_back = read_yml("back_end/config_backend.yml")
+config_back = read_yml("config_backend.yml")
 
 
 def get_client_from_database(client_id, real_time=False):  # data
