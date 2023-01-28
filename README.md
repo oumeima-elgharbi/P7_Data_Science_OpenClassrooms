@@ -1,6 +1,40 @@
 # P7_Data_Science_OpenClassrooms
 
-Add readme for frontend and for backend
+
+
+````bash
+
+heroku login
+cd Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
+
+
+heroku git:remote -a p7-data-science-openclassrooms
+git push heroku master
+
+
+
+heroku git:remote --remote heroku-client -a client-app
+heroku git:remote --remote heroku-server -a server-app
+
+git subtree push --prefix client heroku-client master
+git subtree push --prefix server heroku-server master
+````
+
+````bash
+
+heroku login
+cd Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
+
+$ heroku buildpacks:add -a p7-data-science-oc-api buildpack-backend
+$ heroku buildpacks:add -a p7-data-science-oc-dashboard buildpack-frontend
+
+$ heroku config:set -a p7-data-science-oc-api PROCFILE=back_end/Procfile
+$ heroku config:set -a p7-data-science-oc-dashboard PROCFILE=front_end/Procfile
+
+$ git push https://git.heroku.com/p7-data-science-oc-api.git HEAD:master
+$ git push https://git.heroku.com/p7-data-science-oc-dashboard.git HEAD:master
+
+````
 
 #### Virtual environment
 
