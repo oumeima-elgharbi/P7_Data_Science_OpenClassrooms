@@ -1,23 +1,30 @@
 # P7_Data_Science_OpenClassrooms
 
 
-
+delete remote branch :
+- git remote -v (list all branches)
+- git remote rm branchname
+- 
 ````bash
 
 heroku login
 cd Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
-
-
 heroku git:remote -a p7-data-science-openclassrooms
 git push heroku master
 
 
+heroku login
+cd Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
 
-heroku git:remote --remote heroku-client -a client-app
-heroku git:remote --remote heroku-server -a server-app
+$ heroku create -a p7-data-science-oc-api --remote heroku-back
+$ heroku create -a p7-data-science-oc-dashboard --remote heroku-front
 
-git subtree push --prefix client heroku-client master
-git subtree push --prefix server heroku-server master
+heroku git:remote --remote heroku-back -a p7-data-science-oc-api
+heroku git:remote --remote heroku-front -a p7-data-science-oc-dashboard
+
+git subtree push --prefix backend heroku-back master
+git subtree push --prefix frontend heroku-front master
+
 ````
 
 ````bash

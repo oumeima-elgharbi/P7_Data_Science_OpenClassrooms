@@ -24,8 +24,8 @@ from fastapi import FastAPI, Body
 import uvicorn
 
 # from utils import *
-from backend.prediction_functions import *  # TODO remove
-from backend.preprocessing import *  # TODO remove
+from prediction_functions import *  # TODO remove
+from preprocessing import *  # TODO remove
 
 #from prediction_functions import *  # TODO remove
 #from preprocessing import *  # TODO remove
