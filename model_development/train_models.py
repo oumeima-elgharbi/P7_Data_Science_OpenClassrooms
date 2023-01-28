@@ -149,4 +149,4 @@ def modelling_lightgbm(df_path, debug=False):
 if __name__ == "__main__":
     with timer("Full model run"):
         print("Running time 2h30min lol : 9026s")
-        modelling_lightgbm(df_path="../dataset/cleaned/data_train_preprocessed_vf.csv")
+        modelling_lightgbm(df_path="dataset/cleaned/data_train_preprocessed_vf.csv")

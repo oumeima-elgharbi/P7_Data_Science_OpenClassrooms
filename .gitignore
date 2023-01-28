@@ -128,12 +128,11 @@ dmypy.json
 # Pyre type checker
 .idea/
 .pyre/
-/dataset/
+/model_development/dataset/
 /other_documents/
-/model_preparation/models/
+/model_development/models/
 /venv/
 /tests/
-/resources/
 /backend/resources/
 /frontend/resources/
 *.csv

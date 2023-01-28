@@ -1,49 +1,8 @@
-# P7_Data_Science_OpenClassrooms : Front-end
+# P7_Data_Science_OpenClassrooms : front-end
 
-#### Run
+## I) Context
 
-If deploy == False :
-
-- url : http://localhost:8501/
-  Else:
-- url : https://p7-data-science-openclassrooms.herokuapp.com/
-
-To run the front-end from the root of the repository (we only have one repository for back and front)
-
-```bash
-streamlit run front_end/dashboard.py
-```
-
-We could have done like below if we wanted to separate the front-end from the back-end in two different repositories.
-
-```bash
-cd front_end
-streamlit run dashboard.py
-```
-
-#### Heroku-22 stack
-
-#### Files : Procfile and setup.sh
-
-- Streamlit :
-  web: sh setup.sh && streamlit run dashboard.py
-
-We need a setup.sh to run streamlit dashboard
-
-To open the web service at :
-
-### Config front-end
-
-- threshold
-- **HomeCredit_columns_description.csv** : this file contains descriptions for the columns in the various data files.
-
-######     
-
-if you have packages problems with Streamlit :
-
-#### C:\ProgramData\Anaconda3\python.exe -m pip install --upgrade --force-reinstall streamlit --user
-
-#### Spécifications du dashboard
+#### Dashboard specifications
 
 Michaël vous a fourni des spécifications pour le dashboard interactif. Celui-ci devra contenir au minimum les
 fonctionnalités suivantes :
@@ -54,8 +13,39 @@ Permettre de visualiser des informations descriptives relatives à un client (vi
 Permettre de comparer les informations descriptives relatives à un client à l’ensemble des clients ou à un groupe de
 clients similaires.
 
-Prediction
-St
-SHAP
 bouger chiffre client et changer var globale (exemple : income)
 
+## II) Run
+
+- url development :  **http://localhost:8501/**
+- url production : **https://p7-data-science-oc-dashboard.herokuapp.com/**
+
+To run the back-end from the root of the repository (we only have one repository for back and front)
+
+We separated the front-end from the back-end in two different repositories.
+
+```bash
+cd front_end
+streamlit run dashboard.py
+```
+
+#### Some infos
+
+if you have packages problems with Streamlit :
+
+````bash
+$ C:\ProgramData\Anaconda3\python.exe -m pip install --upgrade --force-reinstall streamlit 
+````
+
+--user won't work in virtual environment
+
+## III) Resources folder and config
+
+We have a config file to find this resource :
+
+- HomeCredit_columns_description.csv : this file contains descriptions for the columns in the various data files.
+
+In the config, we also have :
+
+- the threshold (limit to refuse the credit to a client).
+- the endpoints from the back-end

@@ -1,59 +1,90 @@
 # P7_Data_Science_OpenClassrooms
 
+Hello !
 
-delete remote branch :
-- git remote -v (list all branches)
-- git remote rm branchname
-- 
+Welcome to this repository.
+
+This README contains information about :
+
+- I) Context
+- II) Virtual environment
+- III) Deployment (Cloud : Heroku)
+
+# -----------------------------------------------------------------------------
+
+Sunday :
+
+- dashboard finish
+- SHAP finish
+- Global feature importance
+
+Monday :
+
+- SMOTE
+- CV + GridSearch
+- model
+- refacto feature engineering check (save index name)
+
+Tuesday :
+
+- EDA : Kaggle
+- pytest / unittest
+- pydantics for API !!
+
+Wednesday :
+
+- powerpoint
+- notes méthodo : *Reference : https://leandeep.com/datalab-kaggle/kb002.html*
+
+#### TODO 1 : remove runtime.txt in root only ?
+
+#### TODO 2 : slugignore in root ony ?
+
+#### TODO 3 : refacto to have common config anfd utils ... !!!
+
+Later :
+
+- Preprocess one client
+- MLFlow track experiments
+- MLFlow registry
+- Evidently
+
+# ---------------------------------------------------------------------
+
+## I) Context
+
+Home credit default : Kaggle
+
+Supervised machine learning problem.
+
+Data Science
+=> [model_preparation ](jetbrains://pycharm/navigate/reference?project=P7_Data_Science_OpenClassrooms&path=model_preparation/README.md)
+
+- Exploratory Data Analysis
+- SMOTE, GridsearchCV, Cross-Validation
+- Feature importance : global and local (Shapley value)
+- Method pdf
+
+MLOps :
+
+- Dashboard (Streamlit)
+  => [front-end](jetbrains://pycharm/navigate/reference?project=P7_Data_Science_OpenClassrooms&path=frontend/README.md)
+- API (FastAPI)
+  => [back-end](jetbrains://pycharm/navigate/reference?project=P7_Data_Science_OpenClassrooms&path=backend/README.md)
+- Cloud deployment (Heroku)
+
+The API can be found at this url : https://p7-data-science-oc-api.herokuapp.com/
+The dashboard can be found here : https://p7-data-science-oc-dashboard.herokuapp.com/
+
+## II) Virtual environment
+
+##### Requirements
+
+- Run pipreqs for front-end, back-end, model preparation to get a requirements.txt
+
 ````bash
-
-heroku login
-cd Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
-heroku git:remote -a p7-data-science-openclassrooms
-git push heroku master
-
-
-heroku login
-cd Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
-
-$ heroku create -a p7-data-science-oc-api --remote heroku-back
-$ heroku create -a p7-data-science-oc-dashboard --remote heroku-front
-
-heroku git:remote --remote heroku-back -a p7-data-science-oc-api
-heroku git:remote --remote heroku-front -a p7-data-science-oc-dashboard
-
-git subtree push --prefix backend heroku-back master
-git subtree push --prefix frontend heroku-front master
-
+pipreqs
 ````
-
-````bash
-
-heroku login
-cd Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
-
-$ heroku buildpacks:add -a p7-data-science-oc-api heroku/python
-$ heroku buildpacks:add -a p7-data-science-oc-dashboard heroku/python
-
-$ heroku config:set -a p7-data-science-oc-api PROCFILE=backend/Procfile
-$ heroku config:set -a p7-data-science-oc-dashboard PROCFILE=frontend/Procfile
-
-$ git push https://git.heroku.com/p7-data-science-oc-api.git HEAD:master
-$ git push https://git.heroku.com/p7-data-science-oc-dashboard.git HEAD:master
-
-````
-
-heroku git:remote -a p7-data-science-oc-api
-heroku git:remote -a p7-data-science-oc-dashboard
-
-
-
-ùùùùùùùùùùùùùù
-
-heroku config:set -a p7-frontend APP_BASE=frontend
-
-
-#### Virtual environment
 
 ##### 1) Install python
 
@@ -103,157 +134,105 @@ python -V
 
 python -V to check which version of Python is being run locally
 
-#### Heroku-22 stack
+#### 5) Some infos
 
-#### Files : Procfile and setup.sh
+if you have packages problems with Streamlit :
 
-- API :
-  web: uvicorn back_end.main:app --host=0.0.0.0 --port=${PORT:-5000}
+````bash
+$ C:\ProgramData\Anaconda3\python.exe -m pip install --upgrade --force-reinstall streamlit 
+````
 
-- Streamlit :
-  web: sh setup.sh && streamlit run dashboard.py
+--user won't work in virtual environment
 
-We need a setup.sh to run streamlit dashboard
+## III) Deployment
 
-Using Windows CMD, go to repo with cd..
+### 1) How to deploy the two heroku apps
+
+We made the choice to have one Git repository for two web applications.
+
+- back-end : the API
+- front-end : the dashboard
+
+For deployment we chose Heroku.
+With Heroku, one heroku app means one web application.
+
+We need two applications, the process to deploy the front-end and back-end apps is explained below.
+
+#### First time running repo
+
+- connect to heroku using Heroku CLI
+- go to git repository (locally)
+
+- create heroku app with the name wanted for the two apps
+
+- For the first app :
+    - create a remote branch with wanted name
+    - push changes (after making any commit / commit that was also push to your origin master)
+
+NB : with this method we are deploying a particular directory (backend or frontend in our case)
+Thus, the app must be run as if we are in the directory backend (respectively frontend).
+
+- Do the same for the second app
 
 ````bash
 heroku login
 cd Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
-heroku git:remote -a p7-data-science-openclassrooms
-git push heroku master
+
+$ heroku create -a p7-data-science-oc-api --remote heroku-back
+$ heroku create -a p7-data-science-oc-dashboard --remote heroku-front
+
+$ heroku git:remote --remote heroku-back -a p7-data-science-oc-api
+$ heroku git:remote --remote heroku-front -a p7-data-science-oc-dashboard
+
+$ git subtree push --prefix backend heroku-back master
+$ git subtree push --prefix frontend heroku-front master
 ````
 
-````bash
-web: sh -c 'cd ./front_end/ && sh setup.sh && cd .. && streamlit run front_end/dashboard.py'
-server: uvicorn back_end.main:app --host=0.0.0.0 --port=${PORT:-5000}
+#### To deploy your changes
 
-web: sh setup.sh && streamlit run front_end/dashboard.py
-````
-
-
-Clone the repository
-Use Git to clone p7-data-science-openclassrooms's source code to your local machine.
-
-````bash
-$ heroku git:clone -a p7-data-science-openclassrooms
-$ cd p7-data-science-openclassrooms
-````
-
-Deploy your changes
 Make some changes to the code you just cloned and deploy them to Heroku using Git.
 
-````bash
-$ git add .
-$ git commit -am "deploy True again 3!"
-$ git push heroku master
-````
-
-To open the web service at : https://p7-data-science-openclassrooms.herokuapp.com/
+NB : do we need to do git:remote before pushing ?
 
 ````bash
-heroku open
+$ heroku git:remote --remote heroku-back -a p7-data-science-oc-api
+$ heroku git:remote --remote heroku-front -a p7-data-science-oc-dashboard
 ````
 
-######     
+````bash
+$ git subtree push --prefix backend heroku-back master
+$ git subtree push --prefix frontend heroku-front master
+````
 
-#### C:\ProgramData\Anaconda3\python.exe -m pip install evidently
+#### Helpful commands
 
-if you have packages problems with Streamlit :
+- to delete remote branches :
+    - list all remote branches
+    - delete remote branch
 
-#### C:\ProgramData\Anaconda3\python.exe -m pip install --upgrade --force-reinstall streamlit --user
+````bash
+$ git remote -v
+$ git remote rm branch_name
+````
 
-##### Reference : https://leandeep.com/datalab-kaggle/kb002.html
+If we had one repo and one app :
 
-For Wednesday
+````bash
+heroku login
+cd Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
 
-- Dashboard (Streamlit)
-- SHAP : Feature importance
+heroku git:remote -a my_heroku_app_name
+git push my_heroku_remote_branch_name master
+````
 
-Thursday :
+### 2) Information on Heroku-22 stack
 
-- Cloud (Heroku, Azure Web App)
-- unittest / pytest
+#### Files : Procfile and setup.sh
 
-Friday :
+- API :
+  web: uvicorn main:app --host=0.0.0.0 --port=${PORT:-5000}
 
-- SMOTE
-- CV + GridSearch
-- EDA + model : Kaggle
+- Streamlit :
+  web: sh setup.sh && streamlit run dashboard.py
 
-Saturday :
-
-- notes : precision / recall
-
-Later :
-
-- Preprocess one client
-- MLFlow track experiments
-- MLFlow registry
-- Evidently
-
-### Dataset
-
-source : https://www.kaggle.com/c/home-credit-default-risk/data
-download : https://s3-eu-west-1.amazonaws.com/static.oc-static.com/prod/courses/files/Parcours_data_scientist/Projet+-+Impl%C3%A9menter+un+mod%C3%A8le+de+scoring/Projet+Mise+en+prod+-+home-credit-default-risk.zip
-
-#### Dataset Description
-
-- **application_{train|test}.csv**
-
-    - This is the main table, broken into two files for Train (with TARGET) and Test (without TARGET).
-    - Static data for all applications. One row represents one loan in our data sample.
-
-
-- **bureau.csv**
-
-    - All client's previous credits provided by other financial institutions that were reported to Credit Bureau (for
-      clients
-      who have a loan in our sample).
-
-    - For every loan in our sample, there are as many rows as number of credits the client had in Credit Bureau before
-      the
-      application date.
-
-
-- **bureau_balance.csv**
-
-    - Monthly balances of previous credits in Credit Bureau.
-
-    - This table has one row for each month of history of every previous credit reported to Credit Bureau – i.e the
-      table
-      has (#loans in sample * # of relative previous credits * # of months where we have some history observable for the
-      previous credits) rows.
-
-
-- **POS_CASH_balance.csv**
-
-    - Monthly balance snapshots of previous POS (point of sales) and cash loans that the applicant had with Home Credit.
-    - This table has one row for each month of history of every previous credit in Home Credit (consumer credit and cash
-      loans) related to loans in our sample – i.e. the table has (#loans in sample * # of relative previous credits * #
-      of months in which we have some history observable for the previous credits) rows.
-
-- **credit_card_balance.csv**
-
-    - Monthly balance snapshots of previous credit cards that the applicant has with Home Credit.
-    - This table has one row for each month of history of every previous credit in Home Credit (consumer credit and cash
-      loans) related to loans in our sample – i.e. the table has (#loans in sample * # of relative previous credit cards
-        * # of months where we have some history observable for the previous credit card) rows.
-
-- **previous_application.csv**
-
-    - All previous applications for Home Credit loans of clients who have loans in our sample.
-    - There is one row for each previous application related to loans in our data sample.
-
-
-- **installments_payments.csv**
-    - Repayment history for the previously disbursed credits in Home Credit related to the loans in our sample.
-    - There is
-        - a) one row for every payment that was made plus
-        - b) one row each for missed payment.
-    - One row is equivalent to one payment of one installment OR one installment corresponding to one payment of one
-      previous Home Credit credit related to loans in our sample.
-
-- **HomeCredit_columns_description.csv**
-
-    - This file contains descriptions for the columns in the various data files.
+We need a setup.sh to run streamlit dashboard. We use the url from the back-end in the dashboard.

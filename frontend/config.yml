@@ -3,7 +3,6 @@ deploy:
   is: True # False # False for dev purpose
   dev: 'http://127.0.0.1:8000'
   prod_api: 'https://p7-data-science-oc-api.herokuapp.com'
-  prod_dashboard: 'https://p7-data-science-oc-dashboard.herokuapp.com'
 
 resources:
   zip: "resources.zip"
