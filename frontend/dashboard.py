@@ -43,11 +43,10 @@ print("_____Getting config front-end_____")
 config_front = read_yml("config_frontend.yml")
 
 THRESHOLD = config_front["threshold"]
-ENDPOINT_GET_CLIENT_DATA = config_front["endpoints"]["endpoint_get_client_data"]
+# ENDPOINT_GET_CLIENT_DATA = config_front["endpoints"]["endpoint_get_client_data"]
 ENDPOINT_PREDICT = config_front["endpoints"]["endpoint_predict"]
 ENDPOINT_SHAP = config_front["endpoints"]["endpoint_shap"]
 ENDPOINT_CLIENT_DATA = config_front["endpoints"]["endpoint_client_data"]
-
 DF_DESCRIPTION = pd.read_csv(config_front["columns_description"], encoding="ISO-8859-1")  # not encoded in utf-8
 
 # gc.collect()
@@ -65,38 +64,37 @@ DASHBOARD_CHOICE = "Homepage"
 # TODO refacto
 def load_data():
     # Load data
-    # dataset used to plot features - sample of clients from the Kaggle train set
-    X_split_valid = load_data('X_split_valid', path='./src/')
-    # dataset used to plot features - sample of clients from the Kaggle train set
-    y_split_valid = load_data('y_split_valid', path='./src/')
 
     list_categorical_features = load_data('list_categorical_features')
     dict_categorical_features = load_data('dict_categorical_features')
     list_quantitative_features = load_data('list_quantitative_features')
-
-    list_features_permutation_importances = load_data(
-        'list_features_permutation_importances')
+    list_features_permutation_importances = load_data('list_features_permutation_importances')
     list_summary_plot_shap = load_data('list_summary_plot_shap')
 
 
 # Web page #########################################################################
-# Default settings. This must be the first Streamlit command used in your app, and must only be set once.
 
 def initialize_webview():
+    """
+     Initialize webview with sidebar to choose client and which dashboard to display
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
     # Load data
     # Default settings. This must be the first Streamlit command used in your app, and must only be set once.
     st.set_page_config(page_title="Project 7 Dashboard",
                        initial_sidebar_state="expanded",
                        layout="wide")
-    # st.set_page_config(layout="wide")  ## remove ??
 
-    # Side bar
+    # Sidebar
     with st.sidebar:
-        image_HC = Image.open('./img/Home-Credit-logo.jpg')
-        st.image(image_HC, width=300)
+        logo_homecredit = Image.open('./img/Home-Credit-logo.jpg')
+        st.image(logo_homecredit, width=300)
 
         # Dashboard selector
-        st.write('## Site Map:')
+        st.write('## Menu :')
         global DASHBOARD_CHOICE
         DASHBOARD_CHOICE = st.radio('', [
             'Homepage', 'Basic Dashboard', 'Advanced Dashboard',
@@ -110,19 +108,12 @@ def initialize_webview():
             st.write('## Client ID:')
 
             global CLIENT_ID
-            # CLIENT_ID = st.sidebar.number_input('Insert client id', value=456250)  # default value 100001 # to change later to 0
             CLIENT_ID = st.number_input("Enter client ID", value=100001)
-            # st.caption("Example of client predicted negative (no default) : 324806")
-            # st.caption("Example of client predicted positive (credit default) : 318063")
+            st.caption("Example of client predicted negative (no default) : 100001")
+            st.caption("Example of client predicted positive (credit default) : 456250")
 
             st.caption(" ")
 
-            # Button random
-            # if st.button("Select random client"):
-            #   clients = [str(id) for id in df_test_sample.index]
-            #  size = len(clients)
-            # client_index = randint(0, size - 1)
-            # CLIENT_ID = clients[client_index]
 
         elif DASHBOARD_CHOICE == 'Exploratory Data Analysis':
             st.write('## Choose data:')
@@ -137,9 +128,15 @@ def initialize_webview():
 
 
 ###################################################################################
-###################################################################################
 
 def homepage():
+    """
+     Homepage with an explanation about the context
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
     st.title("Home Credit Default Risk Prediction")
     " "
     " "
@@ -162,6 +159,13 @@ def homepage():
 
 
 def basic_dashboard():
+    """
+    Basic dashboard with prediction and local feature importance
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
     # load_data() # TODO correct
     global CLIENT_ID
     global CLIENT_JSON
@@ -177,17 +181,21 @@ def basic_dashboard():
         st.write('The client with the id {} is not in the database.'.format(CLIENT_ID))
         return  # to get out of the function
 
-    proba_view()
     shap_view()
+    proba_view()
 
 
 def proba_view():
-    # Result of credit application
-    "---------------------------"
+    """
+     Result of credit application
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
     st.header('Result of credit application')
     try:
-        predict_btn = st.button('Predict')
-        if predict_btn:
+        if st.button('Predict'):  # predict_btn = st.button('Predict') # if predict_btn:
             probability = request_prediction(HOST + ENDPOINT_PREDICT, CLIENT_JSON)
             if probability < THRESHOLD:
                 st.success(
@@ -204,33 +212,57 @@ def proba_view():
 
 
 def shap_view():
-    # Local SHAP
-    #####################################################
+    """
+    Local SHAP
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
     st.header('Impact of features on prediction')
     try:
         # get shap values for the selected client
         client_shap_json = request_shap(HOST + ENDPOINT_SHAP, CLIENT_JSON)
         df_shap = json_to_df(client_shap_json)  # just need pd.Dataframe()
-        ##st.write(df_shap.shape) ### for test purposes
         shap_barplot(df_shap, DF_DESCRIPTION)
     except Exception as e:
         print("Exception raised :", e)
 
 
 def advanced_dashboard():
+    """
+    Position of the client vs other clients
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
     global CLIENT_ID
-    # Position of the client vs other clients
-    "---------------------------"
     st.header('Ranking of the client compared to other clients')
 
     ### TODO ###
 
 
 def eda_dashboard():
+    """
+    Exploratory Data Analysis graphs
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
+    ### TODO ###
     pass
 
 
 def dashboard_view():
+    """
+    Displays the correct view as a function of the dashboard selected in the menu.
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
     # Homepage #######################################################
     if DASHBOARD_CHOICE == 'Homepage':
         homepage()
@@ -242,8 +274,11 @@ def dashboard_view():
     if DASHBOARD_CHOICE == 'Advanced Dashboard':
         advanced_dashboard()
 
+    else:  # EDA graphs
+        eda_dashboard()
 
-####################################################### MAIN
+
+######################################################################
 
 def main():
     # Sidebar
@@ -253,68 +288,5 @@ def main():
     dashboard_view()
 
 
-#####################################################
-
-# 3) dashboard front-end
-def main_old():
-    ####################################################
-    global CLIENT_ID
-    st.title("Home Credit Default Risk Prediction")
-    CLIENT_ID = st.sidebar.number_input('Insert client id', value=456250)  # default value 100001 # to change later to 0
-    st.title('Client n°{} application for a loan'.format(CLIENT_ID))
-
-    dashboard_view(dashboard_choice="Homepage")
-
-    # gc.collect()
-    ################################################################"""
-    try:
-        global CLIENT_JSON
-        CLIENT_JSON = request_client_data(HOST + ENDPOINT_CLIENT_DATA, CLIENT_ID)
-    except Exception as e:
-        print("Exception raised while trying to get client data :\n\n", e)
-        st.write('The client with the id {} is not in the database.'.format(CLIENT_ID))
-
-    # Local SHAP
-    #####################################################
-    st.header('Impact of features on prediction')
-    try:
-        # get shap values for the selected client
-        client_shap_json = request_shap(HOST + ENDPOINT_SHAP, CLIENT_JSON)
-        df_shap = json_to_df(client_shap_json)  # just need pd.Dataframe()
-        ##st.write(df_shap.shape) ### for test purposes
-        shap_barplot(df_shap, DF_DESCRIPTION)
-
-    except Exception as e:
-        print("Exception raised :", e)
-
-    ###################################################################################
-    predict_btn = st.button('Prédire')
-    if predict_btn:
-        proba = 0  # ??
-        pred = -1
-
-        try:
-            proba = request_prediction(HOST + ENDPOINT_PREDICT, CLIENT_JSON)  # we get the prediction
-            if proba <= THRESHOLD:
-                pred = 0
-                result = "yes"
-            else:
-                pred = 1
-                result = "no"
-            st.write('Probability that the loan is not payed back {} %'.format(round(100 * proba, 2)))
-            st.write('Loan accepted : {}'.format(result))
-        except Exception as e:
-            print("Exception raised :", e)
-
-        ############################################################
-        # Gauge
-        st.header('Gauge prediction')
-        rectangle_gauge(CLIENT_ID, proba, THRESHOLD)
-        ###################################""
-
-
-############################################################"
-
 if __name__ == '__main__':
     main()
-    # streamlit run dashboard.py OR streamlit run front_end/dashboard.py
