@@ -35,7 +35,7 @@ def get_client_from_database(client_id, real_time=False):  # data
     # if we get here it means the client was not found in the database
     print("__Client not found in database__")
     gc.collect()  # collects for last loop
-    return None
+    raise Exception("Client not in database")
 
 
 def preprocess_one_application(client_id, real_time=False):  # data

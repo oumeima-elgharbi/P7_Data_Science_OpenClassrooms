@@ -52,9 +52,13 @@ async def client_data(client: dict = Body({})):
     """
     print("__Getting client's application data from database__")
     # {"client_id": 0}
-    client_df = preprocess_one_application(client["client_id"])
-    client_json = df_to_json(client_df)
-    return client_json[0]
+    try:
+        client_df = preprocess_one_application(client["client_id"])
+        client_json = df_to_json(client_df)
+        return client_json[0]
+    except Exception as e:
+        print(e)
+        print("Couldn't get client data from database.")
 
 
 @app.get('/clients/{client_id}')  # 12s...
@@ -69,9 +73,13 @@ async def get_client_data(client_id: int):
     print("__Getting client's application data from database__")
     gc.collect()
     # await asyncio.sleep(5)
-    client_df = preprocess_one_application(client_id)
-    client_json = df_to_json(client_df)
-    return client_json[0]
+    try:
+        client_df = preprocess_one_application(client_id)
+        client_json = df_to_json(client_df)
+        return client_json[0]
+    except Exception as e:
+        print(e)
+        print("Couldn't get client data from database.")
 
 
 @app.post("/predict")
@@ -84,6 +92,7 @@ async def predict(client_json: dict = Body({})):  # remove async def ?? # :dict 
     :return: the probability that the client will repay the loan
     :rtype: (float)
     """
+    assert client_json != {}, "There is no data for the client"  # TODO add pydantics verification
     print("_____Start of prediction pipeline_____")
     print("_____Getting client_____")
     client_df = json_to_df(client_json)
@@ -104,6 +113,7 @@ async def get_shap(client_json: dict = Body({})):
     :return: List of dict, each dict is a feature + its SHAP value
     :rtype: (list)
     """
+    assert client_json != {}, "There is no data for the client"  # TODO add pydantics verification
     print("_____Start of SHAP_____")
     client_df = json_to_df(client_json)
 
