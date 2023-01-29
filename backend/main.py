@@ -61,27 +61,6 @@ async def client_data(client: dict = Body({})):
         print("Couldn't get client data from database.")
 
 
-@app.get('/clients/{client_id}')  # 12s...
-async def get_client_data(client_id: int):
-    """
-    Body empty, using the client's id, we get the client's preprocessed data
-
-    :param client_id: (int)
-    :return: a preprocessed client with feature / value
-    :rtype: (dict)
-    """
-    print("__Getting client's application data from database__")
-    gc.collect()
-    # await asyncio.sleep(5)
-    try:
-        client_df = preprocess_one_application(client_id)
-        client_json = df_to_json(client_df)
-        return client_json[0]
-    except Exception as e:
-        print(e)
-        print("Couldn't get client data from database.")
-
-
 @app.post("/predict")
 async def predict(client_json: dict = Body({})):  # remove async def ?? # :dict = Body({})
     """
