@@ -55,7 +55,7 @@ async def client_data(client: dict = Body({})):
     print("__Getting client's application data from database__")
     # {"client_id": 0}
     try:
-        client_df = preprocess_one_application(client["client_id"])  # TODO add option for database name
+        client_df = preprocess_one_application(client["client_id"])  # TODO add option for database name / add in fct preprocess in the body !!
         client_json = df_to_json(client_df)
         return client_json[0]
     except Exception as e:

@@ -39,7 +39,7 @@ def preprocess_one_application(client_id, database_name="new_clients_database_pr
     :param real_time:
     :return:
     """
-    if not real_time:
+    if not real_time:  # TODO add option for database name
         preprocessed_client = get_client_from_database(client_id, database_name)
     else:
         print("__Getting client's application from database__")
