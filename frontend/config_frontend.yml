@@ -1,4 +1,6 @@
 columns_description: "resources/HomeCredit_columns_description.csv"
+known_clients_database_preprocessed: "resources/data_train_preprocessed_vf.csv.gz"
+
 threshold: 0.3
 endpoints:
   #endpoint_get_client_data: "/clients/{}"

@@ -1,9 +1,11 @@
+import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, FancyArrowPatch
 from matplotlib.cm import RdYlGn
 
 from utils import *
+
 
 ############# GAUGE#####################"""
 
@@ -43,7 +45,6 @@ def rectangle_gauge(client_id, client_probability, threshold):
     ax.set_xticks(range(0, 105, 10))
     ax.set_yticks([])
     st.pyplot(fig)
-
 
 
 ######################################## SHAP
@@ -95,13 +96,36 @@ def shap_barplot(df_shap, df_description):
         for feature in list(df['feature']):
             st.caption(feature + ": " + feature_description(feature, df_description))
 
+
 #######################################################################################################################
 ######################################################################"
+
+def add_new_client_to_data_all_clients(data_all_clients, df_client, prediction, y_label="TARGET"):
+    """
+    # TODO : rename function var to not have "metier logic" ?
+    :param:
+    :param:
+    :param:
+    :param:
+    :return:
+    :rtype:
+    """
+    # 1) we add the prediction to the client's dataframe (we add one column
+    # df_client[y_label] = pred # this adds the column at the end
+
+    # we need the column with the prediction at the beginning
+    df_client.insert(0, y_label, prediction, True)  # first column / column_name / value / inplace
+
+    # 2) we add the new client to the dataset of all clients
+    df_all_clients_and_new_client = pd.concat([df_client, data_all_clients])
+    return df_all_clients_and_new_client
+
 
 import joblib
 import numpy as np
 
-def lineplot_in_common(X_split_valid, y_split_valid, feature):
+
+def lineplot_in_common(data_all_clients, feature, y_label='TARGET'):
     """Line plot of a quantitative feature. Common to all clients.
     Plot smoothed over 4000 clients. One dot plotted every 1000 clients.
     Args :
@@ -112,10 +136,8 @@ def lineplot_in_common(X_split_valid, y_split_valid, feature):
     target_bin_size = 4000
 
     # preparation of data
-    df = pd.DataFrame({
-        feature: X_split_valid[feature],
-        'y_true': y_split_valid
-    })
+    df = data_all_clients.copy()
+
     df = df.dropna().sort_values(axis=0, by=feature).copy()
     n_values = len(df)
     n_bins = int(np.ceil(n_values / target_bin_size))
@@ -130,8 +152,8 @@ def lineplot_in_common(X_split_valid, y_split_valid, feature):
     feature_value_start = []
     for i in index_bin_start[2:-2]:
         some_bin = df.iloc[int(i - 0.5 * bin_size):int(i + 0.5 * bin_size)]
-        some_bin_sum0 = (some_bin['y_true'] == 0).sum()
-        some_bin_sum1 = (some_bin['y_true'] == 1).sum()
+        some_bin_sum0 = (some_bin[y_label] == 0).sum()
+        some_bin_sum1 = (some_bin[y_label] == 1).sum()
         some_bin_sum = some_bin_sum0 + some_bin_sum1
         proba_default_ = some_bin_sum1 / some_bin_sum
         proba_default.append(proba_default_)
@@ -155,8 +177,6 @@ def lineplot_in_common(X_split_valid, y_split_valid, feature):
     return fig
 
 
-
-
 def lineplot(client_df, client_id, threshold, feature, df_description):
     """Plots a lineplot of the quantitative feature.
     Args :
@@ -164,13 +184,14 @@ def lineplot(client_df, client_id, threshold, feature, df_description):
     Returns :
     - matplotlib plot via st.pyplot.
     """
-    if feature in [
-        'EXT_SOURCE_2', 'EXT_SOURCE_3', 'EXT_SOURCE_1', 'AMT_ANNUITY'
-    ]:
-        figure = joblib.load('./resources/figure_lineplot_' + feature +
-                             '_for_bankclerk.joblib')
-    else:
-        figure = lineplot_in_common(feature)
+    #if feature in [
+    #    'EXT_SOURCE_2', 'EXT_SOURCE_3', 'EXT_SOURCE_1', 'AMT_ANNUITY'
+    #]:
+    #    figure = joblib.load('./resources/figure_lineplot_' + feature +
+    #                         '_for_bankclerk.joblib')
+    #else:
+        #figure = lineplot_in_common(feature)
+    figure = lineplot_in_common(feature)
     y_max = plt.ylim()[1]
     x_client = client_df[feature].iloc[0]
     if str(x_client) == "nan":

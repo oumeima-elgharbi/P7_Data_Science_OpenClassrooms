@@ -49,6 +49,9 @@ ENDPOINT_SHAP = config_front["endpoints"]["endpoint_shap"]
 ENDPOINT_CLIENT_DATA = config_front["endpoints"]["endpoint_client_data"]
 DF_DESCRIPTION = pd.read_csv(config_front["columns_description"], encoding="ISO-8859-1")  # not encoded in utf-8
 
+# TODO add dtype reading !!! https://stackoverflow.com/questions/50047237/how-to-preserve-dtypes-of-dataframes-when-using-to-csv
+DATA_ALL_CLIENTS = pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8")
+
 # gc.collect()
 
 global CLIENT_ID
@@ -56,15 +59,17 @@ CLIENT_ID = 100001  # 456250
 
 global CLIENT_JSON
 
+# we initialize the first webview to homepage
 global DASHBOARD_CHOICE
 DASHBOARD_CHOICE = "Homepage"
+
+global PREDICTION
 
 
 #################################################################"
 # TODO refacto
 def load_data():
     # Load data
-
     list_categorical_features = load_data('list_categorical_features')
     dict_categorical_features = load_data('dict_categorical_features')
     list_quantitative_features = load_data('list_quantitative_features')
@@ -194,14 +199,17 @@ def proba_view():
     :rtype: None
     """
     st.header('Result of credit application')
+    global PREDICTION
     try:
         if st.button('Predict'):  # predict_btn = st.button('Predict') # if predict_btn:
             probability = request_prediction(HOST + ENDPOINT_PREDICT, CLIENT_JSON)
             if probability < THRESHOLD:
+                PREDICTION = 0
                 st.success(
                     f"  \n __CREDIT ACCEPTED__  \n  \nThe probability of default of the applied credit is __{round(100 * probability, 1)}__% (lower than the threshold of {100 * THRESHOLD}% for obtaining the credit).  \n "
                 )
             else:
+                PREDICTION = 1
                 st.error(
                     f"__CREDIT REFUSED__  \nThe probability of default of the applied credit is __{round(100 * probability, 1)}__% (higher than the threshold of {100 * THRESHOLD}% for obtaining the credit).  \n "
                 )
@@ -231,6 +239,7 @@ def shap_view():
 
 def advanced_dashboard():
     """
+    The view will be the same as basic dashboard but we add more information about client compared to other clients in the database
     Position of the client vs other clients
 
     :param: None
@@ -241,6 +250,18 @@ def advanced_dashboard():
     st.header('Ranking of the client compared to other clients')
 
     ### TODO ###
+
+
+def lineplot_view(data_all_clients, client_json, prediction, feature=""):  ## TODO working on this
+    """
+
+    """
+    # we create a df for the client in json format and add it to the df of all clients
+    df_client = json_to_df(client_json)
+    data_all_clients = add_new_client_to_data_all_clients(data_all_clients, df_client, prediction)
+
+    # TODO FINISH function
+    lineplot(client_df, client_id, threshold, feature, df_description)
 
 
 def eda_dashboard():
