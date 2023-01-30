@@ -252,16 +252,16 @@ def advanced_dashboard():
     ### TODO ###
 
 
-def lineplot_view(data_all_clients, client_json, prediction, feature=""):  ## TODO working on this
+def lineplot_view(feature=""):  ## TODO working on this
     """
 
     """
     # we create a df for the client in json format and add it to the df of all clients
-    df_client = json_to_df(client_json)
-    data_all_clients = add_new_client_to_data_all_clients(data_all_clients, df_client, prediction)
+    df_client = json_to_df(CLIENT_JSON)
+    data_all_clients = add_new_client_to_data_all_clients(DATA_ALL_CLIENTS, df_client, PREDICTION)
 
     # TODO FINISH function
-    lineplot(client_df, client_id, threshold, feature, df_description)
+    lineplot(DATA_ALL_CLIENTS, df_client, CLIENT_ID, THRESHOLD, feature, DF_DESCRIPTION)
 
 
 def eda_dashboard():

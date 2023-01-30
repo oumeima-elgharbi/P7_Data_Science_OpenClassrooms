@@ -177,7 +177,8 @@ def lineplot_in_common(data_all_clients, feature, y_label='TARGET'):
     return fig
 
 
-def lineplot(client_df, client_id, threshold, feature, df_description):
+
+def lineplot(data_all_clients, client_df, client_id, threshold, feature, df_description):
     """Plots a lineplot of the quantitative feature.
     Args :
     - feature (string).
@@ -191,7 +192,7 @@ def lineplot(client_df, client_id, threshold, feature, df_description):
     #                         '_for_bankclerk.joblib')
     #else:
         #figure = lineplot_in_common(feature)
-    figure = lineplot_in_common(feature)
+    figure = lineplot_in_common(data_all_clients, feature)
     y_max = plt.ylim()[1]
     x_client = client_df[feature].iloc[0]
     if str(x_client) == "nan":
