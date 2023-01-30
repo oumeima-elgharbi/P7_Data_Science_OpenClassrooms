@@ -278,6 +278,14 @@ def dashboard_view():
         eda_dashboard()
 
 
+# analyse sur le client (stat) : sur les 3 var les plus importantes // comaprer avec la moy des clients refusés et acceptes /
+# application_train : SUR UNE VAR moy des clients 0 / moy des clients 1 // place mon client par rapport à eux (revenus)
+# Feature importance SHAP globale change pas (meme graph pour chaque client)
+# feature important SHAP local (à la fin du notebook de prediction)
+# sur DB : ajouter info sur client / genre - salaire - etc
+
+# salaire : si modifie / personne acceptée ou pas (bonus)
+
 ######################################################################
 
 def main():

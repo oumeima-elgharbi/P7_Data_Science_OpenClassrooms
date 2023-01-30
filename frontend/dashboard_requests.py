@@ -56,22 +56,3 @@ def request_shap(model_uri, client_json):
             "Request failed with status {}, {}".format(response.status_code, response.text))
 
     return response.json()
-
-
-#################################################
-
-def get_client_data(model_uri, client_id):
-    """
-
-    :param model_uri:
-    :param client_id: (int)
-    :return:
-    """
-    response = requests.request(
-        method='GET', url=model_uri.format(client_id))
-
-    if response.status_code != 200:
-        raise Exception(
-            "Request failed with status {}, {}".format(response.status_code, response.text))
-
-    return response.json()

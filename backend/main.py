@@ -107,16 +107,6 @@ async def get_shap(client_json: dict = Body({})):
     return client_shap_json
 
 
-# analyse sur le client (stat) : sur les 3 var les plus importantes // comaprer avec la moy des clients refusés et acceptes /
-# application_train : SUR UNE VAR moy des clients 0 / moy des clients 1 // place mon client par rapport à eux (revenus)
-# barre jauge proba / (PM)
-# Feature importance SHAP globale change pas (meme graph pour chaque client)
-# feature important SHAP local (à la fin du notebook de prediction)
-# Streamlit / SHAP
-# sur DB : ajouter info sur client / genre - salaire - etc
-
-# salaire : si modifie / personne acceptée ou pas (bonus)
-
 if __name__ == '__main__':
     # opening the web service
     uvicorn.run(app,
