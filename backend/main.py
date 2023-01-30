@@ -47,13 +47,15 @@ async def client_data(client: dict = Body({})):
     """
     Body empty, using the client's id, we get the client's preprocessed data
 
+    Body : {"client_id": 100001, "is_new_client": True} TODO revoir
+
     :return: a preprocessed client with feature / value
     :rtype: (dict)
     """
     print("__Getting client's application data from database__")
     # {"client_id": 0}
     try:
-        client_df = preprocess_one_application(client["client_id"])
+        client_df = preprocess_one_application(client["client_id"])  # TODO add option for database name
         client_json = df_to_json(client_df)
         return client_json[0]
     except Exception as e:

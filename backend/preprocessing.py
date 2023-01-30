@@ -12,19 +12,13 @@ print("_____Preprocessing : getting config_____")
 config_back = read_yml("config_backend.yml")
 
 
-def get_client_from_database(client_id, real_time=False):  # data
+def get_client_from_database(client_id, database_name):  # data
     """
     if real_time = True, database_name = "clients_database" for new clients
     :param client_id:
-    :param real_time: if False, we return the preprocessed client's application
     :return:
     """
     print("__Getting client's application from database__")
-    if not real_time:
-        database_name = "new_clients_database_preprocessed"
-    else:
-        database_name = "new_clients_database"
-
     with pd.read_csv(config_back[database_name], index_col="SK_ID_CURR", chunksize=10000) as reader:
         for data in reader:
             # print("\nHERE :", data.info(verbose=False, memory_usage="deep"), end="\n\n")
@@ -38,7 +32,7 @@ def get_client_from_database(client_id, real_time=False):  # data
     raise Exception("Client not in database")
 
 
-def preprocess_one_application(client_id, real_time=False):  # data
+def preprocess_one_application(client_id, database_name="new_clients_database_preprocessed", real_time=False):  # data
     """
 
     :param client_id:
@@ -46,10 +40,11 @@ def preprocess_one_application(client_id, real_time=False):  # data
     :return:
     """
     if not real_time:
-        preprocessed_client = get_client_from_database(client_id, real_time=False)
+        preprocessed_client = get_client_from_database(client_id, database_name)
     else:
         print("__Getting client's application from database__")
-        client = get_client_from_database(client_id, real_time=True)
+        client = get_client_from_database(client_id, database_name)
+
         preprocessed_client = {}
 
         print("Preprocessing for selected client")
