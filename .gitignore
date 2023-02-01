@@ -139,3 +139,4 @@ dmypy.json
 *.joblib
 *.pkl
 *.gz
+*.zip

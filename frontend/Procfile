@@ -1,1 +1,2 @@
+worker: python script_download_data_folder.py
 web: sh setup.sh && streamlit run dashboard.py
