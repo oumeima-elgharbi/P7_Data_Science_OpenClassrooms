@@ -112,13 +112,15 @@ def add_new_client_to_data_all_clients(data_all_clients, df_client, prediction, 
     """
     # 1) we add the prediction to the client's dataframe (we add one column
     # df_client[y_label] = pred # this adds the column at the end
+    print("__Dataframe shape before adding new client :", data_all_clients.shape)
 
     # we need the column with the prediction at the beginning
     df_client.insert(0, y_label, prediction, True)  # first column / column_name / value / inplace
 
     # 2) we add the new client to the dataset of all clients
-    df_all_clients_and_new_client = pd.concat([df_client, data_all_clients])
-    return df_all_clients_and_new_client
+    df_merged = pd.concat([df_client, data_all_clients])
+    print("__Dataframe shape after adding new client :", df_merged.shape)
+    return df_merged
 
 
 import joblib
@@ -177,7 +179,6 @@ def lineplot_in_common(data_all_clients, feature, y_label='TARGET'):
     return fig
 
 
-
 def lineplot(data_all_clients, client_df, client_id, threshold, feature, df_description):
     """Plots a lineplot of the quantitative feature.
     Args :
@@ -185,13 +186,13 @@ def lineplot(data_all_clients, client_df, client_id, threshold, feature, df_desc
     Returns :
     - matplotlib plot via st.pyplot.
     """
-    #if feature in [
+    # if feature in [
     #    'EXT_SOURCE_2', 'EXT_SOURCE_3', 'EXT_SOURCE_1', 'AMT_ANNUITY'
-    #]:
+    # ]:
     #    figure = joblib.load('./resources/figure_lineplot_' + feature +
     #                         '_for_bankclerk.joblib')
-    #else:
-        #figure = lineplot_in_common(feature)
+    # else:
+    # figure = lineplot_in_common(feature)
     figure = lineplot_in_common(data_all_clients, feature)
     y_max = plt.ylim()[1]
     x_client = client_df[feature].iloc[0]

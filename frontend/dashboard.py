@@ -99,12 +99,12 @@ def initialize_webview():
         st.image(logo_homecredit, width=300)
 
         # Dashboard selector
-        st.write('## Menu :')
+        # st.write('## Menu :')
         global DASHBOARD_CHOICE
-        DASHBOARD_CHOICE = st.radio('', [
+        DASHBOARD_CHOICE = st.radio('Menu', [
             'Homepage', 'Basic Dashboard', 'Advanced Dashboard',
             'Exploratory Data Analysis'
-        ])
+        ])  # label_visibility
         st.write('## ')
         st.write('## ')
 
@@ -121,15 +121,18 @@ def initialize_webview():
 
 
         elif DASHBOARD_CHOICE == 'Exploratory Data Analysis':
-            st.write('## Choose data:')
-            # data_choice = st.radio('', ['Overview', 'bureau.csv', 'bureau_balance.csv', 'POS_CASH_balance.csv', 'credit_card_balance.csv', 'previous_application.csv', 'installments_payments.csv', 'application_train.csv', 'application_test.csv'])
-            data_choice = st.radio('', [
-                'Overview', 'application_train.csv - part 1',
-                'application_train.csv - part 2', 'application_train.csv - part 3',
-                'bureau.csv', 'bureau_balance.csv', 'POS_CASH_balance.csv',
-                'credit_card_balance.csv', 'previous_application.csv',
-                'installments_payments.csv'
-            ])
+            # st.write('## Choose data:')
+            data_choice = st.radio('Choose data',
+                                   ['Overview', 'bureau.csv', 'bureau_balance.csv', 'POS_CASH_balance.csv',
+                                    'credit_card_balance.csv', 'previous_application.csv', 'installments_payments.csv',
+                                    'application_train.csv'])  # , 'application_test.csv']) # label_visibility
+            # data_choice = st.radio('Choose data', [
+            #   'Overview', 'application_train.csv - part 1',
+            #  'application_train.csv - part 2', 'application_train.csv - part 3',
+            # 'bureau.csv', 'bureau_balance.csv', 'POS_CASH_balance.csv',
+            # 'credit_card_balance.csv', 'previous_application.csv',
+            # 'installments_payments.csv'
+            # ])
 
 
 ###################################################################################
@@ -190,7 +193,7 @@ def basic_dashboard():
     proba_view()
 
 
-def proba_view():
+def OLD_proba_view():
     """
      Result of credit application
 
@@ -213,6 +216,34 @@ def proba_view():
                 st.error(
                     f"__CREDIT REFUSED__  \nThe probability of default of the applied credit is __{round(100 * probability, 1)}__% (higher than the threshold of {100 * THRESHOLD}% for obtaining the credit).  \n "
                 )
+            rectangle_gauge(CLIENT_ID, probability, THRESHOLD)
+    except Exception as e:
+        print("Exception raised :", e)
+        st.write("Couldn't compute probability of loan for client {}...".format(CLIENT_ID))
+
+
+def proba_view():
+    """
+     Result of credit application
+    :param: None
+    :return: None
+    :rtype: None
+    """
+    st.header('Result of credit application')
+    global PREDICTION
+    try:
+        probability = request_prediction(HOST + ENDPOINT_PREDICT, CLIENT_JSON)
+        if probability < THRESHOLD:
+            PREDICTION = 0
+            st.success(
+                f"  \n __CREDIT ACCEPTED__  \n  \nThe probability of default of the applied credit is __{round(100 * probability, 1)}__% (lower than the threshold of {100 * THRESHOLD}% for obtaining the credit).  \n "
+            )
+        else:
+            PREDICTION = 1
+            st.error(
+                f"__CREDIT REFUSED__  \nThe probability of default of the applied credit is __{round(100 * probability, 1)}__% (higher than the threshold of {100 * THRESHOLD}% for obtaining the credit).  \n "
+            )
+        if st.button('Predict'):  # predict_btn = st.button('Predict') # if predict_btn:
             rectangle_gauge(CLIENT_ID, probability, THRESHOLD)
     except Exception as e:
         print("Exception raised :", e)
