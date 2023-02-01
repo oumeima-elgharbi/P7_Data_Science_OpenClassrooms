@@ -189,37 +189,8 @@ def basic_dashboard():
         st.write('The client with the id {} is not in the database.'.format(CLIENT_ID))
         return  # to get out of the function
 
-    shap_view()
     proba_view()
-
-
-def OLD_proba_view():
-    """
-     Result of credit application
-
-    :param: None
-    :return: None
-    :rtype: None
-    """
-    st.header('Result of credit application')
-    global PREDICTION
-    try:
-        if st.button('Predict'):  # predict_btn = st.button('Predict') # if predict_btn:
-            probability = request_prediction(HOST + ENDPOINT_PREDICT, CLIENT_JSON)
-            if probability < THRESHOLD:
-                PREDICTION = 0
-                st.success(
-                    f"  \n __CREDIT ACCEPTED__  \n  \nThe probability of default of the applied credit is __{round(100 * probability, 1)}__% (lower than the threshold of {100 * THRESHOLD}% for obtaining the credit).  \n "
-                )
-            else:
-                PREDICTION = 1
-                st.error(
-                    f"__CREDIT REFUSED__  \nThe probability of default of the applied credit is __{round(100 * probability, 1)}__% (higher than the threshold of {100 * THRESHOLD}% for obtaining the credit).  \n "
-                )
-            rectangle_gauge(CLIENT_ID, probability, THRESHOLD)
-    except Exception as e:
-        print("Exception raised :", e)
-        st.write("Couldn't compute probability of loan for client {}...".format(CLIENT_ID))
+    shap_view()
 
 
 def proba_view():

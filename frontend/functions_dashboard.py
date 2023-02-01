@@ -96,10 +96,6 @@ def shap_barplot(df_shap, df_description):
         for feature in list(df['feature']):
             st.caption(feature + ": " + feature_description(feature, df_description))
 
-
-#######################################################################################################################
-######################################################################"
-
 def add_new_client_to_data_all_clients(data_all_clients, df_client, prediction, y_label="TARGET"):
     """
     # TODO : rename function var to not have "metier logic" ?
@@ -123,98 +119,4 @@ def add_new_client_to_data_all_clients(data_all_clients, df_client, prediction, 
     return df_merged
 
 
-import joblib
-import numpy as np
-
-
-def lineplot_in_common(data_all_clients, feature, y_label='TARGET'):
-    """Line plot of a quantitative feature. Common to all clients.
-    Plot smoothed over 4000 clients. One dot plotted every 1000 clients.
-    Args :
-    - feature (string).
-    Returns :
-    - matplotlib figure.
-    """
-    target_bin_size = 4000
-
-    # preparation of data
-    df = data_all_clients.copy()
-
-    df = df.dropna().sort_values(axis=0, by=feature).copy()
-    n_values = len(df)
-    n_bins = int(np.ceil(n_values / target_bin_size))
-    bin_size = int(np.floor(n_values / n_bins))
-    index_bin_start = [bin_size * n for n in range(n_bins)] + [int(bin_size * (n + 0.25)) for n in range(n_bins)] \
-                      + [int(bin_size * (n + 0.5)) for n in range(n_bins)] + \
-                      [int(bin_size * (n + 0.75)) for n in range(n_bins)]
-    index_bin_start = sorted(index_bin_start)
-
-    # Observed probability of default for every bins
-    proba_default = []
-    feature_value_start = []
-    for i in index_bin_start[2:-2]:
-        some_bin = df.iloc[int(i - 0.5 * bin_size):int(i + 0.5 * bin_size)]
-        some_bin_sum0 = (some_bin[y_label] == 0).sum()
-        some_bin_sum1 = (some_bin[y_label] == 1).sum()
-        some_bin_sum = some_bin_sum0 + some_bin_sum1
-        proba_default_ = some_bin_sum1 / some_bin_sum
-        proba_default.append(proba_default_)
-        feature_value_start.append(df[feature].iloc[i])
-
-    # Plotting
-    plt.style.use('seaborn')
-    fig = plt.figure(edgecolor='black', linewidth=4)
-    plt.plot(feature_value_start, proba_default, color='k')
-    ylim_high = plt.ylim()[1]
-    plt.fill_between(x=feature_value_start, y1=proba_default, y2=0, color='r')
-    plt.fill_between(x=feature_value_start,
-                     y1=proba_default,
-                     y2=1,
-                     color='limegreen')
-    plt.ylabel('Observed probability of default')
-    plt.xlabel(feature)
-    fig.suptitle(f'Observed probability of default as a function of {feature}',
-                 y=0.92)
-    plt.ylim(0, max(ylim_high, 0.3))
-    return fig
-
-
-def lineplot(data_all_clients, client_df, client_id, threshold, feature, df_description):
-    """Plots a lineplot of the quantitative feature.
-    Args :
-    - feature (string).
-    Returns :
-    - matplotlib plot via st.pyplot.
-    """
-    # if feature in [
-    #    'EXT_SOURCE_2', 'EXT_SOURCE_3', 'EXT_SOURCE_1', 'AMT_ANNUITY'
-    # ]:
-    #    figure = joblib.load('./resources/figure_lineplot_' + feature +
-    #                         '_for_bankclerk.joblib')
-    # else:
-    # figure = lineplot_in_common(feature)
-    figure = lineplot_in_common(data_all_clients, feature)
-    y_max = plt.ylim()[1]
-    x_client = client_df[feature].iloc[0]
-    if str(x_client) == "nan":
-        x_center = (plt.xlim()[1] + plt.xlim()[0]) / 2
-        plt.annotate(text=f" Client {client_id}\n  data not available",
-                     xy=(x_center, 0),
-                     xytext=(x_center, y_max * 0.9))
-    else:
-        plt.axvline(x=x_client,
-                    ymin=-1e10,
-                    ymax=1e10,
-                    c='k',
-                    ls='dashed',
-                    lw=2)
-        plt.axhline(y=threshold,
-                    xmin=-1e10,
-                    xmax=1e10,
-                    c='darkorange',
-                    ls='dashed',
-                    lw=1)  # line for the optimum_threshold
-        plt.annotate(text=f" Client {client_id}\n  {round(x_client, 3)}",
-                     xy=(x_client, y_max * 0.9))
-    st.pyplot(figure)
-    st.caption(feature + ": " + feature_description(feature, df_description))
+########################################################################################################################
