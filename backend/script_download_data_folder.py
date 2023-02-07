@@ -4,10 +4,10 @@ import json
 
 # to put as env var
 
+# if deploy == True :
 import os
-
-
-# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "service_account/project-7-oc-376509-d874afef7aa1.json"
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "google-credendials.json"
+print("HEYYYY before crashing ?")
 
 
 def create_folder_from_blob_name(blob_name):
