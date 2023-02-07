@@ -75,9 +75,9 @@ print("__Reading the database of all cients as chunks to save memory__")
 DATA_ALL_CLIENTS_CHUNKS = []
 # DATA_ALL_CLIENTS = pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8")
 with pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8", index_col="SK_ID_CURR",
-                 chunksize=20000) as reader:
-    for data in reader:
-        print("_Update the list of chunks_ Shape : ", data.shape)
+                 chunksize=10000) as reader:
+    for i, data in enumerate(reader):
+        print(i, "_Update the list of chunks_ Shape : ", data.shape)
         DATA_ALL_CLIENTS_CHUNKS.append(data)
         gc.collect()
 # gc.collect()
