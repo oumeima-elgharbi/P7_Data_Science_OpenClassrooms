@@ -12,26 +12,26 @@ This README contains information about :
 
 # -----------------------------------------------------------------------------
 
-Sunday :
+Thursday :
 
 - dashboard finish
 - SHAP finish
 - Global feature importance
 
-Monday :
+Saturday :
 
 - SMOTE
 - CV + GridSearch
 - model
 - refacto feature engineering check (save index name)
 
-Tuesday :
+Sunday :
 
 - EDA : Kaggle
 - pytest / unittest
 - pydantics for API !!
 
-Wednesday :
+Sunday :
 
 - powerpoint
 - notes méthodo : *Reference : https://leandeep.com/datalab-kaggle/kb002.html*
