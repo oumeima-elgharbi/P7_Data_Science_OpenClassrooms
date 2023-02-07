@@ -12,6 +12,13 @@ This README contains information about :
 
 # -----------------------------------------------------------------------------
 
+TODO clean code :
+- common folder for back and front : factoriser !!
+- try worker python in heroku to download data at the build !!
+
+- optimize reading of data_train_preprocessed_vf.csv
+- preprocess in real time for test and train ?? (train to think about solution)
+
 Thursday :
 
 - dashboard finish
