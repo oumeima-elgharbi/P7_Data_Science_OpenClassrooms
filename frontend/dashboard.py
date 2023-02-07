@@ -30,6 +30,7 @@ import os
 from os import listdir
 
 this_dir = os.getcwd()
+print("HEYYY", this_dir)
 all_files = [f for f in listdir(this_dir)]
 
 if "resources" not in all_files:
@@ -37,6 +38,7 @@ if "resources" not in all_files:
 
     print("__Download resources folder__")
     subprocess.call(r'python script_download_data_folder.py', shell=True)
+    gc.collect()
 ##############################################################################
 
 # 0) Config : unzip data and check host if deployment or not
