@@ -123,7 +123,7 @@ def initialize_webview():
 
     # Sidebar
     with st.sidebar:
-        logo_homecredit = Image.open('./img/Home-Credit-logo.jpg')
+        logo_homecredit = Image.open('./img/Home-Credit-Logo.jpg')
         st.image(logo_homecredit, width=300)
 
         # Dashboard selector
