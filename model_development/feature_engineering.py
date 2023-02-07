@@ -138,6 +138,14 @@ def one_hot_encoder(df, df_name, training=True, nan_as_category=True):
                               data=encoded_categorical_data,
                               index=df.index)
 
+    # print("Changing dtype from int64 to int8 in encoded dataframe")
+    # print("Memory usage before : ")
+    # print(df_encoded.memory_usage(index=False, deep=True))
+    # df_encoded[encoded_categorical_data_names] # here only encoded columns
+    # print("Memory usage after : ")
+    # df_encoded = df_encoded.astype("int8") # copy=False
+    # print(df_encoded.memory_usage(index=False, deep=True))
+
     # 5) Concatenate the two dataframes for the training set
 
     # when merging, we put the categorical features first so that the targets will be at the end of the dataframe.  // INVERSE
@@ -516,6 +524,11 @@ def generate_dataset(input_path, application_filename, output_file, training=Tru
         print("Re-indexed dataset shape :", df.shape)
         df.to_csv(output_file, index_label="SK_ID_CURR", sep=",")  # read with index_col = "SK_ID_CURR"
         gc.collect()  # delete ??
+
+
+# TODO save csv with less disk space + faster read_csv
+# https://stackoverflow.com/questions/50047237/how-to-preserve-dtypes-of-dataframes-when-using-to-csv
+# https://stackoverflow.com/questions/55299536/pandas-dataframe-csv-reduce-disk-size
 
 
 # TOMORROW : RUN THIS AND SEE if OHE for one query works !!

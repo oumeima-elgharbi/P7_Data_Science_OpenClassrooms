@@ -1,3 +1,4 @@
+import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, FancyArrowPatch
@@ -5,6 +6,8 @@ from matplotlib.cm import RdYlGn
 
 from utils import *
 
+
+############# GAUGE#####################"""
 
 def rectangle_gauge(client_id, client_probability, threshold):
     """Draws a gauge for the result of credit application, and an arrow at the client probability of default.
@@ -43,6 +46,8 @@ def rectangle_gauge(client_id, client_probability, threshold):
     ax.set_yticks([])
     st.pyplot(fig)
 
+
+######################################## SHAP
 
 def feature_description(feature, df_description):
     """Returns a description of the feature, taken from the table HomeCredit_columns_description.csv.
@@ -90,3 +95,28 @@ def shap_barplot(df_shap, df_description):
     with st.expander("Features description", expanded=False):
         for feature in list(df['feature']):
             st.caption(feature + ": " + feature_description(feature, df_description))
+
+def add_new_client_to_data_all_clients(data_all_clients, df_client, prediction, y_label="TARGET"):
+    """
+    # TODO : rename function var to not have "metier logic" ?
+    :param:
+    :param:
+    :param:
+    :param:
+    :return:
+    :rtype:
+    """
+    # 1) we add the prediction to the client's dataframe (we add one column
+    # df_client[y_label] = pred # this adds the column at the end
+    print("__Dataframe shape before adding new client :", data_all_clients.shape)
+
+    # we need the column with the prediction at the beginning
+    df_client.insert(0, y_label, prediction, True)  # first column / column_name / value / inplace
+
+    # 2) we add the new client to the dataset of all clients
+    df_merged = pd.concat([df_client, data_all_clients])
+    print("__Dataframe shape after adding new client :", df_merged.shape)
+    return df_merged
+
+
+########################################################################################################################

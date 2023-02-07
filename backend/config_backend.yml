@@ -1,5 +1,6 @@
-clients_database_preprocessed: "resources/data_test_preprocessed_vf.csv.gz"
-classifier: "resources/LGBMClassifier_fold_0.joblib"
+new_clients_database_preprocessed: "resources/data_test_preprocessed_vf.csv.gz"
+known_clients_database_preprocessed: "resources/data_train_preprocessed_vf.csv.gz"
+classifier: "resources/model_LGB.joblib"
 
 # dashboard : selectionner un num de client et ds infos sur lui, feature importance etc
 # score obtenu : proba / accepté ou pas
@@ -8,7 +9,8 @@ classifier: "resources/LGBMClassifier_fold_0.joblib"
 # api pas trop
 
 # For v2
-clients_database: "dataset/source/application_test.csv"
+new_clients_database: "dataset/source/application_test.csv"
+known_clients_database: "dataset/source/application_train.csv"
 preprocessing:
   application: "model_preparation/models/preprocessing/OneHotEncoder_application.joblib"
   bureau: "model_preparation/models/preprocessing/OneHotEncoder_bureau.joblib"

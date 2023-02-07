@@ -5,12 +5,16 @@ import uvicorn
 from prediction_functions import *  # TODO remove
 from preprocessing import *  # TODO remove
 
+import subprocess
+print("__Download resources folder__")
+subprocess.call(r'python script_download_data_folder.py', shell=True)
+
 # before opening the web service, we load all the models and files
 print("_____Getting config_____")
 config = read_yml("config.yml")
 
-print("__Unzip model and dataset__")
-unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
+#print("__Unzip model and dataset__")
+#unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
 
 print("__Deployment : {}__".format(config["deploy"]["is"]))
 if config["deploy"]["is"]:
@@ -47,31 +51,20 @@ async def client_data(client: dict = Body({})):
     """
     Body empty, using the client's id, we get the client's preprocessed data
 
+    Body : {"client_id": 100001, "is_new_client": True} TODO revoir
+
     :return: a preprocessed client with feature / value
     :rtype: (dict)
     """
     print("__Getting client's application data from database__")
     # {"client_id": 0}
-    client_df = preprocess_one_application(client["client_id"])
-    client_json = df_to_json(client_df)
-    return client_json[0]
-
-
-@app.get('/clients/{client_id}')  # 12s...
-async def get_client_data(client_id: int):
-    """
-    Body empty, using the client's id, we get the client's preprocessed data
-
-    :param client_id: (int)
-    :return: a preprocessed client with feature / value
-    :rtype: (dict)
-    """
-    print("__Getting client's application data from database__")
-    gc.collect()
-    # await asyncio.sleep(5)
-    client_df = preprocess_one_application(client_id)
-    client_json = df_to_json(client_df)
-    return client_json[0]
+    try:
+        client_df = preprocess_one_application(client["client_id"])  # TODO add option for database name / add in fct preprocess in the body !!
+        client_json = df_to_json(client_df)
+        return client_json[0]
+    except Exception as e:
+        print(e)
+        print("Couldn't get client data from database.")
 
 
 @app.post("/predict")
@@ -84,6 +77,7 @@ async def predict(client_json: dict = Body({})):  # remove async def ?? # :dict 
     :return: the probability that the client will repay the loan
     :rtype: (float)
     """
+    assert client_json != {}, "There is no data for the client"  # TODO add pydantics verification
     print("_____Start of prediction pipeline_____")
     print("_____Getting client_____")
     client_df = json_to_df(client_json)
@@ -104,6 +98,7 @@ async def get_shap(client_json: dict = Body({})):
     :return: List of dict, each dict is a feature + its SHAP value
     :rtype: (list)
     """
+    assert client_json != {}, "There is no data for the client"  # TODO add pydantics verification
     print("_____Start of SHAP_____")
     client_df = json_to_df(client_json)
 
@@ -117,16 +112,6 @@ async def get_shap(client_json: dict = Body({})):
           len(client_shap_json) == client_df.shape[1])
     return client_shap_json
 
-
-# analyse sur le client (stat) : sur les 3 var les plus importantes // comaprer avec la moy des clients refusés et acceptes /
-# application_train : SUR UNE VAR moy des clients 0 / moy des clients 1 // place mon client par rapport à eux (revenus)
-# barre jauge proba / (PM)
-# Feature importance SHAP globale change pas (meme graph pour chaque client)
-# feature important SHAP local (à la fin du notebook de prediction)
-# Streamlit / SHAP
-# sur DB : ajouter info sur client / genre - salaire - etc
-
-# salaire : si modifie / personne acceptée ou pas (bonus)
 
 if __name__ == '__main__':
     # opening the web service
