@@ -72,15 +72,15 @@ DF_DESCRIPTION = pd.read_csv(config_front["columns_description"], encoding="ISO-
 
 # TODO add dtype reading !!! https://stackoverflow.com/questions/50047237/how-to-preserve-dtypes-of-dataframes-when-using-to-csv
 print("__Reading the database of all cients as chunks to save memory__")
-DATA_ALL_CLIENTS_CHUNKS = []
+# DATA_ALL_CLIENTS_CHUNKS = []
 # DATA_ALL_CLIENTS = pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8")
-with pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8", index_col="SK_ID_CURR",
-                 chunksize=10000) as reader:
-    for i, data in enumerate(reader):
-        print(i, "_Update the list of chunks_ Shape : ", data.shape)
-        DATA_ALL_CLIENTS_CHUNKS.append(data)
-        gc.collect()
-# gc.collect()
+# with pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8", index_col="SK_ID_CURR",
+#                chunksize=5000) as reader:
+#  for i, data in enumerate(reader):
+#     print(i, "_Update the list of chunks_ Shape : ", data.shape)
+#    DATA_ALL_CLIENTS_CHUNKS.append(data)
+#   gc.collect()
+gc.collect()
 
 global CLIENT_ID
 CLIENT_ID = 100001  # 456250
