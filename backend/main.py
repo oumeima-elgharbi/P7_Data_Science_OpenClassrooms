@@ -5,16 +5,29 @@ import uvicorn
 from prediction_functions import *  # TODO remove
 from preprocessing import *  # TODO remove
 
-#import subprocess
-#print("__Download resources folder__")
-#subprocess.call(r'python script_download_data_folder.py', shell=True)
+#############################################################################
+# TODO remove !! this is NOT clean code
+
+import os
+from os import listdir
+
+this_dir = os.getcwd()
+all_files = [f for f in listdir(this_dir)]
+
+if "resources" not in all_files:
+    import subprocess
+
+    print("__Download resources folder__")
+    subprocess.call(r'python script_download_data_folder.py', shell=True)
+##############################################################################
+
 
 # before opening the web service, we load all the models and files
 print("_____Getting config_____")
 config = read_yml("config.yml")
 
-#print("__Unzip model and dataset__")
-#unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
+# print("__Unzip model and dataset__")
+# unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
 
 print("__Deployment : {}__".format(config["deploy"]["is"]))
 if config["deploy"]["is"]:
@@ -59,7 +72,8 @@ async def client_data(client: dict = Body({})):
     print("__Getting client's application data from database__")
     # {"client_id": 0}
     try:
-        client_df = preprocess_one_application(client["client_id"])  # TODO add option for database name / add in fct preprocess in the body !!
+        client_df = preprocess_one_application(
+            client["client_id"])  # TODO add option for database name / add in fct preprocess in the body !!
         client_json = df_to_json(client_df)
         return client_json[0]
     except Exception as e:

@@ -23,9 +23,21 @@ from dashboard_requests import *
 # voir si ca améliore le score
 
 
-import subprocess
-print("__Download resources folder__")
-subprocess.call(r'python script_download_data_folder.py', shell=True)
+#############################################################################
+# TODO remove !! this is NOT clean code
+
+import os
+from os import listdir
+
+this_dir = os.getcwd()
+all_files = [f for f in listdir(this_dir)]
+
+if "resources" not in all_files:
+    import subprocess
+
+    print("__Download resources folder__")
+    subprocess.call(r'python script_download_data_folder.py', shell=True)
+##############################################################################
 
 # 0) Config : unzip data and check host if deployment or not
 
