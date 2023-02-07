@@ -22,6 +22,11 @@ from dashboard_requests import *
 # SMOTE : classes desequilibrées : dummy 0 : pour améliorer score sur classe 1 et réequilibrer dataset
 # voir si ca améliore le score
 
+
+import subprocess
+print("__Download resources folder__")
+subprocess.call(r'python script_download_data_folder.py', shell=True)
+
 # 0) Config : unzip data and check host if deployment or not
 
 print("_____Getting config_____")
