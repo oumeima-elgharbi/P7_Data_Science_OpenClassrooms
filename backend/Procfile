@@ -1,1 +1,2 @@
+worker: python script_download_data_folder.py
 web: uvicorn main:app --host=0.0.0.0 --port=${PORT:-5000}

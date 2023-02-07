@@ -5,9 +5,9 @@ import uvicorn
 from prediction_functions import *  # TODO remove
 from preprocessing import *  # TODO remove
 
-import subprocess
-print("__Download resources folder__")
-subprocess.call(r'python script_download_data_folder.py', shell=True)
+#import subprocess
+#print("__Download resources folder__")
+#subprocess.call(r'python script_download_data_folder.py', shell=True)
 
 # before opening the web service, we load all the models and files
 print("_____Getting config_____")
