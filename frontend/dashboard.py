@@ -30,8 +30,10 @@ import os
 from os import listdir
 
 this_dir = os.getcwd()
-print("HEYYY", this_dir)
 all_files = [f for f in listdir(this_dir)]
+
+print("THIS CWD", this_dir)
+print("ALL FILES : ", all_files)
 
 if "resources" not in all_files:
     import subprocess
@@ -46,8 +48,8 @@ if "resources" not in all_files:
 print("_____Getting config_____")
 config = read_yml("config.yml")
 
-#print("__Unzip model and dataset__")
-#unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
+# print("__Unzip model and dataset__")
+# unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
 
 print("Deployment ? {}".format(config["deploy"]["is"]))
 if config["deploy"]["is"]:
@@ -69,8 +71,15 @@ ENDPOINT_CLIENT_DATA = config_front["endpoints"]["endpoint_client_data"]
 DF_DESCRIPTION = pd.read_csv(config_front["columns_description"], encoding="ISO-8859-1")  # not encoded in utf-8
 
 # TODO add dtype reading !!! https://stackoverflow.com/questions/50047237/how-to-preserve-dtypes-of-dataframes-when-using-to-csv
-DATA_ALL_CLIENTS = pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8")
-
+print("__Reading the database of all cients as chunks to save memory__")
+DATA_ALL_CLIENTS_CHUNKS = []
+# DATA_ALL_CLIENTS = pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8")
+with pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8", index_col="SK_ID_CURR",
+                 chunksize=20000) as reader:
+    for data in reader:
+        print("_Update the list of chunks_ Shape : ", data.shape)
+        DATA_ALL_CLIENTS_CHUNKS.append(data)
+        gc.collect()
 # gc.collect()
 
 global CLIENT_ID
