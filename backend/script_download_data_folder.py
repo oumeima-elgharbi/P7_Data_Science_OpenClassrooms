@@ -5,8 +5,8 @@ import json
 # to put as env var
 
 # if deploy == True :
-import os
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "google-credentials.json"
+# import os
+# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "google-credentials.json"
 print("HEYYYY before crashing ?")
 
 
