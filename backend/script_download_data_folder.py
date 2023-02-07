@@ -74,3 +74,6 @@ if __name__ == "__main__":
 
 # cd frontend
 # python script_download_data_folder.py
+
+# Config var x2
+# heroku buildpacks:add https://github.com/elishaterada/heroku-google-application-credentials-buildpack --app p7-data-science-oc-api
