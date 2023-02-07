@@ -140,4 +140,5 @@ dmypy.json
 *.pkl
 *.gz
 *.zip
+*.json
 /common/resources/

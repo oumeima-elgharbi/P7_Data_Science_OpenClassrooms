@@ -1,13 +1,10 @@
 import os
 from gcloud import storage
-import json
 
-# to put as env var
+# The credentials are saved as environment variables
 
-import os
-
-
-# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "service_account/project-7-oc-376509-d874afef7aa1.json"
+# if deploy == True :
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "google-credentials.json"
 
 
 def create_folder_from_blob_name(blob_name):
@@ -28,28 +25,24 @@ def create_folder_from_blob_name(blob_name):
             os.makedirs(new_folder)
 
 
-def download_blob_as_file(project_name, bucket_name, prefix, folder):  # credentials
+def download_blob_as_file(project_name, bucket_name, prefix, folder):
     """
 
     :param project_name: (string)
-    :param credentials: (dict) client_email, private_key
     :param bucket_name: (string) 'your-bucket-name'
     :param prefix: (string) 'your-bucket-directory/'
     :param folder: (string) 'your-local-directory/'
     :return:
     """
     # Connect to Google Storage and get bucket
-    storage_client = storage.Client(project=project_name)  # , credentials=credentials
+    storage_client = storage.Client(project=project_name)
     bucket = storage_client.bucket(bucket_name)
 
     # Retrieve all blobs with a prefix matching the folder
     blobs = list(bucket.list_blobs(prefix=prefix))
-    print("HERE1", blobs)
 
     for blob in blobs:
         filename = blob.name
-        # print("HERE2", blob)
-        # print("HERE3", filename)
         # we create the nested local folders according to the blob name
         create_folder_from_blob_name(filename)
         if not filename.endswith("/"):
@@ -63,14 +56,3 @@ if __name__ == "__main__":
                           prefix="resources",  # name of blob where we have stored the data to download
                           folder="")  # path_root + "/"
     print("End of download")
-
-# gcloud auth login
-# puis
-# gcloud auth application-default login
-
-# gcloud config set project project-7-oc-376509
-
-# gcloud auth revoke --all # to log out of gcloud SDK
-
-# cd frontend
-# python script_download_data_folder.py
