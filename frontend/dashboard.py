@@ -74,9 +74,11 @@ ENDPOINT_SHAP_EXPECTED = config_front["endpoints"]["endpoint_shap_expected"]  # 
 
 ENDPOINT_FEATURE_IMPORTANCE = config_front["endpoints"]["endpoint_feature_importance"]
 
+DATA_ALL_CLIENTS_PATH = config_front["known_clients_database_preprocessed"]
+
 # TODO add dtype reading !!! https://stackoverflow.com/questions/50047237/how-to-preserve-dtypes-of-dataframes-when-using-to-csv
 print("__Reading the database of all cients as chunks to save memory__")
-# DATA_ALL_CLIENTS_CHUNKS = []
+#
 # DATA_ALL_CLIENTS = pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8")
 # with pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8", index_col="SK_ID_CURR",
 #                chunksize=5000) as reader:
@@ -95,6 +97,13 @@ global CLIENT_ID
 CLIENT_ID = 100001  # 456250
 
 global CLIENT_JSON
+global CLIENT_DF
+
+# to save time from calling the endpoint global_feature_importance
+global LIST_FEATURES
+
+global NB_FEATURES_TO_PLOT
+NB_FEATURES_TO_PLOT = 2
 
 # we initialize the first webview to homepage
 global DASHBOARD_CHOICE
@@ -227,8 +236,9 @@ def basic_dashboard():
 
     # TODO rename or Global VAR for client_df
     shap_force_plot_view()
-
     global_feature_importance_view()
+
+    # boxplot_view()
 
 
 def proba_view():
@@ -293,19 +303,19 @@ def advanced_dashboard():
     st.sidebar.write('______________________________')
     st.sidebar.write(' ')
 
-    number_features_to_eval = int(st.sidebar.selectbox(
+    global NB_FEATURES_TO_PLOT
+    NB_FEATURES_TO_PLOT = int(st.sidebar.selectbox(
         'Features range you want to analyse',
-        ["2", "3", "4"]))
+        [2, 3, 4, 5, 6]))
 
     st.sidebar.write('______________________________')
     st.sidebar.write(' ')
 
     # SLIDER FOR MOST IMPACTFUL FEATURES
-    st.sidebar.write(f'*Most {str(number_features_to_eval)} impactful features for selected client :*')
+    st.sidebar.write(f'*{str(NB_FEATURES_TO_PLOT)} most impactful features for selected client :* {LIST_FEATURES[:NB_FEATURES_TO_PLOT]}')
 
     # iterate over n MOST IMPACTFUL FEATURES
-
-
+    boxplot_view()
 
 
 def shap_force_plot_view():  # TODO refacto client_df
@@ -342,12 +352,42 @@ def global_feature_importance_view():
         # get global feature importance
         response = request_feature_importance(HOST + ENDPOINT_FEATURE_IMPORTANCE, CLIENT_JSON)
         global_feature_importance_barplot(response, DF_DESCRIPTION)
+
+        # here we keep the value ?? for the boxplot ??
+        global LIST_FEATURES
+        LIST_FEATURES = list(response.keys())  # the response is a dict {feature: value}
+
     except Exception as e:
         print("Exception raised :", e)
 
 
-##########################################################################################"
+def boxplot_view():
+    #global NB_FEATURES_TO_PLOT  # so that the number of boxplot changes when chosen from sidebar
+    #global LIST_FEATURES
 
+    st.header(
+        'Box plots for the most importance features using all the known clients and comparing to the current client')
+
+    # We get the list of most importance features for the model
+    # list_features = list(dict_f_i.keys())[:10]
+
+    client_df = json_to_df(CLIENT_JSON)  # TODO add CLIENT_DF as global var
+
+    print("__Reading database of all clients for the list of features : ", LIST_FEATURES[:NB_FEATURES_TO_PLOT])
+    # we create a list to read the database / csv
+    columns_list = LIST_FEATURES[:NB_FEATURES_TO_PLOT].copy()
+    columns_list.extend(["SK_ID_CURR", "TARGET"])
+
+    print("HEROKU CRASH ??????")
+
+    # we read here the database using only the feature to plot and the index
+    data_all_clients = pd.read_csv(DATA_ALL_CLIENTS_PATH, encoding="utf-8", index_col="SK_ID_CURR",
+                                   usecols=columns_list)
+    for feature in LIST_FEATURES[:NB_FEATURES_TO_PLOT]:  # to display the number of graphs wanted
+        boxplot_all_clients_compared_to_client_feature_value(data_all_clients, feature, client_df)
+
+
+##########################################################################################"
 
 
 def eda_dashboard():

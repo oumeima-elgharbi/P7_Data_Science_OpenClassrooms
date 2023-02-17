@@ -163,7 +163,7 @@ def global_feature_importance_barplot(dict_f_i, df_description, max_features_to_
 
     # to see the plot in notebook :
     # plt.show()
-    # to see the plot in streamlit dahsboard
+    # to see the plot in streamlit dashboard
     st.pyplot(fig)
 
     add_feature_description(list_features=list_features, df_description=df_description)
@@ -171,8 +171,43 @@ def global_feature_importance_barplot(dict_f_i, df_description, max_features_to_
 
 ###########################################################################""
 
-def boxplot_():
-    return
+
+def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, feature, client_df):
+    """
+    Positions the client
+    """
+    mapping_x_ticks = {
+        '1': 'Default Client',
+        '0': 'Non Default Client'
+    }
+    feature_value = client_df[feature].values[0]  # we get the value for the client's feature
+
+    fig, ax = plt.subplots(figsize=(12, 9))
+    # create boxplot
+    sns.boxplot(data=data_all_clients,
+                y=feature,
+                x='TARGET',
+                orient="v",
+                showfliers=False,
+                palette=["#4286DE", "#EA365B"])
+    # add client threshold
+    ax.axhline(feature_value,
+               color='r',
+               label='Client value')
+    # add label and legend
+    ax.legend()
+    labels = [item.get_text() for item in ax.get_xticklabels()]
+    print(labels)
+    labels = [mapping_x_ticks[i] for i in labels]
+    print(labels)
+    ax.set_xticklabels(labels)
+    ax.set_title(f'{feature}')
+    ax.title.set_size(20)
+
+    # to see the plot in notebook :
+    # plt.show()
+    # to see the plot in streamlit dashboard
+    st.pyplot(fig)
 
 
 ###########################################################################""
