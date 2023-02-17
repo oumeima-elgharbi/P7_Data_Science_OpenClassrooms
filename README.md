@@ -12,37 +12,36 @@ This README contains information about :
 
 # -----------------------------------------------------------------------------
 
-TODO clean code :
-
-- how to download resources folder at the startup of app (or build ??) (+ factoriser)
-- common folder for back and front : factoriser !!
-
-- optimize reading of data_train_preprocessed_vf.csv
-- preprocess in real time for test and train ?? (train to think about solution)
-
-Thursday :
+TODO :
 
 - dashboard finish
 - SHAP finish
 - Global feature importance
-
-Saturday :
 
 - SMOTE
 - CV + GridSearch
 - model
 - refacto feature engineering check (save index name)
 
-Sunday :
-
 - EDA : Kaggle
-- pytest / unittest
-- pydantics for API !!
-
-Sunday :
 
 - powerpoint
-- notes méthodo : *Reference : https://leandeep.com/datalab-kaggle/kb002.html*
+- notes methodo : *Reference : https://leandeep.com/datalab-kaggle/kb002.html*
+
+
+**TODO +++ : trouver une solution pour lire data_train_preprocessed_vf.csv within memory range!!!**
+
+- optimize reading of data_train_preprocessed_vf.csv
+
+TODO clean code :
+
+- download resources when building the app (not when running the webservices)
+- common folder for back and front : factoriser !!
+- data_train_preprocessed_vf.csv to read with time optimized
+- unzip resources folder like before ?
+
+- preprocess in real time for test and train ?? (train to think about solution)
+
 
 #### TODO 1 : remove runtime.txt in root only ?
 
@@ -52,6 +51,7 @@ Sunday :
 
 Later :
 
+- pytest / unittest
 - Preprocess one client
 - MLFlow track experiments
 - MLFlow registry

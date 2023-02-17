@@ -70,6 +70,10 @@ ENDPOINT_SHAP = config_front["endpoints"]["endpoint_shap"]
 ENDPOINT_CLIENT_DATA = config_front["endpoints"]["endpoint_client_data"]
 DF_DESCRIPTION = pd.read_csv(config_front["columns_description"], encoding="ISO-8859-1")  # not encoded in utf-8
 
+ENDPOINT_SHAP_EXPECTED = config_front["endpoints"]["endpoint_shap_expected"]  # TODO clean
+
+ENDPOINT_FEATURE_IMPORTANCE = config_front["endpoints"]["endpoint_feature_importance"]
+
 # TODO add dtype reading !!! https://stackoverflow.com/questions/50047237/how-to-preserve-dtypes-of-dataframes-when-using-to-csv
 print("__Reading the database of all cients as chunks to save memory__")
 # DATA_ALL_CLIENTS_CHUNKS = []
@@ -81,6 +85,11 @@ print("__Reading the database of all cients as chunks to save memory__")
 #    DATA_ALL_CLIENTS_CHUNKS.append(data)
 #   gc.collect()
 gc.collect()
+
+# income / age ?
+# graphiques pour situer le client par rapport aux autres (features qui me paraissent)
+# basé sur feature importance GLOBALE et comparer avec ses var
+# basé sur shap ?
 
 global CLIENT_ID
 CLIENT_ID = 100001  # 456250
@@ -97,12 +106,7 @@ global PREDICTION
 #################################################################"
 # TODO refacto
 def load_data():
-    # Load data
-    list_categorical_features = load_data('list_categorical_features')
-    dict_categorical_features = load_data('dict_categorical_features')
-    list_quantitative_features = load_data('list_quantitative_features')
-    list_features_permutation_importances = load_data('list_features_permutation_importances')
-    list_summary_plot_shap = load_data('list_summary_plot_shap')
+    pass
 
 
 # Web page #########################################################################
@@ -205,6 +209,7 @@ def basic_dashboard():
     # load_data() # TODO correct
     global CLIENT_ID
     global CLIENT_JSON
+    global CLIENT_DF
 
     # Main title of the dashboard
     st.title(f'Default Risk Prediction for client {CLIENT_ID}')
@@ -219,6 +224,11 @@ def basic_dashboard():
 
     proba_view()
     shap_view()
+
+    # TODO rename or Global VAR for client_df
+    shap_force_plot_view()
+
+    global_feature_importance_view()
 
 
 def proba_view():
@@ -279,19 +289,69 @@ def advanced_dashboard():
     global CLIENT_ID
     st.header('Ranking of the client compared to other clients')
 
-    ### TODO ###
+    # INPUT HOWMANY FEATURE TO ANALYSED
+    st.sidebar.write('______________________________')
+    st.sidebar.write(' ')
+
+    number_features_to_eval = int(st.sidebar.selectbox(
+        'Features range you want to analyse',
+        ["2", "3", "4"]))
+
+    st.sidebar.write('______________________________')
+    st.sidebar.write(' ')
+
+    # SLIDER FOR MOST IMPACTFUL FEATURES
+    st.sidebar.write(f'*Most {str(number_features_to_eval)} impactful features for selected client :*')
+
+    # iterate over n MOST IMPACTFUL FEATURES
 
 
-def lineplot_view(feature=""):  ## TODO working on this
+
+
+def shap_force_plot_view():  # TODO refacto client_df
     """
+    Local SHAP
 
+    :param: None
+    :return: None
+    :rtype: None
     """
-    # we create a df for the client in json format and add it to the df of all clients
-    df_client = json_to_df(CLIENT_JSON)
-    data_all_clients = add_new_client_to_data_all_clients(DATA_ALL_CLIENTS, df_client, PREDICTION)
+    st.header('SHAP Force plot')
+    try:
+        # get shap values for the selected client
+        response_shap = request_shap_expected(HOST + ENDPOINT_SHAP_EXPECTED, CLIENT_JSON)
 
-    # TODO FINISH function
-    lineplot(DATA_ALL_CLIENTS, df_client, CLIENT_ID, THRESHOLD, feature, DF_DESCRIPTION)
+        expected_value = response_shap["expected_value"]  # CF back end doc TODO refacto
+        encodedNumpyData = response_shap["shap_values"]
+
+        # Deserialization
+        print("Decode JSON serialized NumPy array")
+        decodedArrays = json.loads(encodedNumpyData)
+        finalNumpyArray = np.asarray(decodedArrays["array"])
+
+        client_df = json_to_df(CLIENT_JSON)  # just need pd.Dataframe()
+
+        shap_force_plot(finalNumpyArray, expected_value, PREDICTION, client_df)
+    except Exception as e:
+        print("Exception raised :", e)
+
+
+def global_feature_importance_view():
+    st.header('Global Feature Importance of the model used for the prediction')
+    try:
+        # get global feature importance
+        response = request_feature_importance(HOST + ENDPOINT_FEATURE_IMPORTANCE, CLIENT_JSON)
+
+        columns = response["columns"]
+        global_feature_importance = response["global_feature_importance"]
+
+        global_feature_importance_barplot(columns, global_feature_importance, DF_DESCRIPTION)
+    except Exception as e:
+        print("Exception raised :", e)
+
+
+##########################################################################################"
+
 
 
 def eda_dashboard():
@@ -305,6 +365,8 @@ def eda_dashboard():
     ### TODO ###
     pass
 
+
+#############################################################################################"
 
 def dashboard_view():
     """
