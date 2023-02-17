@@ -202,7 +202,7 @@ print(finalNumpyArray)
 
 
 @app.post('/feature_importance')
-async def shap_values(client_json: dict = Body({})):
+async def get_global_feature_importance(client_json: dict = Body({})):
     """
     Computes Global Feature Importance of the model
 
@@ -214,10 +214,15 @@ async def shap_values(client_json: dict = Body({})):
     print("_____Getting Global Feature Importance_____")
     client_df = json_to_df(client_json)  # TODO refactor remove client_df from parameters
 
-    response = {"columns": client_df.columns.tolist(),
-                "global_feature_importance": model.feature_importances_.tolist()}
+    columns = client_df.columns.tolist()  # need this to serialize into json object
+    global_feature_importance = model.feature_importances_.tolist()  # need this to serialize into json object
 
-    return response
+    # create dict {columns_name:model_feature_importance}
+    dict_f_i = dict(zip(columns, global_feature_importance))  # model.feature_importances_
+    # sorted by feature_importance
+    dict_f_i = {k: v for k, v in sorted(dict_f_i.items(), key=lambda item: item[1], reverse=True)}
+
+    return dict_f_i
 
 
 if __name__ == '__main__':

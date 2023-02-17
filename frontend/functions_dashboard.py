@@ -138,14 +138,10 @@ def shap_force_plot(shap_values, expected_value, prediction, client_df):
 
 ###############################################################################################
 
-def global_feature_importance_barplot(columns, global_feature_importance, df_description, max_features_to_display=20):
+def global_feature_importance_barplot(dict_f_i, df_description, max_features_to_display=20):
     """
     TODO : model.feature_importances_ works only for LGBM ??? to check and clean code
     """
-    # create dict {columns_name:model_feature_importance}
-    dict_f_i = dict(zip(columns, global_feature_importance))  # model.feature_importances_
-    # sorted by feature_importance
-    dict_f_i = {k: v for k, v in sorted(dict_f_i.items(), key=lambda item: item[1], reverse=True)}
     # return barplot
     plt.rcParams['figure.autolayout'] = True
     fig = plt.figure(figsize=(25, 14))  # for seaborn !!
@@ -156,6 +152,7 @@ def global_feature_importance_barplot(columns, global_feature_importance, df_des
     # to not display all of the 777 features, we display only the 15 or 20 most important ones
     list_features = list(dict_f_i.keys())[:max_features_to_display]
     values_per_feature = list(dict_f_i.values())[:max_features_to_display]
+
     bar_plot = sns.barplot(x=values_per_feature,
                            y=list_features)  # orient='h'
 
@@ -170,6 +167,12 @@ def global_feature_importance_barplot(columns, global_feature_importance, df_des
     st.pyplot(fig)
 
     add_feature_description(list_features=list_features, df_description=df_description)
+
+
+###########################################################################""
+
+def boxplot_():
+    return
 
 
 ###########################################################################""

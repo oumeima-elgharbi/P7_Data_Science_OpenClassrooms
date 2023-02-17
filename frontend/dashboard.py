@@ -341,11 +341,7 @@ def global_feature_importance_view():
     try:
         # get global feature importance
         response = request_feature_importance(HOST + ENDPOINT_FEATURE_IMPORTANCE, CLIENT_JSON)
-
-        columns = response["columns"]
-        global_feature_importance = response["global_feature_importance"]
-
-        global_feature_importance_barplot(columns, global_feature_importance, DF_DESCRIPTION)
+        global_feature_importance_barplot(response, DF_DESCRIPTION)
     except Exception as e:
         print("Exception raised :", e)
 
