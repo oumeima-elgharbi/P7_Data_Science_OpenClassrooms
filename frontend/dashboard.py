@@ -77,7 +77,6 @@ ENDPOINT_FEATURE_IMPORTANCE = config_front["endpoints"]["endpoint_feature_import
 DATA_ALL_CLIENTS_PATH = config_front["known_clients_database_preprocessed"]
 
 # TODO add dtype reading !!! https://stackoverflow.com/questions/50047237/how-to-preserve-dtypes-of-dataframes-when-using-to-csv
-print("__Reading the database of all cients as chunks to save memory__")
 #
 # DATA_ALL_CLIENTS = pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8")
 # with pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8", index_col="SK_ID_CURR",
@@ -86,7 +85,7 @@ print("__Reading the database of all cients as chunks to save memory__")
 #     print(i, "_Update the list of chunks_ Shape : ", data.shape)
 #    DATA_ALL_CLIENTS_CHUNKS.append(data)
 #   gc.collect()
-gc.collect()
+# gc.collect()
 
 # income / age ?
 # graphiques pour situer le client par rapport aux autres (features qui me paraissent)
@@ -312,7 +311,8 @@ def advanced_dashboard():
     st.sidebar.write(' ')
 
     # SLIDER FOR MOST IMPACTFUL FEATURES
-    st.sidebar.write(f'*{str(NB_FEATURES_TO_PLOT)} most impactful features for selected client :* {LIST_FEATURES[:NB_FEATURES_TO_PLOT]}')
+    st.sidebar.write(
+        f'*{str(NB_FEATURES_TO_PLOT)} most impactful features for selected client :* {LIST_FEATURES[:NB_FEATURES_TO_PLOT]}')
 
     # iterate over n MOST IMPACTFUL FEATURES
     boxplot_view()
@@ -362,8 +362,8 @@ def global_feature_importance_view():
 
 
 def boxplot_view():
-    #global NB_FEATURES_TO_PLOT  # so that the number of boxplot changes when chosen from sidebar
-    #global LIST_FEATURES
+    # global NB_FEATURES_TO_PLOT  # so that the number of boxplot changes when chosen from sidebar
+    # global LIST_FEATURES
 
     st.header(
         'Box plots for the most importance features using all the known clients and comparing to the current client')
@@ -383,6 +383,7 @@ def boxplot_view():
     # we read here the database using only the feature to plot and the index
     data_all_clients = pd.read_csv(DATA_ALL_CLIENTS_PATH, encoding="utf-8", index_col="SK_ID_CURR",
                                    usecols=columns_list)
+
     for feature in LIST_FEATURES[:NB_FEATURES_TO_PLOT]:  # to display the number of graphs wanted
         boxplot_all_clients_compared_to_client_feature_value(data_all_clients, feature, client_df)
 
