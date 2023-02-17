@@ -172,7 +172,7 @@ def global_feature_importance_barplot(dict_f_i, df_description, max_features_to_
 ###########################################################################""
 
 
-def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, feature, client_df):
+def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, list_features, client_df):
     """
     Positions the client
     """
@@ -180,33 +180,43 @@ def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, featu
         '1': 'Default Client',
         '0': 'Non Default Client'
     }
-    feature_value = client_df[feature].values[0]  # we get the value for the client's feature
+    fig = plt.figure(figsize=(20, 15))
+    n = len(list_features)
 
-    fig, ax = plt.subplots(figsize=(12, 9))
-    # create boxplot
-    sns.boxplot(data=data_all_clients,
-                y=feature,
-                x='TARGET',
-                orient="v",
-                showfliers=False,
-                palette=["#4286DE", "#EA365B"])
-    # add client threshold
-    ax.axhline(feature_value,
-               color='r',
-               label='Client value')
-    # add label and legend
-    ax.legend()
-    labels = [item.get_text() for item in ax.get_xticklabels()]
-    print(labels)
-    labels = [mapping_x_ticks[i] for i in labels]
-    print(labels)
-    ax.set_xticklabels(labels)
-    ax.set_title(f'{feature}')
-    ax.title.set_size(20)
+    for i, feature in enumerate(list_features):
+        # to display the boxplots on the same row
+        position = int('1{}{}'.format(n, i + 1))
+        ax = fig.add_subplot(position)
 
-    # to see the plot in notebook :
-    # plt.show()
-    # to see the plot in streamlit dashboard
+        feature_value = client_df[feature].values[0]  # we get the value for the client's feature
+
+        #fig, ax = plt.subplots(figsize=(12, 9))
+        # create boxplot
+        bp = sns.boxplot(data=data_all_clients,
+                    y=feature,
+                    x='TARGET',
+                    orient="v",
+                    showfliers=False,
+                    palette=["#4286DE", "#EA365B"],
+                         ax=ax)
+        # add client threshold
+        bp.axhline(feature_value,
+                   color='r',
+                   label='Client value'
+                   )
+        # add label and legend
+        bp.legend()
+        labels = [item.get_text() for item in ax.get_xticklabels()]
+        labels = [mapping_x_ticks[i] for i in labels]
+        bp.set_xticklabels(labels)
+        bp.set_title(f'{feature}')
+        bp.title.set_size(20)
+
+        # to see the plot in notebook :
+        # plt.tight_layout()
+        # plt.show()
+        # to see the plot in streamlit dashboard
+    plt.tight_layout()
     st.pyplot(fig)
 
 

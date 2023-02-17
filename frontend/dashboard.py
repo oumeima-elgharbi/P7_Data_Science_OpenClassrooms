@@ -384,8 +384,8 @@ def boxplot_view():
     data_all_clients = pd.read_csv(DATA_ALL_CLIENTS_PATH, encoding="utf-8", index_col="SK_ID_CURR",
                                    usecols=columns_list)
 
-    for feature in LIST_FEATURES[:NB_FEATURES_TO_PLOT]:  # to display the number of graphs wanted
-        boxplot_all_clients_compared_to_client_feature_value(data_all_clients, feature, client_df)
+    #for feature in LIST_FEATURES[:NB_FEATURES_TO_PLOT]:  # to display the number of graphs wanted
+    boxplot_all_clients_compared_to_client_feature_value(data_all_clients, LIST_FEATURES[:NB_FEATURES_TO_PLOT], client_df)
 
 
 ##########################################################################################"
