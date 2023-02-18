@@ -319,6 +319,8 @@ def advanced_dashboard():
     # iterate over n MOST IMPACTFUL FEATURES
     boxplot_view()
 
+    contourplot_view()
+
 
 def shap_force_plot_view():  # TODO refacto client_df
     """
@@ -411,6 +413,25 @@ def boxplot_view():
     # for feature in LIST_FEATURES[:NB_FEATURES_TO_PLOT]:  # to display the number of graphs wanted
     boxplot_all_clients_compared_to_client_feature_value(data_all_clients, LIST_FEATURES[:NB_FEATURES_TO_PLOT],
                                                          client_df)
+
+
+###########################################################################
+
+def contourplot_view():
+    st.header(
+        'Bi variate analysis graph')
+
+    feature_1 = 'AMT_ANNUITY'  # TODO remove and put sidebar
+    feature_2 = 'EXT_SOURCE_2'  # TODO remove and put sidebar
+
+    print("HEROKU CRASH ??????")
+    # we read here the database using only the feature to plot and the index
+    data_all_clients = pd.read_csv(DATA_ALL_CLIENTS_PATH, encoding="utf-8", index_col="SK_ID_CURR",
+                                   usecols=[feature_1, feature_2, "SK_ID_CURR", "TARGET"])
+
+    client_df = json_to_df(CLIENT_JSON)  # TODO add CLIENT_DF as global var
+
+    contourplot(feature_1, feature_2, client_df, CLIENT_ID, data_all_clients, DF_DESCRIPTION)
 
 
 ##########################################################################################"
