@@ -232,14 +232,14 @@ def basic_dashboard():
 
     proba_view()
 
-    shap_summary_plot_view()
-    shap_view()
-
-    # TODO rename or Global VAR for client_df
-    shap_force_plot_view()
+    st.header("Global Feature Importance")
     global_feature_importance_view()
+    shap_summary_plot_view()
 
-    # boxplot_view()
+    st.header("Local Feature Importance")
+    shap_view()
+    shap_force_plot_view()
+    # TODO rename or Global VAR for client_df
 
 
 def proba_view():
@@ -319,7 +319,9 @@ def advanced_dashboard():
     # iterate over n MOST IMPACTFUL FEATURES
     boxplot_view()
 
-    contourplot_view()
+    hist_view()
+
+    # contourplot_view()
 
 
 def shap_force_plot_view():  # TODO refacto client_df
@@ -387,6 +389,9 @@ def shap_summary_plot_view():  # TODO refacto ??
         print("Exception raised :", e)
 
 
+#################################################################################""
+
+
 def boxplot_view():
     # global NB_FEATURES_TO_PLOT  # so that the number of boxplot changes when chosen from sidebar
     # global LIST_FEATURES
@@ -413,6 +418,38 @@ def boxplot_view():
     # for feature in LIST_FEATURES[:NB_FEATURES_TO_PLOT]:  # to display the number of graphs wanted
     boxplot_all_clients_compared_to_client_feature_value(data_all_clients, LIST_FEATURES[:NB_FEATURES_TO_PLOT],
                                                          client_df)
+
+
+#########################################################################"
+
+def hist_view():
+    # global NB_FEATURES_TO_PLOT  # so that the number of boxplot changes when chosen from sidebar
+    # global LIST_FEATURES
+
+    st.header(
+        'Histograms for the most importance features using all the known clients and comparing to the current client')
+
+    # We get the list of most importance features for the model
+    # list_features = list(dict_f_i.keys())[:10]
+
+    client_df = json_to_df(CLIENT_JSON)  # TODO add CLIENT_DF as global var
+
+    print("__Reading database of all clients for the list of features : ", LIST_FEATURES[:NB_FEATURES_TO_PLOT])
+    # we create a list to read the database / csv
+    columns_list = LIST_FEATURES[:NB_FEATURES_TO_PLOT].copy()
+    columns_list.extend(["SK_ID_CURR", "TARGET"])
+
+    FEATURE = "PAYMENT_RATE"
+
+    print("HEROKU CRASH ??????")
+
+    # we read here the database using only the feature to plot and the index
+    data_all_clients = pd.read_csv(DATA_ALL_CLIENTS_PATH, encoding="utf-8", index_col="SK_ID_CURR",
+                                   usecols=columns_list)
+
+    # for feature in LIST_FEATURES[:NB_FEATURES_TO_PLOT]:  # to display the number of graphs wanted
+
+    histgram_compared_to_all_clients(data_all_clients, FEATURE, client_df)
 
 
 ###########################################################################

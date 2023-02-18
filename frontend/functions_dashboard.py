@@ -87,7 +87,7 @@ def shap_barplot(df_shap, df_description):
 
     # Plotting
     plt.style.use('seaborn')
-    fig = plt.figure(edgecolor='black', linewidth=4)
+    fig = plt.figure(edgecolor='black', linewidth=4, figsize=(12, 5))
     colors = [RdYlGn(0.05 * i) for i in range(5)] + \
              [RdYlGn(0.8 + 0.04 * i) for i in range(5)]
     plt.barh(width=df['SHAP value'], y=df['feature'], color=colors)
@@ -125,7 +125,7 @@ def shap_force_plot(shap_values, expected_value, prediction, client_df):
                           matplotlib=True,
                           show=False,
                           text_rotation=15,
-                          figsize=(20, 6))
+                          figsize=(8, 4))
     fig.suptitle(
         "Shows which features had the most influence on the model's prediction for a single observation. \n Features in red increase the probability while blue ones decrease it",
         y=0.92, size=20)
@@ -139,10 +139,10 @@ def shap_force_plot(shap_values, expected_value, prediction, client_df):
 def shap_summary_plot(shap_values, client_df):
     # Plotting
     plt.rcParams['figure.autolayout'] = True
-    fig = plt.figure(edgecolor='black', linewidth=4)  # summary_plot returns None
+    fig = plt.figure(figsize=(12, 5), edgecolor='black', linewidth=4)  # summary_plot returns None
+
     # we need to prepare a fig for matplotlib to display the graph
 
-    print("here")
     shap.summary_plot(shap_values, features=client_df, feature_names=client_df.columns)
     # fig.suptitle(
     #   "Shows the average impact of the features on the model output",
@@ -151,7 +151,6 @@ def shap_summary_plot(shap_values, client_df):
     # plt.show()
     # to see the plot in streamlit dashboard
     st.pyplot(fig)
-    print("end")
 
     ###############################################################################################
 
@@ -162,7 +161,7 @@ def global_feature_importance_barplot(dict_f_i, df_description, max_features_to_
     """
     # return barplot
     plt.rcParams['figure.autolayout'] = True
-    fig = plt.figure(figsize=(25, 14))  # for seaborn !!
+    fig = plt.figure(figsize=(20, 12))  # for seaborn !!
     matplotlib.rc('ytick', labelsize=15)
     matplotlib.rc('xtick', labelsize=15)
 
@@ -222,10 +221,11 @@ def contourplot(feature_1, feature_2, client_df, client_id, df_all_clients, df_d
                     ls='dashed',
                     lw=1)
         # if I want to interpolate data : https://stackoverflow.com/questions/5666056/matplotlib-extracting-data-from-contour-lines
-    #plt.show()
+    # plt.show()
     st.pyplot(figure)
     st.caption(feature_1 + ": " + feature_description(feature_1, df_description))
     st.caption(feature_2 + ": " + feature_description(feature_2, df_description))
+
 
 def contourplot_in_common(df_all_clients, feature_1, feature_2):
     """Contour plot for the observed probability of default as a function of 2 features. Common to all clients.
@@ -287,13 +287,6 @@ def contourplot_in_common(df_all_clients, feature_1, feature_2):
     return fig
 
 
-
-###########################################################################""
-
-def other_graph_like_boxplot():
-    pass
-
-
 ###########################################################################""
 
 def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, list_features, client_df):
@@ -304,7 +297,7 @@ def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, list_
         '1': 'Default Client',
         '0': 'Non Default Client'
     }
-    fig = plt.figure(figsize=(20, 15))
+    fig = plt.figure(figsize=(12, 5))
     n = len(list_features)
 
     for i, feature in enumerate(list_features):
@@ -340,6 +333,42 @@ def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, list_
         # plt.tight_layout()
         # plt.show()
         # to see the plot in streamlit dashboard
+    plt.tight_layout()
+    st.pyplot(fig)
+
+
+###########################################""
+
+
+def histgram_compared_to_all_clients(df_all_clients, feature, client_df):
+    # we get the value for the client's feature
+    feature_value = client_df[feature].values[0]
+
+    fig = plt.figure(figsize=(12, 5))
+
+    # Accepted clients TARGET == 0
+    ax = fig.add_subplot(121)
+    bp = sns.histplot(data=df_all_clients[df_all_clients["TARGET"] == 0],
+                      x=feature,
+                      bins=20)
+    # add client threshold
+    bp.axvline(feature_value,
+               color='r',
+               label='Client value'
+               )
+    plt.title("Distribution of {} for accepted clients".format(feature))
+
+    # Refused clients TARGET == 1
+    ax = fig.add_subplot(122)
+    bp = sns.histplot(data=df_all_clients[df_all_clients["TARGET"] == 1],
+                      x=feature, bins=20)
+    # add client threshold
+    bp.axvline(feature_value,
+               color='r',
+               label='Client value'
+               )
+    plt.title('Distribution of {} for refused clients'.format(feature))
+
     plt.tight_layout()
     st.pyplot(fig)
 
