@@ -93,7 +93,7 @@ DATA_ALL_CLIENTS_PATH = config_front["known_clients_database_preprocessed"]
 # basé sur shap ?
 
 global CLIENT_ID
-CLIENT_ID = 100001  # 456250
+CLIENT_ID = 100005  # 456250
 
 global CLIENT_JSON
 global CLIENT_DF
@@ -153,8 +153,8 @@ def initialize_webview():
             st.write('## Client ID:')
 
             global CLIENT_ID
-            CLIENT_ID = st.number_input("Enter client ID", value=100001)
-            st.caption("Example of client predicted negative (no default) : 100001")
+            CLIENT_ID = st.number_input("Enter client ID", value=100005)
+            st.caption("Example of client predicted negative (no default) : 100005")
             st.caption("Example of client predicted positive (credit default) : 456250")
 
             st.caption(" ")
