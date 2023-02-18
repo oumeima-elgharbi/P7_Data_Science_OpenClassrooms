@@ -1,4 +1,3 @@
-import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, FancyArrowPatch
@@ -289,50 +288,52 @@ def contourplot_in_common(df_all_clients, feature_1, feature_2):
 
 ###########################################################################""
 
-def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, list_features, client_df):
+def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, feature, client_df):
     """
     Positions the client
     """
     mapping_x_ticks = {
-        '1': 'Default Client',
-        '0': 'Non Default Client'
+        '1': 'Client refused for a loan',
+        '0': 'Client accepted for a loan'
     }
-    fig = plt.figure(figsize=(12, 5))
-    n = len(list_features)
+    # fig = plt.figure(figsize=(12, 5))
+    fig, ax = plt.subplots(figsize=(10, 5))
+    # n = len(list_features)
 
-    for i, feature in enumerate(list_features):
-        # to display the boxplots on the same row
-        position = int('1{}{}'.format(n, i + 1))
-        ax = fig.add_subplot(position)
+    # for i, feature in enumerate(list_features):
+    # to display the boxplots on the same row
+    #   position = int('1{}{}'.format(n, i + 1))
+    #  ax = fig.add_subplot(position)
 
-        feature_value = client_df[feature].values[0]  # we get the value for the client's feature
+    feature_value = client_df[feature].values[0]  # we get the value for the client's feature
 
-        # fig, ax = plt.subplots(figsize=(12, 9))
-        # create boxplot
-        bp = sns.boxplot(data=data_all_clients,
-                         y=feature,
-                         x='TARGET',
-                         orient="v",
-                         showfliers=False,
-                         palette=["#4286DE", "#EA365B"],
-                         ax=ax)
-        # add client threshold
-        bp.axhline(feature_value,
-                   color='r',
-                   label='Client value'
-                   )
-        # add label and legend
-        bp.legend()
-        labels = [item.get_text() for item in ax.get_xticklabels()]
-        labels = [mapping_x_ticks[i] for i in labels]
-        bp.set_xticklabels(labels)
-        bp.set_title(f'{feature}')
-        bp.title.set_size(20)
+    # fig, ax = plt.subplots(figsize=(12, 9))
+    # create boxplot
+    bp = sns.boxplot(data=data_all_clients,
+                     y=feature,
+                     x='TARGET',
+                     orient="v",
+                     showfliers=False,
+                     palette=["#4286DE", "#EA365B"],
+                     ax=ax)
+    # add client threshold
+    bp.axhline(feature_value,
+               color='r',
+               label='Client value'
+               )
+    # add label and legend
+    bp.legend()
+    labels = [item.get_text() for item in ax.get_xticklabels()]
+    labels = [mapping_x_ticks[i] for i in labels]
+    bp.set_xticklabels(labels)
 
-        # to see the plot in notebook :
-        # plt.tight_layout()
-        # plt.show()
-        # to see the plot in streamlit dashboard
+    bp.set_title(f'Box plots for {feature}')
+    bp.title.set_size(20)
+
+    # to see the plot in notebook :
+    # plt.tight_layout()
+    # plt.show()
+    # to see the plot in streamlit dashboard
     plt.tight_layout()
     st.pyplot(fig)
 
@@ -350,7 +351,8 @@ def histgram_compared_to_all_clients(df_all_clients, feature, client_df):
     ax = fig.add_subplot(121)
     bp = sns.histplot(data=df_all_clients[df_all_clients["TARGET"] == 0],
                       x=feature,
-                      bins=20)
+                      bins=20,
+                      color="#4286DE")
     # add client threshold
     bp.axvline(feature_value,
                color='r',
@@ -361,7 +363,7 @@ def histgram_compared_to_all_clients(df_all_clients, feature, client_df):
     # Refused clients TARGET == 1
     ax = fig.add_subplot(122)
     bp = sns.histplot(data=df_all_clients[df_all_clients["TARGET"] == 1],
-                      x=feature, bins=20)
+                      x=feature, bins=20, color="#EA365B")
     # add client threshold
     bp.axvline(feature_value,
                color='r',
@@ -373,28 +375,56 @@ def histgram_compared_to_all_clients(df_all_clients, feature, client_df):
     st.pyplot(fig)
 
 
+##################################################################
+
+def add_position_client(client_df, feature_1, feature_2):
+    x_client = client_df[feature_1].iloc[0]
+    y_client = client_df[feature_2].iloc[0]
+
+    if str(x_client) == "nan" or str(y_client) == "nan":
+        x_center = (plt.xlim()[1] + plt.xlim()[0]) / 2
+        y_center = (plt.ylim()[1] + plt.ylim()[0]) / 2
+        plt.text(s=f"Data not available for the selected client",
+                 x=x_center,
+                 y=y_center)  # ,
+        # ax=ax)
+
+    # plot only the y-axis line
+    if str(y_client) != "nan":
+        plt.axhline(y=y_client,
+                    c='k',
+                    ls='dashed',
+                    lw=1)  # ,
+        # ax=ax)
+
+    # plot only the x-axis line
+    if str(x_client) != "nan":
+        plt.axvline(x=x_client,
+                    c='k',
+                    ls='dashed',
+                    lw=1)  # ,
+        # ax=ax)
+
+
+def scatterplot_comparing_all_clients(df_all_clients, feature_1, feature_2, client_df):
+    """
+    :param df_all_clients:
+    :param feature_1:
+    :param feature_2:
+    :param client_df:
+    """
+    if feature_1 != feature_2:
+        fig = plt.figure(figsize=(8, 6))
+
+        plot = sns.scatterplot(x=feature_1, y=feature_2, data=df_all_clients, style='TARGET', hue='TARGET',
+                               size_order=[1, 0], size="TARGET", palette=["#4286DE", "#EA365B"])
+        add_position_client(client_df, feature_1, feature_2)
+        plot.set_title("Scatter plot of {} as a function of {} for all clients".format(feature_2, feature_1))
+
+        plt.tight_layout()
+        # plt.show()
+        st.pyplot(fig)
+    else:
+        st.write("Choose two different features")
+
 ###########################################################################""
-
-def add_new_client_to_data_all_clients(data_all_clients, df_client, prediction, y_label="TARGET"):
-    """
-    # TODO : rename function var to not have "metier logic" ?
-    :param:
-    :param:
-    :param:
-    :param:
-    :return:
-    :rtype:
-    """
-    # 1) we add the prediction to the client's dataframe (we add one column
-    # df_client[y_label] = pred # this adds the column at the end
-    print("__Dataframe shape before adding new client :", data_all_clients.shape)
-
-    # we need the column with the prediction at the beginning
-    df_client.insert(0, y_label, prediction, True)  # first column / column_name / value / inplace
-
-    # 2) we add the new client to the dataset of all clients
-    df_merged = pd.concat([df_client, data_all_clients])
-    print("__Dataframe shape after adding new client :", df_merged.shape)
-    return df_merged
-
-########################################################################################################################
