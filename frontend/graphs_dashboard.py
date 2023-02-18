@@ -1,25 +1,23 @@
+from utils import *
 import streamlit as st
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, FancyArrowPatch
 from matplotlib.cm import RdYlGn
-
-from utils import *
-
 import numpy as np
 import shap
 import matplotlib
 import seaborn as sns
 
 
-############# GAUGE#####################"""
-
 def rectangle_gauge(client_id, client_probability, threshold):
-    """Draws a gauge for the result of credit application, and an arrow at the client probability of default.
-    Args :
-    - id (int) : client ID.
-    - client_probability (float).
-    Returns :
-    - draws a matplotlib figure.
+    """
+    Draws a gauge for the result of credit application, and an arrow at the client probability of default.
+
+    :param client_id: (int)
+    :param client_probability: (float)
+    :param threshold:
+    :return: None
+    :rtype: None
     """
     plt.style.use('default')
     fig, ax = plt.subplots(figsize=(10, 1))
@@ -51,14 +49,14 @@ def rectangle_gauge(client_id, client_probability, threshold):
     st.pyplot(fig)
 
 
-######################################## SHAP
-
 def feature_description(feature, df_description):
-    """Returns a description of the feature, taken from the table HomeCredit_columns_description.csv.
-    Args :
-    - feature (string).
-    Returns :
-    - its description (string.)
+    """
+    Returns a description of the feature, taken from the table HomeCredit_columns_description.csv.
+
+    :param feature: (string)
+    :param df_description: (string)
+    :return:
+    :rtype:
     """
     if feature in list(df_description.Row):
         description = df_description[df_description.Row ==
@@ -69,11 +67,13 @@ def feature_description(feature, df_description):
 
 
 def shap_barplot(df_shap, df_description):
-    """Plots an horizontal barplot of 10 SHAP values (the 5 most positive contributions and the 5 most negatives to the probability of default)
-    Args :
-    - df_shap (dataframe) : SHAP values and feature names.
-    Returns :
-    - matplotlib plot via st.pyplot.
+    """
+    Plots an horizontal barplot of 10 SHAP values (the 5 most positive contributions and the 5 most negatives to the probability of default)
+
+    :param df_shap: (dataframe) : SHAP values and feature names
+    :param df_description:
+    :return:
+    :retype: None
     """
     # Preparation of data
     df = df_shap.sort_values(by='SHAP value', ascending=False)
@@ -103,18 +103,27 @@ def shap_barplot(df_shap, df_description):
 
 def add_feature_description(list_features, df_description):
     """
-        # adds a list with the description of each feature on the graph
+    Adds a list with the description of each feature on the graph
+
+    :param list_features:
+    :param df_description:
+    :return: None
+    :rtype: None
     """
     with st.expander("Features description", expanded=False):
         for feature in list_features:
             st.caption(feature + ": " + feature_description(feature, df_description))
 
-            ###################################################################################
-
 
 def shap_force_plot(shap_values, expected_value, prediction, client_df):
     """
-    :expected_value: (array)
+
+    :param shap_values:
+    :param expected_value: (array)
+    :param prediction:
+    :param client_df:
+    :return:
+    :rtype:
     """
     plt.rcParams['figure.autolayout'] = True
 
@@ -127,7 +136,7 @@ def shap_force_plot(shap_values, expected_value, prediction, client_df):
                           figsize=(8, 4))
     fig.suptitle(
         "Shows which features had the most influence on the model's prediction for a single observation. \n Features in red increase the probability while blue ones decrease it",
-        y=0.92, size=20)
+        y=0.92, size=15)
 
     # to see the plot in notebook :
     # plt.show()
@@ -136,27 +145,32 @@ def shap_force_plot(shap_values, expected_value, prediction, client_df):
 
 
 def shap_summary_plot(shap_values, client_df):
+    """
+
+    :param shap_values:
+    :param client_df:
+    :return:
+    :rtype:
+    """
     # Plotting
     plt.rcParams['figure.autolayout'] = True
     fig = plt.figure(figsize=(12, 5), edgecolor='black', linewidth=4)  # summary_plot returns None
 
     # we need to prepare a fig for matplotlib to display the graph
-
     shap.summary_plot(shap_values, features=client_df, feature_names=client_df.columns)
-    # fig.suptitle(
-    #   "Shows the average impact of the features on the model output",
-    #  y=0.92, size=20)
+
     # to see the plot in notebook :
     # plt.show()
     # to see the plot in streamlit dashboard
     st.pyplot(fig)
 
-    ###############################################################################################
-
 
 def global_feature_importance_barplot(dict_f_i, df_description, max_features_to_display=20):
     """
     TODO : model.feature_importances_ works only for LGBM ??? to check and clean code
+    :param dict_f_i:
+    :param df_description:
+    :param max_features_to_display:
     """
     # return barplot
     plt.rcParams['figure.autolayout'] = True
@@ -187,110 +201,13 @@ def global_feature_importance_barplot(dict_f_i, df_description, max_features_to_
 
 ###########################################################################""
 
-#### BIVARIATE GRAPH
-
-def contourplot(feature_1, feature_2, client_df, client_id, df_all_clients, df_description):
-    """Contour plot for the observed probability of default as a function of 2 features.
-    Args :
-    - feature1 (string).
-    - feature2 (string).
-    Returns :
-    - matplotlib plot via st.pyplot.
-    """
-    figure = contourplot_in_common(df_all_clients, feature_1, feature_2)
-    x_client = client_df[feature_1].iloc[0]
-    y_client = client_df[feature_2].iloc[0]
-    if str(x_client) == "nan" or str(y_client) == "nan":
-        x_center = (plt.xlim()[1] + plt.xlim()[0]) / 2
-        y_center = (plt.ylim()[1] + plt.ylim()[0]) / 2
-        plt.text(s=f" Client {client_id}\n  data not available",
-                 x=x_center,
-                 y=y_center)
-    else:
-        plt.axvline(x=x_client,
-                    ymin=-1e10,
-                    ymax=1e10,
-                    c='k',
-                    ls='dashed',
-                    lw=1)
-        plt.axhline(y=y_client,
-                    xmin=-1e10,
-                    xmax=1e10,
-                    c='k',
-                    ls='dashed',
-                    lw=1)
-        # if I want to interpolate data : https://stackoverflow.com/questions/5666056/matplotlib-extracting-data-from-contour-lines
-    # plt.show()
-    st.pyplot(figure)
-    st.caption(feature_1 + ": " + feature_description(feature_1, df_description))
-    st.caption(feature_2 + ": " + feature_description(feature_2, df_description))
-
-
-def contourplot_in_common(df_all_clients, feature_1, feature_2):
-    """Contour plot for the observed probability of default as a function of 2 features. Common to all clients.
-    Args :
-    - feature1 (string).
-    - feature2 (string).
-    Returns :
-    - matplotlib figure.
-    """
-    target_mesh_size = 500  # target population for each mesh
-
-    # Preparation of data
-    df = pd.DataFrame({
-        feature_1: df_all_clients[feature_1],
-        feature_2: df_all_clients[feature_2],
-        'y_true': df_all_clients["TARGET"]
-    })
-    df = df.dropna().copy()
-    n_values = len(df)
-    n_bins = int(np.ceil(np.sqrt(n_values / target_mesh_size)))
-    bin_size = int(np.floor(n_values / n_bins))
-    index_bin_start = sorted([bin_size * n for n in range(n_bins)])
-    ser1 = df[feature_1].sort_values().copy()
-    ser2 = df[feature_2].sort_values().copy()
-
-    # Filling the grid
-    grid_proba_default = np.full((n_bins, n_bins), -1.0)
-    ser_true0 = (df['y_true'] == 0)
-    ser_true1 = (df['y_true'] == 1)
-    for i1, ind1 in enumerate(index_bin_start):
-        for i2, ind2 in enumerate(index_bin_start):
-            ser_inside_this_mesh = (df[feature_1] >= ser1.iloc[ind1]) & (df[feature_2] >= ser2.iloc[ind2]) & (
-                    df[feature_1] <= ser1.iloc[ind1 + bin_size - 1]) & (
-                                           df[feature_2] <= ser2.iloc[ind2 + bin_size - 1])
-            # sum of clients true0 inside this square bin
-            sum_0 = (ser_inside_this_mesh & ser_true0).sum()
-            sum_1 = (ser_inside_this_mesh & ser_true1).sum()
-            sum_ = sum_0 + sum_1
-            if sum_ == 0:
-                proba_default = 1
-            else:
-                proba_default = sum_1 / sum_
-            grid_proba_default[i2, i1] = proba_default
-
-    # X, Y of the grid
-    X = [ser1.iloc[i + int(bin_size / 2)] for i in index_bin_start]
-    Y = [ser2.iloc[i + int(bin_size / 2)] for i in index_bin_start]
-
-    # Plotting
-    plt.style.use('seaborn')
-    fig = plt.figure(edgecolor='black', linewidth=4)
-    plt.contourf(X, Y, grid_proba_default, cmap='Reds')
-    plt.colorbar(shrink=0.8)
-    plt.xlabel(feature_1)
-    plt.ylabel(feature_2)
-    fig.suptitle(
-        f'Observed probability of default as a function of {feature_1} and {feature_2}',
-        y=0.92)
-    return fig
-
-
-###########################################################################""
-
 def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, feature, client_df):
     """
     Positions the client
+
+    :param data_all_clients:
+    :param feature:
+    :param client_df:
     """
     mapping_x_ticks = {
         '1': 'Client refused for a loan',
@@ -322,7 +239,7 @@ def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, featu
                label='Client value'
                )
     # add label and legend
-    bp.legend()
+    # bp.legend()
     labels = [item.get_text() for item in ax.get_xticklabels()]
     labels = [mapping_x_ticks[i] for i in labels]
     bp.set_xticklabels(labels)
@@ -338,10 +255,13 @@ def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, featu
     st.pyplot(fig)
 
 
-###########################################""
-
-
 def histgram_compared_to_all_clients(df_all_clients, feature, client_df):
+    """
+
+    :param df_all_clients:
+    :param feature:
+    :param client_df:
+    """
     # we get the value for the client's feature
     feature_value = client_df[feature].values[0]
 
@@ -375,8 +295,6 @@ def histgram_compared_to_all_clients(df_all_clients, feature, client_df):
     st.pyplot(fig)
 
 
-##################################################################
-
 def add_position_client(client_df, feature_1, feature_2):
     x_client = client_df[feature_1].iloc[0]
     y_client = client_df[feature_2].iloc[0]
@@ -408,6 +326,7 @@ def add_position_client(client_df, feature_1, feature_2):
 
 def scatterplot_comparing_all_clients(df_all_clients, feature_1, feature_2, client_df):
     """
+
     :param df_all_clients:
     :param feature_1:
     :param feature_2:
@@ -426,5 +345,3 @@ def scatterplot_comparing_all_clients(df_all_clients, feature_1, feature_2, clie
         st.pyplot(fig)
     else:
         st.write("Choose two different features")
-
-###########################################################################""

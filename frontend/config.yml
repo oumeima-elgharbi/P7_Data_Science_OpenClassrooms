@@ -1,5 +1,5 @@
 version: v1
 deploy:
-  is: False # False # False for dev purpose
+  is: True # False # False for dev purpose
   dev: 'http://127.0.0.1:8000'
   prod_api: 'https://p7-data-science-oc-api.herokuapp.com'
