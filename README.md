@@ -14,10 +14,6 @@ This README contains information about :
 
 TODO :
 
-- dashboard finish
-- SHAP finish
-- Global feature importance
-
 - SMOTE
 - CV + GridSearch
 - model
@@ -29,15 +25,10 @@ TODO :
 - notes methodo : *Reference : https://leandeep.com/datalab-kaggle/kb002.html*
 
 
-**TODO +++ : trouver une solution pour lire data_train_preprocessed_vf.csv within memory range!!!**
-
-- optimize reading of data_train_preprocessed_vf.csv
-
 TODO clean code :
 
 - download resources when building the app (not when running the webservices)
 - common folder for back and front : factoriser !!
-- data_train_preprocessed_vf.csv to read with time optimized
 - unzip resources folder like before ?
 
 - preprocess in real time for test and train ?? (train to think about solution)
@@ -47,7 +38,7 @@ TODO clean code :
 
 #### TODO 2 : slugignore in root ony ?
 
-#### TODO 3 : refacto to have common config anfd utils ... !!!
+#### TODO 3 : refacto to have common config and utils ... !!!
 
 Later :
 
