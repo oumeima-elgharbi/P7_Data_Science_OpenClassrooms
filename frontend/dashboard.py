@@ -231,6 +231,8 @@ def basic_dashboard():
         return  # to get out of the function
 
     proba_view()
+
+    shap_summary_plot_view()
     shap_view()
 
     # TODO rename or Global VAR for client_df
@@ -361,6 +363,28 @@ def global_feature_importance_view():
         print("Exception raised :", e)
 
 
+def shap_summary_plot_view():  # TODO refacto ??
+    st.header('SHAP Feature Importance summary plot')
+    try:
+        # get shap values for the selected client
+        response_shap = request_shap_expected(HOST + ENDPOINT_SHAP_EXPECTED, CLIENT_JSON)
+        encodedNumpyData = response_shap["shap_values"]
+
+        # Deserialization
+        print("Decode JSON serialized NumPy array")
+        decodedArrays = json.loads(encodedNumpyData)
+        finalNumpyArray = np.asarray(decodedArrays["array"])
+        shap_values = list(finalNumpyArray)  # TODO refacto / response is an array (2, 1, 777)
+        # or shap_values should be a list of 2 arrays, not an array of two arrays
+
+        client_df = json_to_df(CLIENT_JSON)  # just need pd.Dataframe()
+
+        shap_summary_plot(shap_values, client_df)
+
+    except Exception as e:
+        print("Exception raised :", e)
+
+
 def boxplot_view():
     # global NB_FEATURES_TO_PLOT  # so that the number of boxplot changes when chosen from sidebar
     # global LIST_FEATURES
@@ -384,8 +408,9 @@ def boxplot_view():
     data_all_clients = pd.read_csv(DATA_ALL_CLIENTS_PATH, encoding="utf-8", index_col="SK_ID_CURR",
                                    usecols=columns_list)
 
-    #for feature in LIST_FEATURES[:NB_FEATURES_TO_PLOT]:  # to display the number of graphs wanted
-    boxplot_all_clients_compared_to_client_feature_value(data_all_clients, LIST_FEATURES[:NB_FEATURES_TO_PLOT], client_df)
+    # for feature in LIST_FEATURES[:NB_FEATURES_TO_PLOT]:  # to display the number of graphs wanted
+    boxplot_all_clients_compared_to_client_feature_value(data_all_clients, LIST_FEATURES[:NB_FEATURES_TO_PLOT],
+                                                         client_df)
 
 
 ##########################################################################################"

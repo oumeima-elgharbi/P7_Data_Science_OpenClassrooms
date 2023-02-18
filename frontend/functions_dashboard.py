@@ -136,7 +136,25 @@ def shap_force_plot(shap_values, expected_value, prediction, client_df):
     st.pyplot(fig)
 
 
-###############################################################################################
+def shap_summary_plot(shap_values, client_df):
+    # Plotting
+    plt.rcParams['figure.autolayout'] = True
+    fig = plt.figure(edgecolor='black', linewidth=4)  # summary_plot returns None
+    # we need to prepare a fig for matplotlib to display the graph
+
+    print("here")
+    shap.summary_plot(shap_values, features=client_df, feature_names=client_df.columns)
+    # fig.suptitle(
+    #   "Shows the average impact of the features on the model output",
+    #  y=0.92, size=20)
+    # to see the plot in notebook :
+    # plt.show()
+    # to see the plot in streamlit dashboard
+    st.pyplot(fig)
+    print("end")
+
+    ###############################################################################################
+
 
 def global_feature_importance_barplot(dict_f_i, df_description, max_features_to_display=20):
     """
@@ -171,6 +189,23 @@ def global_feature_importance_barplot(dict_f_i, df_description, max_features_to_
 
 ###########################################################################""
 
+def global_shap():
+    return
+
+
+###########################################################################""
+
+def bivarie_graph():
+    pass
+
+
+###########################################################################""
+
+def other_graph_like_boxplot():
+    pass
+
+
+###########################################################################""
 
 def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, list_features, client_df):
     """
@@ -190,14 +225,14 @@ def boxplot_all_clients_compared_to_client_feature_value(data_all_clients, list_
 
         feature_value = client_df[feature].values[0]  # we get the value for the client's feature
 
-        #fig, ax = plt.subplots(figsize=(12, 9))
+        # fig, ax = plt.subplots(figsize=(12, 9))
         # create boxplot
         bp = sns.boxplot(data=data_all_clients,
-                    y=feature,
-                    x='TARGET',
-                    orient="v",
-                    showfliers=False,
-                    palette=["#4286DE", "#EA365B"],
+                         y=feature,
+                         x='TARGET',
+                         orient="v",
+                         showfliers=False,
+                         palette=["#4286DE", "#EA365B"],
                          ax=ax)
         # add client threshold
         bp.axhline(feature_value,
