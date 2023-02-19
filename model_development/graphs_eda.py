@@ -71,12 +71,31 @@ def plot_stats(df, feature, label_rotation=False, horizontal_layout=True):
     plt.show();
 
 
-def plot_distribution(df, var):
+def plot_distribution(df, feature, color):
     """
+    # Plot distribution of one feature
+    Source : https://www.kaggle.com/code/gpreda/home-credit-default-risk-extensive-eda#Explore-the-data
+
+    :param df:
+    :param feature:
+    :param color:
+    :return: None
+    :rtype: None
+    """
+    plt.figure(figsize=(10, 6))
+    plt.title("Distribution of %s" % feature)
+    sns.distplot(df[feature].dropna(), color=color, kde=True, bins=100)
+    plt.show()
+
+
+def plot_distribution_comp(df, var, nrow=2):
+    """
+    # Plot distribution of multiple features, with TARGET = 1/0 on the same graph
     Source : https://www.kaggle.com/code/gpreda/home-credit-default-risk-extensive-eda#Explore-the-data
 
     :param df:
     :param var:
+    :param nrow:
     :return: None
     :rtype: None
     """
@@ -87,11 +106,11 @@ def plot_distribution(df, var):
 
     sns.set_style('whitegrid')
     plt.figure()
-    fig, ax = plt.subplots(2, 2, figsize=(12, 12))
+    fig, ax = plt.subplots(nrow, 2, figsize=(12, 6 * nrow))
 
     for feature in var:
         i += 1
-        plt.subplot(2, 2, i)
+        plt.subplot(nrow, 2, i)
         sns.kdeplot(t1[feature], bw=0.5, label="TARGET = 1")
         sns.kdeplot(t0[feature], bw=0.5, label="TARGET = 0")
         plt.ylabel('Density plot', fontsize=12)
@@ -101,7 +120,7 @@ def plot_distribution(df, var):
     plt.show();
 
 
-def plot_b_stats(df, feature, label_rotation=False, horizontal_layout=True):
+def plot_bureau_stats(df, feature, label_rotation=False, horizontal_layout=True):
     """
     Source : https://www.kaggle.com/code/gpreda/home-credit-default-risk-extensive-eda#Explore-the-data
 
@@ -119,17 +138,17 @@ def plot_b_stats(df, feature, label_rotation=False, horizontal_layout=True):
     cat_perc = df[[feature, 'TARGET']].groupby([feature], as_index=False).mean()
     cat_perc.sort_values(by='TARGET', ascending=False, inplace=True)
 
-    if (horizontal_layout):
+    if horizontal_layout:
         fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12, 6))
     else:
         fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(12, 14))
     sns.set_color_codes("pastel")
     s = sns.barplot(ax=ax1, x=feature, y="Number of contracts", data=df1)
-    if (label_rotation):
+    if label_rotation:
         s.set_xticklabels(s.get_xticklabels(), rotation=90)
 
     s = sns.barplot(ax=ax2, x=feature, y='TARGET', order=cat_perc[feature], data=cat_perc)
-    if (label_rotation):
+    if label_rotation:
         s.set_xticklabels(s.get_xticklabels(), rotation=90)
     plt.ylabel('Percent of target with value 1 [%]', fontsize=10)
     plt.tick_params(axis='both', which='major', labelsize=10)
@@ -137,7 +156,7 @@ def plot_b_stats(df, feature, label_rotation=False, horizontal_layout=True):
     plt.show();
 
 
-def plot_b_distribution(df, feature, color):
+def plot_bureau_distribution(df, feature, color):
     """
     Source : https://www.kaggle.com/code/gpreda/home-credit-default-risk-extensive-eda#Explore-the-data
 
@@ -190,7 +209,7 @@ def is_outlier(points, thresh=3.5):
     return modified_z_score > thresh
 
 
-def plot_b_o_distribution(df, feature, color):
+def plot_bureau_outliers_distribution(df, feature, color):
     """
     Source : https://www.kaggle.com/code/gpreda/home-credit-default-risk-extensive-eda#Explore-the-data
 
@@ -208,9 +227,9 @@ def plot_b_o_distribution(df, feature, color):
     plt.show()
 
 
-# Plot distribution of multiple features, with TARGET = 1/0 on the same graph
-def plot_b_distribution_comp(df, var, nrow=2):
+def plot_bureau_distribution_comp(df, var, nrow=2):
     """
+    # Plot distribution of multiple features, with TARGET = 1/0 on the same graph
     Source : https://www.kaggle.com/code/gpreda/home-credit-default-risk-extensive-eda#Explore-the-data
 
     :param df:
@@ -239,9 +258,7 @@ def plot_b_distribution_comp(df, var, nrow=2):
     plt.show();
 
 
-######################################################################################
-
-def plot_p_stats(df, feature, label_rotation=False, horizontal_layout=True):
+def plot_previous_application_stats(df, feature, label_rotation=False, horizontal_layout=True):
     """
     Source : https://www.kaggle.com/code/gpreda/home-credit-default-risk-extensive-eda#Explore-the-data
 
@@ -259,17 +276,17 @@ def plot_p_stats(df, feature, label_rotation=False, horizontal_layout=True):
     cat_perc = df[[feature, 'TARGET']].groupby([feature], as_index=False).mean()
     cat_perc.sort_values(by='TARGET', ascending=False, inplace=True)
 
-    if (horizontal_layout):
+    if horizontal_layout:
         fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12, 6))
     else:
         fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(12, 14))
     sns.set_color_codes("pastel")
     s = sns.barplot(ax=ax1, x=feature, y="Number of contracts", data=df1)
-    if (label_rotation):
+    if label_rotation:
         s.set_xticklabels(s.get_xticklabels(), rotation=90)
 
     s = sns.barplot(ax=ax2, x=feature, y='TARGET', order=cat_perc[feature], data=cat_perc)
-    if (label_rotation):
+    if label_rotation:
         s.set_xticklabels(s.get_xticklabels(), rotation=90)
     plt.ylabel('Percent of target with value 1 [%]', fontsize=10)
     plt.tick_params(axis='both', which='major', labelsize=10)
