@@ -47,7 +47,7 @@ def evaluate_models(model_name, result, y_test, y_pred):
                                               })])
     # we sort the datafraeme of results by best : by=["F1-score]
     result = result.sort_values(by=["ROC-AUC"], ascending=False)
-    pd.display(result)
+    display(result)
 
     return result
 

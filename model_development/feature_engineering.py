@@ -42,10 +42,8 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # Create local directories to save data
 print("__Creating folders locally__")
-#os.makedirs("dataset", exist_ok=True)
 os.makedirs("dataset/source", exist_ok=True)
 os.makedirs("dataset/cleaned", exist_ok=True)
-#os.makedirs("models", exist_ok=True)
 os.makedirs("models/preprocessing", exist_ok=True)
 
 @contextmanager
