@@ -106,7 +106,6 @@ def initialize_webview():
         if DASHBOARD_CHOICE in ['Client dashboard', 'Comparing with previous clients']:
             # Client selector
             # st.write('## Client ID:')
-
             CLIENT_ID = st.number_input("Enter client ID", value=100005)
             st.caption("Example of client predicted negative (no default) : 100005")
             st.caption("Example of client predicted positive (credit default) : 456250")

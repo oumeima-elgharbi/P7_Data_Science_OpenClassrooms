@@ -26,34 +26,6 @@ def get_prediction_proba(model, client_df):
     return probability
 
 
-'''
-def get_shap_values(model, client_df):
-    """
-
-    :param model: serialized model that has a predict_proba method
-    :param client_df: (DataFrame)
-    :return:
-    :rtype: (DataFrame)
-    """
-
-    explainer = shap.TreeExplainer(
-        model)  # TODO : LightGBM binary classifier with TreeExplainer shap values output has changed to a list of ndarray
-    shap_values = explainer.shap_values(client_df)
-    # return shap_values, explainer
-    df_shap = pd.DataFrame({
-        'SHAP value': shap_values[1][0],
-        'feature': client_df.columns
-    })
-    df_shap.sort_values(by='SHAP value', inplace=True, ascending=False)
-
-    return df_shap
-
-'''
-
-
-#################""
-
-
 def get_shap_values(model, client_df):
     """
 

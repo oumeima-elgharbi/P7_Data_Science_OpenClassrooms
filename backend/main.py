@@ -1,14 +1,15 @@
 # Library imports
-import json
-
 from fastapi import FastAPI, Body
 import uvicorn
 
 from prediction_functions import *  # TODO remove
 from preprocessing import *  # TODO remove
 
+from json import JSONEncoder
+import numpy as np
+
 #############################################################################
-# TODO remove !! this is NOT clean code
+# TODO remove and download data at the startup of the app
 
 import os
 from os import listdir
@@ -21,7 +22,16 @@ if "resources" not in all_files:
 
     print("__Download resources folder__")
     subprocess.call(r'python script_download_data_folder.py', shell=True)
+
+
 ##############################################################################
+
+# to send a numpy array as a json response
+class NumpyArrayEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return JSONEncoder.default(self, obj)
 
 
 # before opening the web service, we load all the models and files
@@ -52,11 +62,10 @@ app = FastAPI()
 @app.get('/')
 async def index():
     """
-    Welcome message.
-    Args:
-    - None.
-    Returns:
-    - Message (string).
+    Welcome message to check that the API is working
+    :param: None
+    :return: a message that says that this is an API
+    :rtype: (string)
     """
     return 'Hello, you are accessing an API'
 
@@ -119,11 +128,8 @@ async def shap_values(client_json: dict = Body({})):
     client_df = json_to_df(client_json)
 
     print("_____Getting SHAP for our client_____")
-    # df_shap = get_shap_values(model, client_df)
-
-    #
-    shap_values = get_shap_values(model, client_df)
-    df_shap = get_df_shap(shap_values, client_df)
+    shap_value = get_shap_values(model, client_df)
+    df_shap = get_df_shap(shap_value, client_df)
 
     # transforming df to json response
     client_shap_json = df_to_json(df_shap)
@@ -133,7 +139,7 @@ async def shap_values(client_json: dict = Body({})):
     return client_shap_json
 
 
-@app.post('/shap_expected')  # TODO refacto !!
+@app.post('/shap_expected')  # TODO refacto
 async def shap_expected_values(client_json: dict = Body({})):
     """
     Computes SHAP values for each feature for a client
@@ -149,62 +155,21 @@ async def shap_expected_values(client_json: dict = Body({})):
     print("_____Getting SHAP expected values from model_____")
     shap_value, shap_expected_values_list = get_shap_expected_value(model, client_df)
 
-    numpyData = {"array": shap_value}
-    encodedNumpyData = json.dumps(numpyData, cls=NumpyArrayEncoder)  # use dump() to write array into file
-    # return encodedNumpyData
+    numpy_data = {"array": shap_value}
+    encoded_numpy_data = json.dumps(numpy_data, cls=NumpyArrayEncoder)  # use dump() to write array into file
 
-    ################################""""""
-    # shap_values_dict = {0: shap_values[0],
-    #                    1: shap_values[1]}
-
-    # shap_values_json = json.dumps(shap_values_dict)
-    ##########################################
-
-    response = {"expected_value": shap_expected_values_list,
-                "shap_values": encodedNumpyData}
     # shap_expected_values_list is a list because we called .shap_values
+    response = {"expected_value": shap_expected_values_list,
+                "shap_values": encoded_numpy_data}
 
     return response
-
-
-from json import JSONEncoder
-import numpy
-
-
-class NumpyArrayEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, numpy.ndarray):
-            return obj.tolist()
-        return JSONEncoder.default(self, obj)
-
-
-"""
-
-
-"""
-
-"""
-
-# Serialization
-numpyData = {"array": numpyArrayOne}
-encodedNumpyData = json.dumps(numpyData, cls=NumpyArrayEncoder)  # use dump() to write array into file
-print("Printing JSON serialized NumPy array")
-print(encodedNumpyData)
-
-# Deserialization
-print("Decode JSON serialized NumPy array")
-decodedArrays = json.loads(encodedNumpyData)
-
-finalNumpyArray = numpy.asarray(decodedArrays["array"])
-print("NumPy Array")
-print(finalNumpyArray)
-"""
 
 
 @app.post('/feature_importance')
 async def get_global_feature_importance(client_json: dict = Body({})):
     """
     Computes Global Feature Importance of the model
+    TODO refacto : we are now using the client's data to get the columns names
 
     :param client_json: (dict) json formatted preprocessed client
     :return:
