@@ -116,7 +116,6 @@ def one_hot_encoder(df, df_name, training=True, nan_as_category=True):
         joblib.dump(encoder, filename_joblib)
 
     else:
-        ###df[categorical_columns] = df[categorical_columns] ## TODO fillnan ?
         # load model
         print("Loading One Hot Encoder and columns")
         # encoder = joblib.load(filename_joblib)
@@ -137,14 +136,6 @@ def one_hot_encoder(df, df_name, training=True, nan_as_category=True):
     df_encoded = pd.DataFrame(columns=encoded_categorical_data_names,
                               data=encoded_categorical_data,
                               index=df.index)
-
-    # print("Changing dtype from int64 to int8 in encoded dataframe")
-    # print("Memory usage before : ")
-    # print(df_encoded.memory_usage(index=False, deep=True))
-    # df_encoded[encoded_categorical_data_names] # here only encoded columns
-    # print("Memory usage after : ")
-    # df_encoded = df_encoded.astype("int8") # copy=False
-    # print(df_encoded.memory_usage(index=False, deep=True))
 
     # 5) Concatenate the two dataframes for the training set
 
@@ -530,18 +521,16 @@ def generate_dataset(input_path, application_filename, output_file, training=Tru
 # https://stackoverflow.com/questions/50047237/how-to-preserve-dtypes-of-dataframes-when-using-to-csv
 # https://stackoverflow.com/questions/55299536/pandas-dataframe-csv-reduce-disk-size
 
+# select features ? / remove features that are not important for the decision ?
 
-# TOMORROW : RUN THIS AND SEE if OHE for one query works !!
 if __name__ == "__main__":
     with timer("Full model run"):
         generate_dataset(input_path="dataset/source/", application_filename='application_train.csv',
                          output_file="dataset/cleaned/data_train_preprocessed_vf.csv", training=True)
         generate_dataset(input_path="dataset/source/", application_filename='application_test.csv',
                          output_file="dataset/cleaned/data_test_preprocessed_vf.csv", training=False)
-        print("END")
         # preprocessed_one_query = generate_dataset(input_path="dataset/cleaned/",
         #                                         application_filename='one_query_test.csv',
         #                                        output_file="dataset/cleaned/preprocessed_one_query_test.csv",
         #                                       training=False)
 
-# selection de feature / retirer les variables pas importantes pour la décision

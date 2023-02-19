@@ -19,6 +19,7 @@ def evaluate_models(model_name, result, y_test, y_pred):
     :param y_test:
     :param y_pred:
     :return:
+    :rtype: (DataFrame)
 
     :UC: y_test must be a Pandas Series with a label
     """
@@ -46,7 +47,7 @@ def evaluate_models(model_name, result, y_test, y_pred):
                                               })])
     # we sort the datafraeme of results by best : by=["F1-score]
     result = result.sort_values(by=["ROC-AUC"], ascending=False)
-    display(result)
+    pd.display(result)
 
     return result
 
@@ -57,6 +58,7 @@ def confusion(y_test, y_pred):
     :param y_test:
     :param y_pred:
     :return:
+    :rtype: (DataFrame)
     """
     mat = confusion_matrix(y_test, y_pred)  # a numpy array
     mat = pd.DataFrame(mat)
@@ -73,6 +75,7 @@ def evaluate_classification(y_test, y_pred, y_pred_proba):
     :param y_pred:
     :param y_pred_proba:
     :return:
+    :rtype: None
     """
     # 1) Metrics
     print(classification_report(y_test, y_pred))
@@ -110,7 +113,12 @@ def score(estimator, X_train, X_test, y_train, y_test):  ## To delete if not nee
     """
     Computes and prints train score and test score.
     :param estimator:
+    :param X_train:
+    :param X_test:
+    :param y_train:
+    :param y_test:
     :return:
+    :rtype: None
     """
     tr_score = estimator.score(X_train, y_train).round(4)
     te_score = estimator.score(X_test, y_test).round(4)
