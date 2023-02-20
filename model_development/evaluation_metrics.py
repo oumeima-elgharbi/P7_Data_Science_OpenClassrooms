@@ -11,13 +11,14 @@ global results
 results = pd.DataFrame({})
 
 
-def evaluate_models(model_name, result, y_test, y_pred):
+def evaluate_models(model_name, result, y_test, y_pred, beta=10):
     """
 
     :param model_name:
     :param result:
     :param y_test:
     :param y_pred:
+    :param beta: (int)
     :return:
     :rtype: (DataFrame)
 
@@ -26,8 +27,7 @@ def evaluate_models(model_name, result, y_test, y_pred):
     print("Prediction for : ", y_test.name)  # name Pandas Series
     f1_score_positif = f1_score(y_test, y_pred, average='binary').round(3)
     f1_score_weighted = f1_score(y_test, y_pred, average='weighted').round(3)
-    b = 3
-    f_score_beta = fbeta_score(y_test, y_pred, beta=b).round(3)
+    f_score_beta = fbeta_score(y_test, y_pred, beta=beta).round(3)
 
     recall = recall_score(y_test, y_pred).round(3)
     precision = precision_score(y_test, y_pred).round(3)
@@ -38,7 +38,7 @@ def evaluate_models(model_name, result, y_test, y_pred):
 
     result = pd.concat([result, pd.DataFrame({"___Model___": [model_name],
                                               "__ROC-AUC__": [roc_auc],
-                                              "__F-score Beta = {}__".format(b): [f_score_beta],
+                                              "__F-score Beta = {}__".format(beta): [f_score_beta],
                                               "__Recall__": [recall],
                                               "Precision": [precision],
                                               "F1-score": [f1_score_positif],
@@ -46,7 +46,7 @@ def evaluate_models(model_name, result, y_test, y_pred):
                                               "Accuracy": [accuracy]
                                               })])
     # we sort the datafraeme of results by best : by=["F1-score]
-    result = result.sort_values(by=["ROC-AUC"], ascending=False)
+    result = result.sort_values(by=["__ROC-AUC__"], ascending=False)
     display(result)
 
     return result
