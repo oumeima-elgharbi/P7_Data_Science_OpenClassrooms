@@ -11,7 +11,7 @@ global results
 results = pd.DataFrame({})
 
 
-def evaluate_models(model_name, result, y_test, y_pred, beta=10):
+def evaluate_models(model_name, result, y_test, y_pred, beta=2):
     """
 
     :param model_name:

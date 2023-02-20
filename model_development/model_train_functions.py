@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+import os
+
 from tqdm import tqdm
 import pickle
 import joblib
@@ -23,6 +25,8 @@ from sklearn.metrics import (recall_score, roc_auc_score, f1_score, roc_curve, a
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, StratifiedKFold, learning_curve, GridSearchCV
+
+from time import time
 
 
 def fit_and_predict(model, model_name, X_train, y_train, X_test):
@@ -62,6 +66,7 @@ def plot_precision_recall_vs_threshold(precisions, recalls, thresholds):
     plt.show()
 
 
+# not used
 def make_grisearch_smote(model,
                          X,
                          y,
@@ -110,8 +115,11 @@ def make_grisearch(model,
         scoring=ftwo_scorer,
         cv=stratified_kfold,
         n_jobs=-1)
-
+    print("Fitting Grid")
+    t0 = time()
     grid_search.fit(X, y)
+    t1 = time() - t0
+    print("Computing time :", t1)
     return grid_search.best_score_, grid_search.best_params_
 
 
@@ -128,7 +136,7 @@ def evaluate(model,
              X,
              y,
              k_fold=5,
-             beta=2,
+             beta=3,
              show_confusion_matrice=False,
              # apply_undersampling=False,
              apply_smote=False,
@@ -140,6 +148,8 @@ def evaluate(model,
     and return 4 metrics with a n Kfold cros validated
     and "mean" confusion matrice (with possibility to display
     '''
+    print("Starting time")
+    t0 = time()
     # instanciate skf
     skf = StratifiedKFold(n_splits=k_fold, random_state=123, shuffle=True)
 
@@ -147,9 +157,9 @@ def evaluate(model,
               'precision_': [],
               'recall_': [],
               'accuracy_': [], }
-    cm = np.array([[0, 0], [0, 0]])
     i = 0
     for train_ix, test_ix in skf.split(X, y):
+        print("Iteration : ", i)
         X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
         y_train, y_test = y.iloc[train_ix], y.iloc[test_ix]
 
@@ -169,27 +179,29 @@ def evaluate(model,
 
         else:
             # predict
-            predictions = fit_and_predict(model, model_name + "_" + str(i), X_train, y_train, X_test)
+            print("Starting fit and predict")
+            # Create local directories to save data
+            os.makedirs("models/{}".format(model_name), exist_ok=True)  # just in case the folder doesn't exist
+            model_filename = "{}/{}_fold_{}".format(model_name, model_name, i)
+            predictions = fit_and_predict(model, model_filename, X_train, y_train, X_test)
 
         scores['f_beta_score_'].append(fbeta_score(y_test, predictions, beta=beta))
         scores['precision_'].append(accuracy_score(y_test, predictions))
         scores['recall_'].append(recall_score(y_test, predictions))
         scores['accuracy_'].append(accuracy_score(y_test, predictions))
 
-        cm += confusion_matrix(y_test, predictions)
         i += 1
 
     # return mean for metrics
     for metric, scores_values in scores.items():
         scores[metric] = np.mean(scores_values)
 
-    # return mean cm
-    cm = cm // k_fold
-
     if show_confusion_matrice:
         ConfusionMatrixDisplay(cm, display_labels=model.classes_).plot()
 
-    return pd.DataFrame.from_dict(scores, orient='index').rename(columns={0: model_name}), cm
+    t1 = time() - t0
+    print("Computing time :", t1)
+    return pd.DataFrame.from_dict(scores, orient='index').rename(columns={0: model_name})
 
 
 def get_feature_importance_model(model, columns):
