@@ -19,7 +19,7 @@ Home credit default : Kaggle
 Supervised machine learning problem.
 
 Data Science
-=> [model_preparation ](jetbrains://pycharm/navigate/reference?project=P7_Data_Science_OpenClassrooms&path=model_preparation/README.md)
+=> [model_development ](jetbrains://pycharm/navigate/reference?project=P7_Data_Science_OpenClassrooms&path=model_development/README.md)
 
 - Exploratory Data Analysis
 - SMOTE, GridsearchCV, Cross-Validation
@@ -255,3 +255,24 @@ python script_download_data_folder.py
   web: sh setup.sh && streamlit run dashboard.py
 
 We need a setup.sh to run streamlit dashboard. We use the url from the back-end in the dashboard.
+
+# -----------------------------------------------------------------------------
+
+TODO clean code :
+
+- download resources when building the app (not when running the webservices)
+- common folder for back and front : factorize !!
+- unzip resources folder like before ?
+
+- preprocess in real time for test and train ?? (train to think about solution)
+
+- remove runtime.txt in root only ?
+- slugignore in root ony ?
+
+Later :
+
+- pytest / unittest
+- Preprocess one client
+- MLFlow track experiments
+- MLFlow registry
+- Evidently
