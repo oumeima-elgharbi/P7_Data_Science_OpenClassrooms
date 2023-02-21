@@ -29,13 +29,13 @@ from sklearn.model_selection import train_test_split, StratifiedKFold, learning_
 from time import time
 
 
-def fit_and_predict(model, model_name, X_train, y_train, X_test):
+def fit_and_predict(model, model_name, X_train, y_train, X_val):
     model.fit(X_train, y_train)
     # save the model to disk
     print("Saving model with joblib")
     filename_joblib = 'models/{}.joblib'.format(model_name)
     joblib.dump(model, filename_joblib)
-    return model.predict(X_test)
+    return model.predict(X_val)
 
 
 def f1_(y_test, predictions):
@@ -158,37 +158,27 @@ def evaluate(model,
               'recall_': [],
               'accuracy_': [], }
     i = 0
-    for train_ix, test_ix in skf.split(X, y):
+    for train_ix, val_ix in skf.split(X, y):
         print("Iteration : ", i)
-        X_train, X_test = X.iloc[train_ix], X.iloc[test_ix]
-        y_train, y_test = y.iloc[train_ix], y.iloc[test_ix]
+        X_train, X_val = X.iloc[train_ix], X.iloc[val_ix]
+        y_train, y_val = y.iloc[train_ix], y.iloc[val_ix]
 
         if apply_smote:
             oversample = SMOTE(k_neighbors=smote_params['k_neighbors'],
                                sampling_strategy=smote_params['sampling_strategy'])
             X_train, y_train = oversample.fit_resample(X_train, y_train)
 
-        # if apply_undersampling:
-        #   undersample = NearMiss(version=1, n_neighbors=100, sampling_strategy=0.5)
-        #  X_train, y_train = undersample.fit_resample(X_train, y_train)
+        # predict
+        print("Starting fit and predict")
+        # Create local directories to save data
+        os.makedirs("models/{}".format(model_name), exist_ok=True)  # just in case the folder doesn't exist
+        model_filename = "{}/{}_fold_{}".format(model_name, model_name, i)
+        predictions = fit_and_predict(model, model_filename, X_train, y_train, X_val)
 
-        #  if move_treshold:
-        #     model.fit(X_train, y_train)
-        #    probabilities = model.predict_proba(X_test)[:, 1]
-        #   predictions = adjusted_classes(probabilities, treshold)
-
-        else:
-            # predict
-            print("Starting fit and predict")
-            # Create local directories to save data
-            os.makedirs("models/{}".format(model_name), exist_ok=True)  # just in case the folder doesn't exist
-            model_filename = "{}/{}_fold_{}".format(model_name, model_name, i)
-            predictions = fit_and_predict(model, model_filename, X_train, y_train, X_test)
-
-        scores['f_beta_score_'].append(fbeta_score(y_test, predictions, beta=beta))
-        scores['precision_'].append(accuracy_score(y_test, predictions))
-        scores['recall_'].append(recall_score(y_test, predictions))
-        scores['accuracy_'].append(accuracy_score(y_test, predictions))
+        scores['f_beta_score_'].append(fbeta_score(y_val, predictions, beta=beta))
+        scores['precision_'].append(accuracy_score(y_val, predictions))
+        scores['recall_'].append(recall_score(y_val, predictions))
+        scores['accuracy_'].append(accuracy_score(y_val, predictions))
 
         i += 1
 
@@ -196,11 +186,8 @@ def evaluate(model,
     for metric, scores_values in scores.items():
         scores[metric] = np.mean(scores_values)
 
-    if show_confusion_matrice:
-        ConfusionMatrixDisplay(cm, display_labels=model.classes_).plot()
-
     t1 = time() - t0
-    print("Computing time :", t1)
+    print("Computing time :", t1, "seconds")
     return pd.DataFrame.from_dict(scores, orient='index').rename(columns={0: model_name})
 
 
@@ -223,15 +210,17 @@ def get_feature_importance_model(model, columns):
     return dict_feature_importance
 
 
-def plot_feature_importance(dict_feature_importance):
+def plot_feature_importance(dict_feature_importance, max_to_display=20):
     """
 
     :param dict_feature_importance:
+    :param max_to_display:
     :return: None
     :rtype: None
     """
     plt.rcParams['figure.autolayout'] = True
     plt.figure(figsize=(15, 8))
-    sns.barplot(x=list(dict_feature_importance.values()), y=list(dict_feature_importance.keys()), orient='h',
+    sns.barplot(x=list(dict_feature_importance.values())[:max_to_display],
+                y=list(dict_feature_importance.keys())[:max_to_display], orient='h',
                 color='#BCD6AD')
     plt.show()
