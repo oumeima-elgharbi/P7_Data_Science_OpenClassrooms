@@ -255,24 +255,3 @@ python script_download_data_folder.py
   web: sh setup.sh && streamlit run dashboard.py
 
 We need a setup.sh to run streamlit dashboard. We use the url from the back-end in the dashboard.
-
-# -----------------------------------------------------------------------------
-
-TODO clean code :
-
-- download resources when building the app (not when running the webservices)
-- common folder for back and front : factorize !!
-- unzip resources folder like before ?
-
-- preprocess in real time for test and train ?? (train to think about solution)
-
-- remove runtime.txt in root only ?
-- slugignore in root ony ?
-
-Later :
-
-- pytest / unittest
-- Preprocess one client
-- MLFlow track experiments
-- MLFlow registry
-- Evidently
