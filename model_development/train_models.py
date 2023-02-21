@@ -11,9 +11,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
 from contextlib import contextmanager
+import os
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+# Create local directories to save data
+print("__Creating folders locally__")
+os.makedirs("dataset/cleaned/LGBM", exist_ok=True)
+os.makedirs("models/LGBM", exist_ok=True)
 
 global seed
 seed = 1001
@@ -29,6 +35,14 @@ def timer(title):
 # LightGBM GBDT with KFold or Stratified KFold
 # Parameters from Tilii kernel: https://www.kaggle.com/tilii7/olivier-lightgbm-parameters-by-bayesian-opt/code
 def kfold_lightgbm(df, num_folds, stratified=False):
+    """
+
+    :param df:
+    :param num_folds:
+    :param stratified:
+    :return:
+    :rtype:
+    """
     # Divide in training/validation set
     train_df = df.copy()
 
@@ -43,7 +57,7 @@ def kfold_lightgbm(df, num_folds, stratified=False):
     # Create arrays and dataframes to store results
     oof_preds = np.zeros(train_df.shape[0])
     # sub_preds = np.zeros(test_df.shape[0])
-    feature_importance_df = pd.DataFrame()
+    feature_importance_df = pd.DataFrame() # put SK_ID_CURR in pd.read_csv so not needed here below
     feats = [f for f in train_df.columns if f not in ['TARGET', 'SK_ID_CURR']] # 'SK_ID_BUREAU', 'SK_ID_PREV', 'index' # deleted
 
     for n_fold, (train_idx, valid_idx) in enumerate(folds.split(train_df[feats], train_df['TARGET'])):
@@ -141,12 +155,15 @@ def display_importances(feature_importance_df_):
 
 def modelling_lightgbm(df_path, debug=False):
     print("__Loading DataFrame__")
-    df = pd.read_csv(df_path)
+    df = pd.read_csv(df_path, index_col="SK_ID_CURR")
     with timer("Run LightGBM with kfold"):
         feat_importance = kfold_lightgbm(df, num_folds=10, stratified=False)
 
 
+
+
+
 if __name__ == "__main__":
     with timer("Full model run"):
-        print("Running time 2h30min lol : 9026s")
-        modelling_lightgbm(df_path="dataset/cleaned/data_train_preprocessed_vf.csv")
+        print("Running time 3h")
+        modelling_lightgbm(df_path="dataset/cleaned/train.csv") # data_train_preprocessed_vf

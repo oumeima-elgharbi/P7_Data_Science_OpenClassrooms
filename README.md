@@ -10,45 +10,6 @@ This README contains information about :
 - II) Virtual environment
 - III) Deployment (Cloud : Heroku)
 
-# -----------------------------------------------------------------------------
-
-Thursday :
-
-- dashboard finish
-- SHAP finish
-- Global feature importance
-
-Saturday :
-
-- SMOTE
-- CV + GridSearch
-- model
-- refacto feature engineering check (save index name)
-
-Sunday :
-
-- EDA : Kaggle
-- pytest / unittest
-- pydantics for API !!
-
-Sunday :
-
-- powerpoint
-- notes méthodo : *Reference : https://leandeep.com/datalab-kaggle/kb002.html*
-
-#### TODO 1 : remove runtime.txt in root only ?
-
-#### TODO 2 : slugignore in root ony ?
-
-#### TODO 3 : refacto to have common config anfd utils ... !!!
-
-Later :
-
-- Preprocess one client
-- MLFlow track experiments
-- MLFlow registry
-- Evidently
-
 # ---------------------------------------------------------------------
 
 ## I) Context
@@ -146,7 +107,7 @@ $ C:\ProgramData\Anaconda3\python.exe -m pip install --upgrade --force-reinstall
 
 ## III) Deployment
 
-### 1) How to deploy the two heroku apps
+### 1.1) How to deploy the two heroku apps
 
 We made the choice to have one Git repository for two web applications.
 
@@ -225,6 +186,64 @@ heroku git:remote -a my_heroku_app_name
 git push my_heroku_remote_branch_name master
 ````
 
+### 1.2) Google Cloud Storage
+
+#### On Google Cloud
+
+- project_name : "project-7-oc-376509"
+- bucket_name : "p7-data"
+- save files in a folder (blob) "resources"
+
+- grant access to the bucket to the service account created
+
+#### On Heroku : config vars
+
+Set up two config variables for each app
+
+- GOOGLE_APPLICATION_CREDENTIALS : google-credentials.json
+- GOOGLE_CREDENTIALS : {your_json_service_account}
+
+The service account cannot be committed for security reasons !
+
+#### With the terminal
+
+First, add this heroku google-buildpack for the two apps (the one below works for Heroku-22)
+This enables the creation a service account saved in a json file :
+
+````bash
+heroku login
+cd Documents\OC_projets\P7\P7_Data_Science_OpenClassrooms
+
+heroku buildpacks:add https://github.com/gerywahyunugraha/heroku-google-application-credentials-buildpack --app p7-data-science-oc-api
+heroku buildpacks:add https://github.com/gerywahyunugraha/heroku-google-application-credentials-buildpack --app p7-data-science-oc-dashboard
+````
+
+#### Locally
+
+Save the json service account named google-credentials.json to test your apps locally.
+
+Or, connect to your Google account using gcloud :
+
+````bash
+gcloud auth login
+gcloud auth application-default login
+````
+
+Then, run the script to download data !
+
+````bash
+cd backend
+python script_download_data_folder.py
+````
+
+````bash
+cd frontend
+python script_download_data_folder.py
+````
+
+- $gcloud config set project project-7-oc-376509
+- $gcloud auth revoke --all # to log out of gcloud SDK
+
 ### 2) Information on Heroku-22 stack
 
 #### Files : Procfile and setup.sh
@@ -236,3 +255,24 @@ git push my_heroku_remote_branch_name master
   web: sh setup.sh && streamlit run dashboard.py
 
 We need a setup.sh to run streamlit dashboard. We use the url from the back-end in the dashboard.
+
+# -----------------------------------------------------------------------------
+
+TODO clean code :
+
+- download resources when building the app (not when running the webservices)
+- common folder for back and front : factorize !!
+- unzip resources folder like before ?
+
+- preprocess in real time for test and train ?? (train to think about solution)
+
+- remove runtime.txt in root only ?
+- slugignore in root ony ?
+
+Later :
+
+- pytest / unittest
+- Preprocess one client
+- MLFlow track experiments
+- MLFlow registry
+- Evidently

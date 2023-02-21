@@ -8,3 +8,9 @@ endpoints:
   endpoint_shap: "/shap"
   endpoint_client_data: "/client_data"
 
+
+  endpoint_shap_expected: "/shap_expected" # TODO clean
+  endpoint_feature_importance: "/feature_importance" # TODO clean
+
+
+

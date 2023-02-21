@@ -11,22 +11,23 @@ global results
 results = pd.DataFrame({})
 
 
-def evaluate_models(model_name, result, y_test, y_pred):
+def evaluate_models(model_name, result, y_test, y_pred, beta=2):
     """
 
     :param model_name:
     :param result:
     :param y_test:
     :param y_pred:
+    :param beta: (int)
     :return:
+    :rtype: (DataFrame)
 
     :UC: y_test must be a Pandas Series with a label
     """
     print("Prediction for : ", y_test.name)  # name Pandas Series
     f1_score_positif = f1_score(y_test, y_pred, average='binary').round(3)
     f1_score_weighted = f1_score(y_test, y_pred, average='weighted').round(3)
-    b = 3
-    f_score_beta = fbeta_score(y_test, y_pred, beta=b).round(3)
+    f_score_beta = fbeta_score(y_test, y_pred, beta=beta).round(3)
 
     recall = recall_score(y_test, y_pred).round(3)
     precision = precision_score(y_test, y_pred).round(3)
@@ -37,7 +38,7 @@ def evaluate_models(model_name, result, y_test, y_pred):
 
     result = pd.concat([result, pd.DataFrame({"___Model___": [model_name],
                                               "__ROC-AUC__": [roc_auc],
-                                              "__F-score Beta = {}__".format(b): [f_score_beta],
+                                              "__F-score Beta = {}__".format(beta): [f_score_beta],
                                               "__Recall__": [recall],
                                               "Precision": [precision],
                                               "F1-score": [f1_score_positif],
@@ -45,7 +46,7 @@ def evaluate_models(model_name, result, y_test, y_pred):
                                               "Accuracy": [accuracy]
                                               })])
     # we sort the datafraeme of results by best : by=["F1-score]
-    result = result.sort_values(by=["ROC-AUC"], ascending=False)
+    result = result.sort_values(by=["__ROC-AUC__"], ascending=False)
     display(result)
 
     return result
@@ -57,6 +58,7 @@ def confusion(y_test, y_pred):
     :param y_test:
     :param y_pred:
     :return:
+    :rtype: (DataFrame)
     """
     mat = confusion_matrix(y_test, y_pred)  # a numpy array
     mat = pd.DataFrame(mat)
@@ -73,6 +75,7 @@ def evaluate_classification(y_test, y_pred, y_pred_proba):
     :param y_pred:
     :param y_pred_proba:
     :return:
+    :rtype: None
     """
     # 1) Metrics
     print(classification_report(y_test, y_pred))
@@ -110,7 +113,12 @@ def score(estimator, X_train, X_test, y_train, y_test):  ## To delete if not nee
     """
     Computes and prints train score and test score.
     :param estimator:
+    :param X_train:
+    :param X_test:
+    :param y_train:
+    :param y_test:
     :return:
+    :rtype: None
     """
     tr_score = estimator.score(X_train, y_train).round(4)
     te_score = estimator.score(X_test, y_test).round(4)

@@ -16,6 +16,7 @@ def get_client_from_database(client_id, database_name):  # data
     """
     if real_time = True, database_name = "clients_database" for new clients
     :param client_id:
+    :param database_name:
     :return:
     """
     print("__Getting client's application from database__")
@@ -36,6 +37,7 @@ def preprocess_one_application(client_id, database_name="new_clients_database_pr
     """
 
     :param client_id:
+    :param database_name:
     :param real_time:
     :return:
     """

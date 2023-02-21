@@ -1,12 +1,7 @@
+# For v1
 new_clients_database_preprocessed: "resources/data_test_preprocessed_vf.csv.gz"
 known_clients_database_preprocessed: "resources/data_train_preprocessed_vf.csv.gz"
 classifier: "resources/model_LGB.joblib"
-
-# dashboard : selectionner un num de client et ds infos sur lui, feature importance etc
-# score obtenu : proba / accepté ou pas
-# cas réel : ici sûr pas d'ajout de client / dans dashboard : variable avec curseur
-# evaluation sur le dashboard si tout apparait bien et sur modelisation : Grid, SMOTE, fonction cout métier
-# api pas trop
 
 # For v2
 new_clients_database: "dataset/source/application_test.csv"

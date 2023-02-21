@@ -1,39 +1,39 @@
-import requests
-from functions_dashboard import *
+# Importing librairies
+from graphs_dashboard import *
+from dashboard_requests import *
 from utils import *
-import gc
 
+import gc
 import streamlit as st
-import joblib
-import requests
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle, FancyArrowPatch
-from matplotlib.cm import RdYlGn
 from PIL import Image
-from random import randint
 
-from dashboard_requests import *
+#############################################################################
+# TODO : clean code / download folder when building the app
 
-# SHAP : featu importance globale (constt) // local : le client 4 : telle var plus impacte sur son score et diff de feat importance
-# global : 3e dans la lsite mais si client X : 1er revenu
+import os
+from os import listdir
 
-# SMOTE : classes desequilibrées : dummy 0 : pour améliorer score sur classe 1 et réequilibrer dataset
-# voir si ca améliore le score
+this_dir = os.getcwd()
+all_files = [f for f in listdir(this_dir)]
 
+# print("THIS CWD", this_dir)
+# print("ALL FILES : ", all_files)
 
-import subprocess
-print("__Download resources folder__")
-subprocess.call(r'python script_download_data_folder.py', shell=True)
+if "resources" not in all_files:
+    import subprocess
 
-# 0) Config : unzip data and check host if deployment or not
+    print("__Download resources folder__")
+    subprocess.call(r'python script_download_data_folder.py', shell=True)
+    gc.collect()
+
+##############################################################################
+
+# Config :Check host if deployment or not
 
 print("_____Getting config_____")
 config = read_yml("config.yml")
-
-#print("__Unzip model and dataset__")
-#unzip_file(path_to_zip_file=config["resources"]["zip"], directory_to_extract_to=config["resources"]["unzip"])
 
 print("Deployment ? {}".format(config["deploy"]["is"]))
 if config["deploy"]["is"]:
@@ -41,48 +41,38 @@ if config["deploy"]["is"]:
 else:
     HOST = config["deploy"]["dev"]
 
-##################################################################################################################
-
-# 1) Config front-end
+# Config front-end
 print("_____Getting config front-end_____")
 config_front = read_yml("config_frontend.yml")
 
 THRESHOLD = config_front["threshold"]
-# ENDPOINT_GET_CLIENT_DATA = config_front["endpoints"]["endpoint_get_client_data"]
 ENDPOINT_PREDICT = config_front["endpoints"]["endpoint_predict"]
 ENDPOINT_SHAP = config_front["endpoints"]["endpoint_shap"]
 ENDPOINT_CLIENT_DATA = config_front["endpoints"]["endpoint_client_data"]
+ENDPOINT_SHAP_EXPECTED = config_front["endpoints"]["endpoint_shap_expected"]  # TODO clean
+ENDPOINT_FEATURE_IMPORTANCE = config_front["endpoints"]["endpoint_feature_importance"]
+DATA_ALL_CLIENTS_PATH = config_front["known_clients_database_preprocessed"]
 DF_DESCRIPTION = pd.read_csv(config_front["columns_description"], encoding="ISO-8859-1")  # not encoded in utf-8
 
-# TODO add dtype reading !!! https://stackoverflow.com/questions/50047237/how-to-preserve-dtypes-of-dataframes-when-using-to-csv
-DATA_ALL_CLIENTS = pd.read_csv(config_front["known_clients_database_preprocessed"], encoding="utf-8")
-
-# gc.collect()
-
+# Initializing all the global variables
 global CLIENT_ID
-CLIENT_ID = 100001  # 456250
+CLIENT_ID = 100005  # 456250
+
+global NB_FEATURES_TO_PLOT
+NB_FEATURES_TO_PLOT = 2
 
 global CLIENT_JSON
+global CLIENT_DF
+global LIST_FEATURES
+global SELECTED_FEATURE
+global FEATURE_1
+global FEATURE_2
+global PREDICTION
 
 # we initialize the first webview to homepage
 global DASHBOARD_CHOICE
 DASHBOARD_CHOICE = "Homepage"
 
-global PREDICTION
-
-
-#################################################################"
-# TODO refacto
-def load_data():
-    # Load data
-    list_categorical_features = load_data('list_categorical_features')
-    dict_categorical_features = load_data('dict_categorical_features')
-    list_quantitative_features = load_data('list_quantitative_features')
-    list_features_permutation_importances = load_data('list_features_permutation_importances')
-    list_summary_plot_shap = load_data('list_summary_plot_shap')
-
-
-# Web page #########################################################################
 
 def initialize_webview():
     """
@@ -92,6 +82,9 @@ def initialize_webview():
     :return: None
     :rtype: None
     """
+    global DASHBOARD_CHOICE
+    global CLIENT_ID
+
     # Load data
     # Default settings. This must be the first Streamlit command used in your app, and must only be set once.
     st.set_page_config(page_title="Project 7 Dashboard",
@@ -100,44 +93,23 @@ def initialize_webview():
 
     # Sidebar
     with st.sidebar:
-        logo_homecredit = Image.open('./img/Home-Credit-logo.jpg')
+        logo_homecredit = Image.open('./img/Home-Credit-Logo.jpg')
         st.image(logo_homecredit, width=300)
 
         # Dashboard selector
         # st.write('## Menu :')
-        global DASHBOARD_CHOICE
         DASHBOARD_CHOICE = st.radio('Menu', [
-            'Homepage', 'Basic Dashboard', 'Advanced Dashboard',
-            'Exploratory Data Analysis'
-        ])  # label_visibility
+            'Homepage', 'Client dashboard', 'Comparing with previous clients'])  # label_visibility
         st.write('## ')
         st.write('## ')
 
-        if DASHBOARD_CHOICE in ['Basic Dashboard', 'Advanced Dashboard']:
+        if DASHBOARD_CHOICE in ['Client dashboard', 'Comparing with previous clients']:
             # Client selector
-            st.write('## Client ID:')
-
-            global CLIENT_ID
-            CLIENT_ID = st.number_input("Enter client ID", value=100001)
-            st.caption("Example of client predicted negative (no default) : 100001")
+            # st.write('## Client ID:')
+            CLIENT_ID = st.number_input("Enter client ID", value=100005)
+            st.caption("Example of client predicted negative (no default) : 100005")
             st.caption("Example of client predicted positive (credit default) : 456250")
-
             st.caption(" ")
-
-
-        elif DASHBOARD_CHOICE == 'Exploratory Data Analysis':
-            # st.write('## Choose data:')
-            data_choice = st.radio('Choose data',
-                                   ['Overview', 'bureau.csv', 'bureau_balance.csv', 'POS_CASH_balance.csv',
-                                    'credit_card_balance.csv', 'previous_application.csv', 'installments_payments.csv',
-                                    'application_train.csv'])  # , 'application_test.csv']) # label_visibility
-            # data_choice = st.radio('Choose data', [
-            #   'Overview', 'application_train.csv - part 1',
-            #  'application_train.csv - part 2', 'application_train.csv - part 3',
-            # 'bureau.csv', 'bureau_balance.csv', 'POS_CASH_balance.csv',
-            # 'credit_card_balance.csv', 'previous_application.csv',
-            # 'installments_payments.csv'
-            # ])
 
 
 ###################################################################################
@@ -153,23 +125,46 @@ def homepage():
     st.title("Home Credit Default Risk Prediction")
     " "
     " "
-    "This site contains an **interactive dashboard** to explain to the bank's customers the reason of **approval or refusal of their credit applications.**"
-    "Probability of credit default has been calculated by a prediction model based on machine learning."
+    "This webview contains an **interactive dashboard** to explain to the bank's customers the reason of **approval or refusal of their credit application.**"
+    "The probability of credit default has been calculated by a prediction model based on machine learning."
     " "
     " "
-    "The bullet points of the prediction model are:"
-    "- The data used for model training contain the entire set of tables available for the [Home Credit data repository at Kaggle.](https://www.kaggle.com/c/home-credit-default-risk/data)"
-    "- The prediction model used to determine the probability of default of a credit application is based on the **LGBM algorithm** (Light Gradient Boosting Machine)."
-    "- This model has been optimized with the intent to **minimize the buisness cost function** : each defaulting client costs 10 times the gain of a non-defaulting client."
-    f"- The optimization  has lead to an **optimum threshold for the probability of default : {100 * THRESHOLD}%**. In other words, customer with a probability of default below {100 * THRESHOLD}% get their credit accepted, and refused if above {100 * THRESHOLD}%."
+    "There are two views available :"
+    "- A **Client dashboard** version that contains information about the acceptance or the refusal of the client's loan."
+    "=> Global Feature Importance"
+    "=> Local Feature Importance"
     " "
+    "- And **Comparing with previous clients** which is a dashboard that compares the client to previous clients for whom we know if they have repaid or not their loan."
     " "
-    "The dashboard is available in 2 versions:"
-    "- A **basic** version, to be used by customer relation management."
-    "- An **advanced**, more detailed version for deeper understanding of the data."
-    "An **exploratory data analysis** is also available for the raw data used for the LGBM model training."
-    " "
+    "=> Distribution for a chosen feature"
+    "=> Positioning the client compared to previous clients based on two selected features"
 
+
+def initialize_client_dashboard():
+    """
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
+    global CLIENT_ID
+    global CLIENT_JSON
+    global CLIENT_DF
+
+    # Main title of the dashboard
+    st.title(f'Default Risk Prediction for client {CLIENT_ID}')
+
+    # Get client data
+    try:
+        CLIENT_JSON = request_client_data(HOST + ENDPOINT_CLIENT_DATA, CLIENT_ID)
+        CLIENT_DF = json_to_df(CLIENT_JSON)
+    except Exception as e:
+        print("Exception raised while trying to get client data :\n\n", e)
+        st.write('The client with the id {} is not in the database.'.format(CLIENT_ID))
+        return  # to get out of the function
+
+
+###############################################################
 
 def basic_dashboard():
     """
@@ -179,33 +174,28 @@ def basic_dashboard():
     :return: None
     :rtype: None
     """
-    # load_data() # TODO correct
-    global CLIENT_ID
-    global CLIENT_JSON
+    initialize_client_dashboard()
 
-    # Main title of the dashboard
-    st.title(f'Default Risk Prediction for client {CLIENT_ID}')
-
-    # Get client data
-    try:
-        CLIENT_JSON = request_client_data(HOST + ENDPOINT_CLIENT_DATA, CLIENT_ID)
-    except Exception as e:
-        print("Exception raised while trying to get client data :\n\n", e)
-        st.write('The client with the id {} is not in the database.'.format(CLIENT_ID))
-        return  # to get out of the function
-
+    st.header('Result of credit application')
     proba_view()
-    shap_view()
+
+    st.header("Global Feature Importance")
+    global_feature_importance_view()
+    shap_summary_plot_view()
+    "---------------------------"
+    st.header("Local Feature Importance")
+    shap_barplot_view()
+    shap_force_plot_view()
 
 
 def proba_view():
     """
      Result of credit application
+
     :param: None
     :return: None
     :rtype: None
     """
-    st.header('Result of credit application')
     global PREDICTION
     try:
         probability = request_prediction(HOST + ENDPOINT_PREDICT, CLIENT_JSON)
@@ -226,15 +216,15 @@ def proba_view():
         st.write("Couldn't compute probability of loan for client {}...".format(CLIENT_ID))
 
 
-def shap_view():
+def shap_barplot_view():
     """
-    Local SHAP
+    Local SHAP barplot
 
     :param: None
     :return: None
     :rtype: None
     """
-    st.header('Impact of features on prediction')
+    # st.write('')
     try:
         # get shap values for the selected client
         client_shap_json = request_shap(HOST + ENDPOINT_SHAP, CLIENT_JSON)
@@ -244,44 +234,250 @@ def shap_view():
         print("Exception raised :", e)
 
 
+def shap_force_plot_view():
+    """
+    Local SHAP force plot
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
+    st.write('SHAP Force plot')
+    try:
+        # get shap values for the selected client
+        response_shap = request_shap_expected(HOST + ENDPOINT_SHAP_EXPECTED, CLIENT_JSON)
+
+        expected_value = response_shap["expected_value"]  # CF back end doc TODO refacto
+        encoded_numpy_data = response_shap["shap_values"]
+
+        # Deserialization
+        print("Decode JSON serialized NumPy array")
+        decoded_arrays = json.loads(encoded_numpy_data)
+        final_numpy_array = np.asarray(decoded_arrays["array"])
+
+        shap_force_plot(final_numpy_array, expected_value, PREDICTION, CLIENT_DF)
+    except Exception as e:
+        print("Exception raised :", e)
+
+
+def global_feature_importance_view():
+    """
+    :param: None
+    :return: None
+    :rtype: None
+    """
+    global LIST_FEATURES
+    st.write('Global Feature Importance of the model used for the prediction')
+    try:
+        # get global feature importance
+        response = request_feature_importance(HOST + ENDPOINT_FEATURE_IMPORTANCE, CLIENT_JSON)
+        global_feature_importance_barplot(response, DF_DESCRIPTION)
+
+        # here we keep the value ?? for the boxplot ??
+        LIST_FEATURES = list(response.keys())  # the response is a dict {feature: value}
+
+    except Exception as e:
+        print("Exception raised :", e)
+
+
+def shap_summary_plot_view():  # TODO refacto ??
+    """
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
+    st.write('SHAP Feature Importance summary plot')
+    try:
+        # get shap values for the selected client
+        response_shap = request_shap_expected(HOST + ENDPOINT_SHAP_EXPECTED, CLIENT_JSON)
+        encoded_numpy_data = response_shap["shap_values"]
+
+        # Deserialization
+        print("Decode JSON serialized NumPy array")
+        decoded_arrays = json.loads(encoded_numpy_data)
+        final_numpy_array = np.asarray(decoded_arrays["array"])
+        shap_values = list(final_numpy_array)  # TODO refacto / response is an array (2, 1, 777)
+        # or shap_values should be a list of 2 arrays, not an array of two arrays
+
+        st.write("Shows the average impact of the features on the model output")
+        shap_summary_plot(shap_values, CLIENT_DF)
+
+    except Exception as e:
+        print("Exception raised :", e)
+
+
+#################################################################################""
+
+
 def advanced_dashboard():
     """
-    The view will be the same as basic dashboard but we add more information about client compared to other clients in the database
+    The view contains information about the client compared to other clients in the database
     Position of the client vs other clients
 
     :param: None
     :return: None
     :rtype: None
     """
-    global CLIENT_ID
-    st.header('Ranking of the client compared to other clients')
+    initialize_client_dashboard()
+    global NB_FEATURES_TO_PLOT
+    global SELECTED_FEATURE
+    global FEATURE_1
+    global FEATURE_2
 
-    ### TODO ###
+    # to get a list of important features
+    global LIST_FEATURES
+    try:
+        # get global feature importance
+        response = request_feature_importance(HOST + ENDPOINT_FEATURE_IMPORTANCE, CLIENT_JSON)
+        # here we keep the value ?? for the boxplot ??
+        LIST_FEATURES = list(response.keys())  # the response is a dict {feature: value}
+    except Exception as e:
+        print("Exception raised :", e)
+        return
+
+    sidebar_nb_features()
+
+    # Distribution plots
+    selectbox_for_distribution_plots()
+    boxplot_view()
+    hist_view()
+
+    # Bi variate plot
+    selectbox_for_scatterplot()
+    scatter_plot_view()
 
 
-def lineplot_view(feature=""):  ## TODO working on this
+def sidebar_nb_features():
     """
-
-    """
-    # we create a df for the client in json format and add it to the df of all clients
-    df_client = json_to_df(CLIENT_JSON)
-    data_all_clients = add_new_client_to_data_all_clients(DATA_ALL_CLIENTS, df_client, PREDICTION)
-
-    # TODO FINISH function
-    lineplot(DATA_ALL_CLIENTS, df_client, CLIENT_ID, THRESHOLD, feature, DF_DESCRIPTION)
-
-
-def eda_dashboard():
-    """
-    Exploratory Data Analysis graphs
 
     :param: None
     :return: None
     :rtype: None
     """
-    ### TODO ###
-    pass
+    global NB_FEATURES_TO_PLOT
+    global LIST_FEATURES
 
+    st.sidebar.write(' ')
+    NB_FEATURES_TO_PLOT = int(st.sidebar.selectbox(
+        'Number of features to choose from',
+        [2, 3, 4, 5, 6, 7, 8, 9, 10]))
+
+    st.sidebar.write(' ')
+
+    # this is to have a pretty display of all the features in the sidebar
+    s = ""
+    for e in LIST_FEATURES[:NB_FEATURES_TO_PLOT]:
+        s = s + '\n- ' + e
+
+    st.sidebar.write(
+        f'*{str(NB_FEATURES_TO_PLOT)} most impactful features for selected client :* {s}')
+    st.sidebar.write(' ')  # to add a blank space
+
+
+def selectbox_for_distribution_plots():
+    """
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
+    global SELECTED_FEATURE
+    global LIST_FEATURES
+    global NB_FEATURES_TO_PLOT
+    # Positioning of the client with comparison to other clients (choice of feature)
+    "---------------------------"
+    st.header(
+        'Distribution of a selected feature'
+    )
+    SELECTED_FEATURE = st.selectbox(
+        f'Choose a feature among {len(LIST_FEATURES[:NB_FEATURES_TO_PLOT])}',
+        options=LIST_FEATURES[:NB_FEATURES_TO_PLOT])  # to have a maximum number of features to plot
+
+
+def selectbox_for_scatterplot():
+    """
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
+    global FEATURE_1
+    global FEATURE_2
+    global LIST_FEATURES
+    global NB_FEATURES_TO_PLOT
+
+    "---------------------------"
+    st.header(
+        'Comparing the client to previous clients using two selected features'
+    )
+
+    list_for_feature_1 = LIST_FEATURES[:NB_FEATURES_TO_PLOT]
+    FEATURE_1 = st.selectbox(
+        f'Choose the first feature among {len(list_for_feature_1)}',
+        options=list_for_feature_1)  # to have a maximum number of features to plot
+
+    # we remove the feature 1 from the choices for feature 2 ??
+    list_for_feature_2 = list_for_feature_1.copy()
+    list_for_feature_2.remove(FEATURE_1)
+    FEATURE_2 = st.selectbox(
+        f'Choose the second feature among {len(list_for_feature_2)}',
+        options=list_for_feature_2)  # to have a maximum number of features to plot
+
+
+def boxplot_view():
+    """
+
+    :param: None
+    :return: None
+    :rtype: None
+    """
+    st.write(
+        'Box plots for the most importance features using all the known clients and comparing to the current client')
+
+    # we read here the database using only the feature to plot and the index
+    columns_list = [SELECTED_FEATURE, "SK_ID_CURR", "TARGET"]
+    print("__Reading database of all clients for the list of features : ", columns_list)
+    data_all_clients = pd.read_csv(DATA_ALL_CLIENTS_PATH, encoding="utf-8", index_col="SK_ID_CURR",
+                                   usecols=columns_list)
+
+    boxplot_all_clients_compared_to_client_feature_value(data_all_clients, SELECTED_FEATURE, CLIENT_DF)
+
+
+def hist_view():
+    """
+    :param: None
+    :return: None
+    :rtype: None
+    """
+    st.write(
+        'Histograms for the most importance features using all the known clients and comparing to the current client')
+
+    # we read here the database using only the feature to plot and the index
+    columns_list = [SELECTED_FEATURE, "SK_ID_CURR", "TARGET"]
+    print("__Reading database of all clients for the list of features : ", columns_list)
+    data_all_clients = pd.read_csv(DATA_ALL_CLIENTS_PATH, encoding="utf-8", index_col="SK_ID_CURR",
+                                   usecols=columns_list)
+
+    histgram_compared_to_all_clients(data_all_clients, SELECTED_FEATURE, CLIENT_DF)
+
+
+def scatter_plot_view():
+    """
+    :param: None
+    :return: None
+    :rtype: None
+    """
+    # we read here the database using only the feature to plot and the index
+    columns_list = [FEATURE_1, FEATURE_2, "SK_ID_CURR", "TARGET"]
+    print("__Reading database of all clients for the list of features : ", columns_list)
+    data_all_clients = pd.read_csv(DATA_ALL_CLIENTS_PATH, encoding="utf-8", index_col="SK_ID_CURR",
+                                   usecols=columns_list)
+
+    scatterplot_comparing_all_clients(data_all_clients, FEATURE_1, FEATURE_2, CLIENT_DF)
+
+
+#############################################################################################"
 
 def dashboard_view():
     """
@@ -291,32 +487,23 @@ def dashboard_view():
     :return: None
     :rtype: None
     """
-    # Homepage #######################################################
     if DASHBOARD_CHOICE == 'Homepage':
         homepage()
 
-    # Basic and Advanced Dashboards #######################################################
-    elif DASHBOARD_CHOICE in ['Basic Dashboard', 'Advanced Dashboard']:
+    elif DASHBOARD_CHOICE == 'Client dashboard':
         basic_dashboard()
-
-    if DASHBOARD_CHOICE == 'Advanced Dashboard':
+    else:
         advanced_dashboard()
 
-    else:  # EDA graphs
-        eda_dashboard()
-
-
-# analyse sur le client (stat) : sur les 3 var les plus importantes // comaprer avec la moy des clients refusés et acceptes /
-# application_train : SUR UNE VAR moy des clients 0 / moy des clients 1 // place mon client par rapport à eux (revenus)
-# Feature importance SHAP globale change pas (meme graph pour chaque client)
-# feature important SHAP local (à la fin du notebook de prediction)
-# sur DB : ajouter info sur client / genre - salaire - etc
-
-# salaire : si modifie / personne acceptée ou pas (bonus)
 
 ######################################################################
 
 def main():
+    """
+    :param: None
+    :return: None
+    :rtype: None
+    """
     # Sidebar
     initialize_webview()
 
