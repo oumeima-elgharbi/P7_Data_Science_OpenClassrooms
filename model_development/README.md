@@ -68,8 +68,8 @@ download : https://s3-eu-west-1.amazonaws.com/static.oc-static.com/prod/courses/
 
 ## II) Exploratory Data Analysis
 
+- Analysis of raw datasets
 - Graphs
-- SMOTE
 
 ## III) Classification models
 
@@ -77,6 +77,7 @@ download : https://s3-eu-west-1.amazonaws.com/static.oc-static.com/prod/courses/
 - Training
 - GridsearchCV
 - Cross-Validation
+- SMOTE
 
 ## IV) Evaluation
 
