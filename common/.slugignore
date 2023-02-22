@@ -130,7 +130,7 @@ dmypy.json
 .pyre/
 /dataset/
 /other_documents/
-/model_development/
+/modelling/
 /venv/
 /tests/
 /resources/

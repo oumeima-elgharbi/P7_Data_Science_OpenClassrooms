@@ -128,9 +128,9 @@ dmypy.json
 # Pyre type checker
 .idea/
 .pyre/
-/model_development/dataset/
+/modelling/dataset/
 /other_documents/
-/model_development/models/
+/modelling/models/
 /venv/
 /tests/
 /backend/resources/
@@ -139,3 +139,4 @@ dmypy.json
 *.joblib
 *.pkl
 *.gz
+*.json
