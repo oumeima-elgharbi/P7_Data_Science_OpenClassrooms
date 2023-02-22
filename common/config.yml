@@ -4,6 +4,7 @@ deploy:
   dev: 'http://127.0.0.1:8000'
   prod_api: 'https://p7-data-science-oc-api.herokuapp.com'
 
+# not used anymore :
 resources:
   zip: "resources.zip"
   unzip: ""

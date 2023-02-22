@@ -1,8 +1,16 @@
 columns_description: "resources/HomeCredit_columns_description.csv"
-threshold: 0.4
+known_clients_database_preprocessed: "resources/data_train_preprocessed_vf.csv.gz"
+
+threshold: 0.3
 endpoints:
-  endpoint_get_client_data: "/clients/{}"
+  #endpoint_get_client_data: "/clients/{}"
   endpoint_predict: "/predict"
   endpoint_shap: "/shap"
   endpoint_client_data: "/client_data"
+
+
+  endpoint_shap_expected: "/shap_expected" # TODO clean
+  endpoint_feature_importance: "/feature_importance" # TODO clean
+
+
 

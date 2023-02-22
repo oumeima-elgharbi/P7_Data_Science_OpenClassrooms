@@ -45,7 +45,7 @@ def df_to_json(client_df):
     return client_json
 
 
-def unzip_file(path_to_zip_file, directory_to_extract_to):
+def unzip_file(path_to_zip_file, directory_to_extract_to):  # TODO delete ? not used anymore
     """
 
     :param path_to_zip_file: (string)

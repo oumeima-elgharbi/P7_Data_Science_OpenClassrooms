@@ -12,19 +12,14 @@ print("_____Preprocessing : getting config_____")
 config_back = read_yml("config_backend.yml")
 
 
-def get_client_from_database(client_id, real_time=False):  # data
+def get_client_from_database(client_id, database_name):  # data
     """
-
+    if real_time = True, database_name = "clients_database" for new clients
     :param client_id:
-    :param real_time: if False, we return the preprocessed client's application
+    :param database_name:
     :return:
     """
     print("__Getting client's application from database__")
-    if not real_time:
-        database_name = "clients_database_preprocessed"
-    else:
-        database_name = "clients_database"
-
     with pd.read_csv(config_back[database_name], index_col="SK_ID_CURR", chunksize=10000) as reader:
         for data in reader:
             # print("\nHERE :", data.info(verbose=False, memory_usage="deep"), end="\n\n")
@@ -35,21 +30,23 @@ def get_client_from_database(client_id, real_time=False):  # data
     # if we get here it means the client was not found in the database
     print("__Client not found in database__")
     gc.collect()  # collects for last loop
-    return None
+    raise Exception("Client not in database")
 
 
-def preprocess_one_application(client_id, real_time=False):  # data
+def preprocess_one_application(client_id, database_name="new_clients_database_preprocessed", real_time=False):  # data
     """
 
     :param client_id:
+    :param database_name:
     :param real_time:
     :return:
     """
-    if not real_time:
-        preprocessed_client = get_client_from_database(client_id, real_time=False)
+    if not real_time:  # TODO add option for database name
+        preprocessed_client = get_client_from_database(client_id, database_name)
     else:
         print("__Getting client's application from database__")
-        client = get_client_from_database(client_id, real_time=True)
+        client = get_client_from_database(client_id, database_name)
+
         preprocessed_client = {}
 
         print("Preprocessing for selected client")
