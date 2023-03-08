@@ -13,8 +13,6 @@ Permettre de visualiser des informations descriptives relatives à un client (vi
 Permettre de comparer les informations descriptives relatives à un client à l’ensemble des clients ou à un groupe de
 clients similaires.
 
-bouger chiffre client et changer var globale (exemple : income)
-
 ## II) Run
 
 - url development :  **http://localhost:8501/**
@@ -25,7 +23,7 @@ To run the back-end from the root of the repository (we only have one repository
 We separated the front-end from the back-end in two different repositories.
 
 ```bash
-cd front_end
+cd frontend
 streamlit run dashboard.py
 ```
 

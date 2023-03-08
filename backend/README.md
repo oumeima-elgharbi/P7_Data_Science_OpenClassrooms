@@ -54,7 +54,7 @@ To run the back-end from the root of the repository (we only have one repository
 We separated the front-end from the back-end in two different repositories.
 
 ```bash
-cd back_end
+cd backend
 uvicorn main:app --reload 
 ```
 
